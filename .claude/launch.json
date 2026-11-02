@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "loot-lift-pwa",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd /private/tmp/claude-502/-Users-kids-Desktop-nehemiah-apps/da4b95c7-a671-4837-b254-67393e4fb809/scratchpad/pwa && exec python3 -m http.server 8765"],
+      "port": 8765
+    }
+  ]
+}

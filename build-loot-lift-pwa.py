@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+"""Build the installable (PWA) version of Rep Quest.
+
+Reads loot-lift.html (the app page) and writes loot-lift-pwa/:
+  index.html, manifest.webmanifest, sw.js, icons/*.png
+
+Run it again after changing loot-lift.html:  python3 build-loot-lift-pwa.py
+"""
+import hashlib
+import json
+import math
+import struct
+import zlib
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+SRC = HERE / "loot-lift.html"
+OUT = HERE / "loot-lift-pwa"
+
+BG = (0x14, 0x16, 0x1B)
+RED = (0xE0, 0x39, 0x3E)
+RED_DARK = (0xB8, 0x2A, 0x30)
+HUB = (0x3A, 0x3F, 0x4A)
+HOLE = (0x0C, 0x0D, 0x10)
+
+
+def write_png(path, size, pixel):
+    rows = bytearray()
+    for y in range(size):
+        rows.append(0)
+        for x in range(size):
+            rows.extend(pixel(x, y))
+    def chunk(tag, data):
+        return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
+    png = b"\x89PNG\r\n\x1a\n"
+    png += chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 2, 0, 0, 0))
+    png += chunk(b"IDAT", zlib.compress(bytes(rows), 9))
+    png += chunk(b"IEND", b"")
+    path.write_bytes(png)
+
+
+def plate_icon(size, plate_scale):
+    """A red 25 kg bumper plate on the gym-floor background, 2x2 supersampled."""
+    c = size / 2
+    R = size * plate_scale
+    layers = [  # (outer radius as fraction of plate radius, color), drawn outside-in
+        (1.00, RED), (0.80, RED_DARK), (0.77, RED), (0.30, HUB), (0.20, HOLE),
+    ]
+
+    def color_at(px, py):
+        d = math.hypot(px - c, py - c) / R
+        col = BG
+        for r, k in layers:
+            if d <= r:
+                col = k
+        # soft drop shadow under the plate
+        if d > 1.0 and col == BG:
+            sd = math.hypot(px - c, py - c - size * 0.025) / R
+            if sd <= 1.0:
+                col = tuple(int(v * 0.55) for v in BG)
+        return col
+
+    offs = (0.25, 0.75)
+
+    def pixel(x, y):
+        acc = [0, 0, 0]
+        for oy in offs:
+            for ox in offs:
+                k = color_at(x + ox, y + oy)
+                for i in range(3):
+                    acc[i] += k[i]
+        return bytes(v // 4 for v in acc)
+
+    return pixel
+
+
+def build():
+    OUT.mkdir(exist_ok=True)
+    (OUT / "icons").mkdir(exist_ok=True)
+
+    # icons: "any" icons fill more of the square; maskable keeps the plate inside the safe zone
+    write_png(OUT / "icons/icon-192.png", 192, plate_icon(192, 0.44))
+    write_png(OUT / "icons/icon-512.png", 512, plate_icon(512, 0.44))
+    write_png(OUT / "icons/maskable-512.png", 512, plate_icon(512, 0.34))
+    write_png(OUT / "icons/apple-touch-icon.png", 180, plate_icon(180, 0.38))
+
+    src = SRC.read_text(encoding="utf-8")
+    split = src.index('<div class="app">')
+    head_bits, body = src[:split], src[split:]
+    index = (
+        "<!doctype html>\n<html lang=\"en\">\n<head>\n"
+        "<meta charset=\"utf-8\">\n"
+        "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\">\n"
+        "<link rel=\"manifest\" href=\"manifest.webmanifest\">\n"
+        "<link rel=\"icon\" type=\"image/png\" href=\"icons/icon-192.png\">\n"
+        "<link rel=\"apple-touch-icon\" href=\"icons/apple-touch-icon.png\">\n"
+        "<meta name=\"apple-mobile-web-app-title\" content=\"Rep Quest\">\n"
+        "<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"black-translucent\">\n"
+        "<meta name=\"mobile-web-app-capable\" content=\"yes\">\n"
+        "<style>:root{padding-top:env(safe-area-inset-top,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n"
+        "<script>window.LOOTLIFT_PWA = true;</script>\n"
+        + head_bits.strip() + "\n</head>\n<body>\n" + body.strip() + "\n</body>\n</html>\n"
+    )
+    (OUT / "index.html").write_text(index, encoding="utf-8")
+
+    manifest = {
+        "name": "Rep Quest",
+        "short_name": "Rep Quest",
+        "description": "Random workouts that earn loot crates to decorate your own gym.",
+        "id": "./",
+        "start_url": "./",
+        "scope": "./",
+        "display": "standalone",
+        "orientation": "portrait",
+        "background_color": "#14161b",
+        "theme_color": "#14161b",
+        "categories": ["health", "fitness", "games"],
+        "icons": [
+            {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+            {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+            {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        ],
+    }
+    (OUT / "manifest.webmanifest").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    shell = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png",
+             "./icons/icon-512.png", "./icons/maskable-512.png", "./icons/apple-touch-icon.png"]
+    version = hashlib.sha1(index.encode()).hexdigest()[:10]
+    sw = f"""// Rep Quest service worker. Generated by build-loot-lift-pwa.py; edit the script, not this file.
+const CACHE = "loot-lift-{version}";
+const TRACKER_CACHE = "rep-tracker-v1";
+const SHELL = {json.dumps(shell)};
+
+self.addEventListener("install", e => {{
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+}});
+
+self.addEventListener("activate", e => {{
+  e.waitUntil(caches.keys()
+    .then(keys => Promise.all(keys.filter(k => k.startsWith("loot-lift-") && k !== CACHE).map(k => caches.delete(k))))
+    .then(() => self.clients.claim()));
+}});
+
+self.addEventListener("fetch", e => {{
+  const req = e.request;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+
+  // The app page: try the network first so updates show up, fall back to the saved copy offline.
+  if (req.mode === "navigate") {{
+    e.respondWith(fetch(req).then(res => {{
+      const copy = res.clone(); caches.open(CACHE).then(c => c.put("./index.html", copy)); return res;
+    }}).catch(() => caches.match("./index.html")));
+    return;
+  }}
+
+  // Google Fonts: serve the saved copy right away, refresh it in the background.
+  if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com") {{
+    e.respondWith(caches.open(CACHE).then(async c => {{
+      const hit = await c.match(req);
+      const net = fetch(req).then(res => {{ if (res.ok || res.type === "opaque") c.put(req, res.clone()); return res; }}).catch(() => hit);
+      return hit || net;
+    }}));
+    return;
+  }}
+
+  // Body tracker code and model (pinned versions that never change): download once, keep for offline.
+  // Kept in their own cache so app updates don't make people download them again.
+  if ((url.hostname === "cdn.jsdelivr.net" && url.pathname.startsWith("/npm/@mediapipe/tasks-vision@")) ||
+      (url.hostname === "storage.googleapis.com" && url.pathname.startsWith("/mediapipe-models/"))) {{
+    e.respondWith(caches.open(TRACKER_CACHE).then(async c => {{
+      const hit = await c.match(req);
+      if (hit) return hit;
+      const res = await fetch(req);
+      if (res.ok) c.put(req, res.clone());
+      return res;
+    }}));
+    return;
+  }}
+
+  if (url.origin === self.location.origin) {{
+    e.respondWith(caches.match(req).then(hit => hit || fetch(req)));
+  }}
+}});
+"""
+    (OUT / "sw.js").write_text(sw, encoding="utf-8")
+    print(f"Built {OUT} (cache {version})")
+
+
+if __name__ == "__main__":
+    build()

@@ -1,0 +1,1597 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Rep Quest">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<style>:root{padding-top:env(safe-area-inset-top,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<script>window.LOOTLIFT_PWA = true;</script>
+<title>Rep Quest</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#14161b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+/* Layout: phone-shaped app shell (max 480px, centered on desktop) on a rubber gym floor; fixed bottom tab bar.
+   Workout tiers are colored like Olympic bumper plates: 10 kg green, 15 kg yellow, 20 kg blue, 25 kg red. */
+:root {
+  color-scheme: dark;
+  --floor: #14161b;
+  --panel: #1e2129;
+  --panel-2: #282c36;
+  --line: #343946;
+  --chalk: #eef0f3;
+  --dim: #9097a6;
+  --p10: #2fae5b;
+  --p15: #f2c230;
+  --p20: #2f74d8;
+  --p25: #e0393e;
+  --r0: #a3abb9;
+  --r1: #4fa3ff;
+  --r2: #b46cff;
+  --r3: #ffb627;
+  --r4: #ff4fa3;
+  --r5: #ff7a1a;
+  --rainbow: linear-gradient(90deg, #ff3b3b, #ffb627, #f2ff3b, #3bff8a, #3bb5ff, #b46cff, #ff4fa3);
+  --ink: #101216;
+  --display: "Saira Stencil One", "Impact", "Arial Narrow Bold", sans-serif;
+  --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --label: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --nav-h: 64px;
+}
+html, body { background: var(--floor); color: var(--chalk); }
+[hidden] { display: none !important; }
+body {
+  font-family: var(--body); font-size: 16px; line-height: 1.45;
+  background:
+    radial-gradient(circle at 20% 10%, #ffffff06 0 1px, transparent 1px) 0 0 / 7px 7px,
+    radial-gradient(circle at 70% 60%, #00000040 0 1px, transparent 1px) 0 0 / 5px 5px,
+    var(--floor);
+  -webkit-tap-highlight-color: transparent;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--floor); }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--chalk); outline-offset: 2px; }
+.app {
+  max-width: 480px; margin: 0 auto; min-height: 100%;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px calc(var(--nav-h) + 24px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+/* ---------- header ---------- */
+.top { display: flex; flex-direction: column; gap: 12px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--floor); padding-block: 8px 10px; border-bottom: 1px solid var(--line); }
+.brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { font-family: var(--display); font-size: 28px; letter-spacing: .02em; line-height: 1; margin: 0; }
+.brand span { color: var(--p25); }
+.lvl { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.lvl-badge { font-family: var(--label); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; background: var(--chalk); color: var(--ink); padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+.xpbar { flex: 1; height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; min-width: 70px; }
+.xpbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--p10), var(--p15), var(--p20), var(--p25)); border-radius: inherit; transition: width .5s; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.stat { background: var(--panel); border-radius: 8px; padding: 6px 8px; display: flex; flex-direction: column; }
+.stat b { font-family: var(--label); font-size: 20px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat small { font-family: var(--label); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+
+/* ---------- bottom nav ---------- */
+.nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
+}
+.nav-inner { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); height: var(--nav-h); }
+.nav button { background: none; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--dim); font-family: var(--label); font-weight: 600; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; position: relative; }
+.nav button svg { width: 24px; height: 24px; }
+.nav button[aria-selected="true"] { color: var(--chalk); }
+.nav button[aria-selected="true"]::after { content: ""; position: absolute; top: 0; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; background: var(--p25); }
+.nav .badge { position: absolute; top: 8px; left: calc(50% + 6px); background: var(--p25); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 9px; display: grid; place-items: center; padding: 0 4px; letter-spacing: 0; }
+
+/* ---------- generic ---------- */
+h2 { font-family: var(--display); font-size: 22px; font-weight: 400; margin: 0; line-height: 1.1; text-wrap: balance; }
+.eyebrow { font-family: var(--label); font-weight: 600; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+.card { background: var(--panel); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.spacer { flex: 1; }
+.btn { border: 0; border-radius: 10px; padding: 14px 18px; font-family: var(--label); font-weight: 700; font-size: 17px; letter-spacing: .06em; text-transform: uppercase; background: var(--panel-2); color: var(--chalk); min-height: 50px; }
+.btn.primary { background: var(--chalk); color: var(--ink); }
+.btn.go { background: var(--tc, var(--p10)); color: var(--ink); }
+.btn.ghost { background: transparent; border: 1px solid var(--line); }
+.btn.wide { width: 100%; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.muted { color: var(--dim); }
+.note { font-size: 14px; color: var(--dim); margin: 0; }
+section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
+
+/* ---------- plates (tier picker) ---------- */
+.plates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.plate { background: none; border: 0; padding: 4px 0 0; display: flex; flex-direction: column; align-items: center; gap: 6px; border-radius: 12px; }
+.plate .disc {
+  width: 100%; max-width: 76px; aspect-ratio: 1; border-radius: 50%; position: relative;
+  background:
+    radial-gradient(circle, #0c0d10 0 13%, #3a3f4a 13.5% 17%, transparent 17.5%),
+    radial-gradient(circle, transparent 0 62%, #00000033 62.5% 64%, transparent 64.5%),
+    var(--tc);
+  box-shadow: inset 0 -5px 0 #00000040, 0 4px 0 #00000055;
+  display: grid; place-items: center; transition: transform .15s;
+}
+.plate .disc b { position: absolute; top: 12%; font-family: var(--label); font-weight: 700; font-size: 13px; color: var(--ink); opacity: .85; }
+.plate .nm { font-family: var(--label); font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); }
+.plate[aria-pressed="true"] .disc { transform: scale(1.06); outline: 3px solid var(--chalk); outline-offset: 3px; }
+.plate[aria-pressed="true"] .nm { color: var(--chalk); }
+.plate:disabled { opacity: .35; cursor: not-allowed; }
+.tierinfo { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-family: var(--label); font-size: 14px; letter-spacing: .04em; color: var(--dim); }
+.tierinfo b { color: var(--chalk); }
+
+/* ---------- workout ---------- */
+.wo-head { display: flex; align-items: flex-start; gap: 12px; }
+.wo-head .tchip { font-family: var(--label); font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: var(--tc); color: var(--ink); padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+.wo-meta { display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--label); font-size: 15px; color: var(--dim); }
+.wo-meta b { color: var(--chalk); font-variant-numeric: tabular-nums; }
+.exlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ex { display: flex; align-items: center; gap: 12px; background: var(--panel-2); border-radius: 10px; padding: 12px; min-height: 56px; }
+.ex input { width: 26px; height: 26px; accent-color: var(--tc); flex: none; }
+.ex label { flex: 1; min-width: 0; display: flex; flex-direction: column; cursor: pointer; }
+.ex .nm { font-weight: 600; }
+.ex .hint { font-size: 13px; color: var(--dim); }
+.ex .amt { font-family: var(--label); font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ex.done { opacity: .55; }
+.ex.done .nm { text-decoration: line-through; }
+.ex input:disabled + label { cursor: default; }
+.timer { font-family: var(--label); font-weight: 700; font-size: 44px; line-height: 1; font-variant-numeric: tabular-nums; }
+.lockline { font-family: var(--label); font-size: 15px; color: var(--dim); }
+.earned { align-items: center; text-align: center; }
+
+/* ---------- crates ---------- */
+.crate {
+  --cw: 110px;
+  width: var(--cw); aspect-ratio: 1.15; position: relative; border-radius: 6px;
+  background:
+    linear-gradient(90deg, #00000038 0 9%, transparent 9% 91%, #00000038 91%),
+    linear-gradient(0deg, #00000030 0 10%, transparent 10% 74%, #ffffff26 74% 77%, #00000030 77%),
+    var(--tc);
+  box-shadow: inset 0 0 0 3px #00000040, 0 6px 0 #00000066;
+  display: grid; place-items: center;
+}
+.crate::after { content: attr(data-label); font-family: var(--display); font-size: calc(var(--cw) * .13); color: var(--ink); opacity: .78; margin-top: 14%; }
+.crate.glow { box-shadow: inset 0 0 0 3px #00000040, 0 6px 0 #00000066, 0 0 calc(var(--cw) * .22) var(--tc); }
+.crate.top {
+  background:
+    linear-gradient(90deg, #00000038 0 9%, transparent 9% 91%, #00000038 91%),
+    linear-gradient(0deg, #00000030 0 10%, transparent 10% 74%, #ffffff40 74% 77%, #00000030 77%),
+    var(--rainbow);
+  background-size: 100% 100%, 100% 100%, 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer { to { background-position: 0 0, 0 0, 200% 0; } }
+.rainbow-text { background: var(--rainbow); -webkit-background-clip: text; background-clip: text; color: transparent !important; }
+.crate::before { content: ""; position: absolute; left: 42%; right: 42%; top: 18%; height: 14%; background: #0000004d; border-radius: 3px; }
+.crategrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+.cratecard { background: var(--panel-2); border-radius: 12px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.cratecard .nm { font-family: var(--label); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: 14px; }
+.odds { display: flex; height: 8px; border-radius: 4px; overflow: hidden; width: 100%; }
+.odds i { display: block; height: 100%; }
+.loglist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.loglist li { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+.loglist .em { font-size: 22px; width: 28px; text-align: center; }
+.rtag { font-family: var(--label); font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--rc); }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; }
+.legend span { display: flex; align-items: center; gap: 5px; font-family: var(--label); font-size: 13px; color: var(--dim); }
+.legend i { width: 10px; height: 10px; border-radius: 2px; background: var(--rc); }
+
+/* ---------- gym room ---------- */
+.room { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); position: relative; user-select: none; }
+.wall { padding: 12px 10px 14px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; min-height: 96px; align-items: center; position: relative; }
+.wall::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: #00000059; }
+.flr { padding: 10px 8px 12px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px 6px; }
+.slot { aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center; position: relative; background: none; border: 0; padding: 0; min-width: 0; }
+.wall .slot { background: #ffffff0a; border: 1px dashed #ffffff1f; }
+.flr .slot::before { content: ""; position: absolute; left: 14%; right: 14%; bottom: 8%; height: 16%; border-radius: 50%; background: #00000038; }
+.slot.filled::before { background: radial-gradient(closest-side, var(--rc), transparent); opacity: .55; }
+.wall .slot.filled { border-style: solid; border-color: transparent; background: #00000026; box-shadow: 0 0 14px -4px var(--rc); }
+.sprite { font-size: clamp(22px, 8vw, 34px); line-height: 1; position: relative; filter: drop-shadow(0 3px 2px #00000066); }
+.flr .r0 .sprite { transform: scale(.82) translateY(4px); }
+.flr .r2 .sprite { transform: scale(1.12); }
+.neon { font-family: var(--display); font-size: clamp(9px, 2.7vw, 12px); color: #fff; text-shadow: 0 0 4px var(--rc), 0 0 10px var(--rc), 0 0 18px var(--rc); line-height: 1; text-align: center; }
+.room.placing .slot.target { outline: 2px dashed var(--chalk); outline-offset: -2px; animation: pulse 1.1s infinite; }
+@keyframes pulse { 50% { background-color: #ffffff22; } }
+.room-label { position: absolute; top: 6px; right: 8px; font-family: var(--label); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #ffffff80; z-index: 1; pointer-events: none; }
+
+/* wall skins */
+.wall.sk-concrete { background: linear-gradient(180deg, #3b404b, #2e323b); }
+.wall.sk-brick {
+  background-color: #7a3a2c;
+  background-image:
+    linear-gradient(0deg, #4b2219 2px, transparent 2px),
+    linear-gradient(90deg, #4b2219 2px, transparent 2px),
+    linear-gradient(90deg, #4b2219 2px, transparent 2px);
+  background-size: 100% 18px, 36px 36px, 36px 36px;
+  background-position: 0 0, 0 0, 18px 18px;
+}
+.wall.sk-neon { background: radial-gradient(120% 90% at 50% 0%, #3d1460, #160a26 70%); box-shadow: inset 0 3px 0 #ff3cf0, inset 0 -11px 0 -3px #22e6ff; }
+.wall.sk-galaxy {
+  background:
+    radial-gradient(1px 1px at 10% 30%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 35% 70%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 62% 22%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 82% 60%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 50% 50%, #cfd8ff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 92% 15%, #fff 50%, transparent 51%),
+    radial-gradient(60% 90% at 25% 40%, #5b2ca0aa, transparent), radial-gradient(60% 80% at 80% 70%, #1f6fb0aa, transparent), #0a0b1e;
+}
+/* floor skins */
+.flr.sk-plain { background: linear-gradient(180deg, #23262d, #1a1c22); }
+.flr.sk-rubber { background-color: #17181c; background-image: linear-gradient(45deg, #222429 25%, transparent 25%, transparent 75%, #222429 75%), linear-gradient(45deg, #222429 25%, transparent 25%, transparent 75%, #222429 75%); background-size: 28px 28px; background-position: 0 0, 14px 14px; }
+.flr.sk-court { background: repeating-linear-gradient(90deg, #b9824a 0 22px, #a8733f 22px 23px, #c48e55 23px 45px, #a8733f 45px 46px); box-shadow: inset 0 10px 0 -6px #ffffffb0; }
+.flr.sk-gold { background: linear-gradient(135deg, #8a6417, #f3c64b 30%, #b88a24 55%, #ffe08a 75%, #9b7019); }
+.wall.sk-lava {
+  background:
+    radial-gradient(40% 30% at 20% 80%, #ff7a1a99, transparent), radial-gradient(30% 40% at 75% 30%, #ff3d1a80, transparent),
+    repeating-linear-gradient(115deg, transparent 0 26px, #ff6a1acc 26px 28px, transparent 28px 60px),
+    repeating-linear-gradient(35deg, transparent 0 40px, #ff9a3a99 40px 41px, transparent 41px 90px),
+    #24100a;
+}
+.flr.sk-clouds {
+  background:
+    radial-gradient(28% 40% at 15% 30%, #fff, transparent 70%), radial-gradient(30% 45% at 55% 70%, #fff, transparent 70%),
+    radial-gradient(25% 35% at 88% 25%, #fff, transparent 70%), linear-gradient(180deg, #a9d6ff, #e4f3ff);
+}
+.wall.sk-arena {
+  background:
+    conic-gradient(from 160deg at 18% 0%, transparent, #fff8d655 8deg, transparent 22deg),
+    conic-gradient(from 178deg at 50% 0%, transparent, #fff8d666 8deg, transparent 18deg),
+    conic-gradient(from 196deg at 82% 0%, transparent, #fff8d655 8deg, transparent 22deg),
+    radial-gradient(circle, #ffffff40 1px, transparent 1.5px) 0 60% / 9px 9px,
+    linear-gradient(180deg, #0d1226, #222c55);
+}
+.flr.sk-platform {
+  background:
+    linear-gradient(90deg, #111 0 14%, transparent 14% 86%, #111 86%),
+    repeating-linear-gradient(90deg, #c99358 0 30px, #b88247 30px 31px),
+    #c99358;
+}
+.wall.sk-lockers {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 6px, #00000040 6px 7px) 0 8px / 100% 22px no-repeat,
+    repeating-linear-gradient(90deg, #4a5b73 0 34px, #22293a 34px 36px);
+}
+.flr.sk-track { background: repeating-linear-gradient(0deg, #b5452f 0 26px, #f2e9e4 26px 28px); }
+.flr.sk-turf {
+  background:
+    linear-gradient(90deg, transparent 0 49.5%, #ffffffb0 49.5% 50.5%, transparent 50.5%),
+    repeating-linear-gradient(90deg, #2f8f3a 0 30px, #2a8034 30px 60px);
+}
+.slot.top::before { background: conic-gradient(#ff3b3b, #ffb627, #3bff8a, #3bb5ff, #b46cff, #ff3b3b); opacity: .7; filter: blur(4px); }
+.reveal.top .rays { background: repeating-conic-gradient(#ff3b3b 0 6deg, transparent 6deg 12deg, #ffb627 12deg 18deg, transparent 18deg 24deg, #3bff8a 24deg 30deg, transparent 30deg 36deg, #3bb5ff 36deg 42deg, transparent 42deg 48deg, #b46cff 48deg 54deg, transparent 54deg 60deg); opacity: .7; }
+.rtag.rainbow-text, .eyebrow .rainbow-text { color: transparent; }
+
+/* placing banner + inventory */
+.banner { display: flex; align-items: center; gap: 10px; background: var(--chalk); color: var(--ink); border-radius: 10px; padding: 10px 12px; font-weight: 600; }
+.banner .em { font-size: 24px; }
+.banner button { margin-left: auto; background: var(--ink); color: var(--chalk); border: 0; border-radius: 8px; padding: 8px 12px; font-family: var(--label); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.invgroup { display: flex; flex-direction: column; gap: 8px; }
+.invgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.item { background: var(--panel-2); border: 1px solid transparent; border-radius: 12px; padding: 10px 6px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; text-align: center; min-width: 0; }
+.item .em { font-size: 30px; line-height: 1.1; }
+.item .nm { font-size: 13px; font-weight: 600; line-height: 1.2; }
+.item .ct { position: absolute; top: 6px; right: 8px; font-family: var(--label); font-weight: 700; font-size: 13px; color: var(--dim); }
+.item[aria-pressed="true"] { border-color: var(--chalk); }
+.item .got { color: var(--p10); }
+.item.missing > :not(.nm):not(.kind) { opacity: .35; filter: grayscale(1); }
+.item.missing .nm { color: var(--dim); }
+.kind { font-size: 12px; color: var(--dim); }
+.fold { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: 0; padding: 4px 0; min-height: 44px; text-align: left; }
+.fold .chev { width: 22px; height: 22px; flex: none; display: grid; place-items: center; color: var(--dim); transition: transform .2s; }
+.fold[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.item::before { content: ""; position: absolute; left: 8px; right: 8px; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: var(--rc); }
+.swatch { width: 44px; height: 30px; border-radius: 6px; border: 1px solid #ffffff30; }
+.styles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stylebox { background: var(--panel-2); border-radius: 10px; padding: 10px; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.stylebox > div { min-width: 0; flex: 1; }
+.stylebox small { display: block; }
+.stylebox button { background: none; border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; font-size: 12px; font-family: var(--label); letter-spacing: .06em; text-transform: uppercase; }
+
+/* ---------- leaderboard ---------- */
+.seg { display: inline-flex; background: var(--panel-2); border-radius: 10px; padding: 3px; }
+.seg button { border: 0; background: none; padding: 8px 12px; border-radius: 8px; font-family: var(--label); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: 14px; color: var(--dim); }
+.seg button[aria-pressed="true"] { background: var(--chalk); color: var(--ink); }
+.board { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.lb { display: grid; grid-template-columns: 34px 38px 1fr auto; align-items: center; gap: 10px; background: var(--panel-2); border-radius: 12px; padding: 10px 12px; width: 100%; border: 1px solid transparent; text-align: left; }
+.lb.me { border-color: var(--chalk); }
+.lb .rk { font-family: var(--display); font-size: 20px; text-align: center; color: var(--dim); }
+.board li:nth-child(1) .rk { color: var(--r3); }
+.board li:nth-child(2) .rk { color: #d6dbe4; }
+.board li:nth-child(3) .rk { color: #d08a54; }
+.lb img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
+.lb .who { min-width: 0; }
+.lb .who b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb .who small { color: var(--dim); font-size: 13px; }
+.lb .sc { text-align: right; font-family: var(--label); font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.lb .sc small { display: block; font-size: 11px; letter-spacing: .1em; color: var(--dim); text-transform: uppercase; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--line); font-family: var(--display); font-size: 18px; }
+input[type="text"] { flex: 1; min-width: 0; font: inherit; font-size: 17px; color: var(--chalk); background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-height: 50px; }
+input[type="text"]::placeholder { color: var(--dim); }
+.player { font-family: var(--label); font-weight: 600; font-size: 14px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 9em; }
+.install { display: flex; align-items: center; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 14px; }
+.install p { margin: 0; flex: 1; min-width: 0; }
+.install .x { background: none; border: 0; color: var(--dim); font-size: 20px; padding: 4px 8px; }
+.install .btn { min-height: 40px; padding: 8px 14px; font-size: 15px; }
+.syncnote { font-size: 13px; color: var(--dim); display: flex; gap: 8px; align-items: center; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); flex: none; }
+.dot.on { background: var(--p10); }
+.empty { text-align: center; padding: 24px 12px; color: var(--dim); }
+
+/* ---------- overlays ---------- */
+.overlay { position: fixed; inset: 0; z-index: 40; background: #07080bf0; display: flex; align-items: center; justify-content: center; padding: max(20px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.overlay[hidden] { display: none !important; }
+.ov-inner { width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center; position: relative; max-height: 100%; overflow-y: auto; }
+.ov-inner.left { text-align: left; align-items: stretch; }
+#crateOvInner { overflow: visible; }
+#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 41; }
+.bigcrate { --cw: 180px; }
+.bigcrate.shake { animation: shake .9s ease-in-out; }
+@keyframes shake {
+  0%,100% { transform: none; } 10% { transform: rotate(-6deg) scale(1.02); } 20% { transform: rotate(6deg); } 30% { transform: rotate(-8deg) scale(1.05); }
+  40% { transform: rotate(8deg); } 55% { transform: rotate(-10deg) scale(1.08); } 70% { transform: rotate(10deg) scale(1.1); } 85% { transform: scale(1.18); }
+}
+.reveal { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; }
+.reveal .rays { position: absolute; width: 300px; height: 300px; top: 50%; left: 50%; margin: -170px 0 0 -150px; background: repeating-conic-gradient(var(--rc) 0 8deg, transparent 8deg 24deg); border-radius: 50%; mask: radial-gradient(closest-side, #000 20%, transparent); -webkit-mask: radial-gradient(closest-side, #000 20%, transparent); opacity: .5; animation: spin 9s linear infinite; z-index: -1; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.reveal .big { font-size: 96px; line-height: 1; animation: pop .5s cubic-bezier(.2, 1.6, .4, 1) both; filter: drop-shadow(0 6px 10px #000a); }
+.reveal .big.neon { font-size: 36px; padding: 18px 0; }
+@keyframes pop { from { transform: scale(.2); opacity: 0; } }
+.reveal .rname { font-family: var(--display); font-size: 28px; line-height: 1.1; }
+.reveal .rtag { font-size: 16px; }
+.reveal .rdesc { color: var(--dim); font-size: 15px; margin: 0; max-width: 32ch; }
+.tapopen { font-family: var(--label); font-size: 16px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.ov-actions { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.closex { position: absolute; top: 0; right: 0; background: var(--panel-2); border: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; }
+
+/* ---------- camera rep check ---------- */
+.scanbtn { flex: none; display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 9px; padding: 0 12px; min-height: 40px; background: var(--tc); color: var(--ink); font-family: var(--label); font-weight: 700; font-size: 15px; letter-spacing: .06em; text-transform: uppercase; }
+.scanbtn:disabled { opacity: .4; cursor: not-allowed; }
+.camicon { display: grid; place-items: center; }
+.scanned { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--p10); color: var(--ink); font-weight: 700; font-size: 20px; }
+.exlabel { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.overlay.cam { padding: 0; background: #000; display: block; }
+.overlay.cam video, .overlay.cam canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+.cam-ui {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  color: #fff; text-shadow: 0 1px 3px #000c; pointer-events: none;
+}
+.cam-ui button { pointer-events: auto; }
+.cam-top { display: flex; flex-direction: column; gap: 4px; max-width: 480px; }
+.cam-top .eyebrow { color: #ffffffcc; }
+.cam-tip { font-size: 15px; color: #ffffffd9; }
+.cam-count { align-self: center; display: flex; align-items: baseline; gap: 8px; font-family: var(--display); line-height: 1; }
+.cam-count b { font-size: clamp(88px, 30vw, 160px); font-weight: 400; transition: color .2s; }
+.cam-count b.bump { animation: bump .35s ease-out; }
+@keyframes bump { 40% { transform: scale(1.18); color: var(--p15); } }
+.cam-count span { font-size: 32px; color: #ffffffb3; }
+.overlay.cam.finished .cam-count b { color: var(--p10); }
+.cam-bottom { display: flex; flex-direction: column; gap: 8px; max-width: 480px; width: 100%; align-self: center; }
+.cam-status { font-weight: 600; font-size: 17px; text-align: center; background: #000000a0; border-radius: 10px; padding: 10px 12px; text-shadow: none; }
+.cam-status.bad { background: #e0393ee6; }
+.overlay.cam.finished .cam-status { background: var(--p10); color: var(--ink); }
+.cam-privacy { margin: 0; font-size: 12px; text-align: center; color: #ffffffb3; }
+.cam-bottom .btn { background: #000000b0; border-color: #ffffff55; color: #fff; text-shadow: none; }
+.toast { position: fixed; left: 50%; bottom: calc(var(--nav-h) + 16px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px); background: var(--chalk); color: var(--ink); font-weight: 600; padding: 10px 16px; border-radius: 10px; opacity: 0; transition: .25s; z-index: 50; pointer-events: none; max-width: calc(100% - 32px); text-align: center; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand-row">
+      <h1 class="brand">REP<span>QUEST</span></h1>
+      <div class="lvl"><span class="player" id="playerName" hidden></span><span class="lvl-badge" id="lvlBadge">Lvl 1</span><div class="xpbar" aria-hidden="true"><i id="xpFill" style="width:0%"></i></div></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="sXp">0</b><small>XP</small></div>
+      <div class="stat"><b id="sWo">0</b><small>Workouts</small></div>
+      <div class="stat"><b id="sCr">0</b><small>Crates</small></div>
+      <div class="stat"><b id="sRt">0</b><small>Gym score</small></div>
+    </div>
+  </header>
+
+  <div id="installSlot"></div>
+  <main>
+    <section role="tabpanel" id="tab-workout"></section>
+    <section role="tabpanel" id="tab-crates" hidden></section>
+    <section role="tabpanel" id="tab-gym" hidden></section>
+    <section role="tabpanel" id="tab-board" hidden></section>
+  </main>
+</div>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-inner" role="tablist">
+    <button role="tab" data-tab="workout" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12h20M5 8v8M8 6v12M16 6v12M19 8v8"/></svg>Train</button>
+    <button role="tab" data-tab="crates" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 8l9-4 9 4v9l-9 4-9-4z"/><path d="M3 8l9 4 9-4M12 12v9"/></svg>Crates<span class="badge" id="crateBadge" hidden>0</span></button>
+    <button role="tab" data-tab="gym" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 10l9-6 9 6v10H3z"/><path d="M9 20v-6h6v6"/></svg>My Gym</button>
+    <button role="tab" data-tab="board" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg>Ranks</button>
+  </div>
+</nav>
+
+<div class="overlay" id="crateOv" hidden><div class="ov-inner" id="crateOvInner"></div></div>
+<div class="overlay" id="gymOv" hidden><div class="ov-inner left" id="gymOvInner"></div></div>
+<div class="overlay cam" id="camOv" hidden>
+  <video id="camVideo" playsinline muted autoplay></video>
+  <canvas id="camCanvas"></canvas>
+  <div class="cam-ui">
+    <div class="cam-top">
+      <div class="eyebrow" id="camRound">Camera check</div>
+      <h2 id="camName">Squats</h2>
+      <div class="cam-tip" id="camTip"></div>
+    </div>
+    <div class="cam-count" aria-live="polite"><b id="camCount">0</b><span id="camGoal">/ 10</span></div>
+    <div class="cam-bottom">
+      <div class="cam-status" id="camStatus" role="status">Starting camera…</div>
+      <p class="cam-privacy">The camera picture stays on your phone. Nothing is recorded or sent anywhere.</p>
+      <button class="btn ghost wide" id="camStop">Stop</button>
+    </div>
+  </div>
+</div>
+<canvas id="fx" hidden></canvas>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ================= data ================= */
+const TIERS = [
+  // odds = % chance the crate you earn is Common, Rare, Epic, Legendary, Mythic, Powerlifter
+  { name: "Warm-up", kg: "10 KG", color: "var(--p10)", xp: 10,  count: 3, rounds: 1, mult: 1,   odds: [75, 20, 5, 0, 0, 0] },
+  { name: "Grinder", kg: "15 KG", color: "var(--p15)", xp: 25,  count: 4, rounds: 2, mult: 1.3, odds: [35, 40, 20, 5, 0, 0] },
+  { name: "Beast",   kg: "20 KG", color: "var(--p20)", xp: 50,  count: 5, rounds: 3, mult: 1.6, odds: [5, 30, 35, 22, 7, 1] },
+  { name: "Legend",  kg: "25 KG", color: "var(--p25)", xp: 100, count: 6, rounds: 3, mult: 2.2, odds: [0, 5, 25, 38, 24, 8] },
+];
+// what each crate rarity drops: % chance of a Common … Powerlifter item
+const CRATE_DROPS = [
+  [65, 25, 10, 0, 0, 0],
+  [25, 60, 15, 0, 0, 0],
+  [0, 25, 60, 15, 0, 0],
+  [0, 0, 25, 60, 15, 0],
+  [0, 0, 0, 25, 60, 15],
+  [0, 0, 0, 30, 0, 70],
+];
+// worst to rarest
+const RAR = [
+  { label: "Common",      color: "var(--r0)", val: 5 },
+  { label: "Rare",        color: "var(--r1)", val: 15 },
+  { label: "Epic",        color: "var(--r2)", val: 40 },
+  { label: "Legendary",   color: "var(--r3)", val: 100 },
+  { label: "Mythic",      color: "var(--r4)", val: 250 },
+  { label: "Powerlifter", color: "var(--r5)", val: 600 },
+];
+const TOP = RAR.length - 1;
+const an = word => (/^[AEIOU]/i.test(word) ? "an " : "a ") + word;
+function rollFrom(odds) {
+  let x = Math.random() * odds.reduce((a, b) => a + b, 0);
+  for (let r = 0; r < odds.length; r++) { x -= odds[r]; if (x < 0) return r; }
+  return odds.findLastIndex(o => o > 0);
+}
+function crateEl(c, cw, tag = "div", attrs = {}) {
+  return h(tag, { ...attrs, class: "crate" + (c >= 4 ? " glow" : "") + (c === TOP ? " top" : "") + (attrs.class ? " " + attrs.class : ""), "data-label": RAR[c].label.toUpperCase(), style: `--tc:${RAR[c].color};--cw:${cw}px` });
+}
+const rarText = (r, txt) => h("b", { class: r === TOP ? "rainbow-text" : null, style: r === TOP ? null : `color:${RAR[r].color}`, text: txt });
+// slot: floor | wall | wallSkin | floorSkin
+const ITEMS = [
+  { id: "shake",    name: "Protein Shake",   e: "🥤", r: 0, slot: "floor", d: "Vanilla. Probably." },
+  { id: "kicks",    name: "Fresh Kicks",     e: "👟", r: 0, slot: "floor", d: "Laced up and ready." },
+  { id: "medball",  name: "Medicine Ball",   e: "🏐", r: 0, slot: "floor", d: "Slam it. Toss it. Love it." },
+  { id: "rope",     name: "Jump Rope",       e: "🪢", r: 0, slot: "floor", d: "Double-unders not included." },
+  { id: "bag",      name: "Gym Bag",         e: "🎒", r: 0, slot: "floor", d: "Smells like hard work." },
+  { id: "plant",    name: "Gym Plant",       e: "🪴", r: 0, slot: "floor", d: "Even plants need gains." },
+  { id: "banana",   name: "Banana Stash",    e: "🍌", r: 0, slot: "floor", d: "Potassium power." },
+  { id: "clock",    name: "Rest Timer",      e: "⏱️", r: 0, slot: "wall",  d: "60 seconds. Not 61." },
+  { id: "chart",    name: "Workout Chart",   e: "📋", r: 0, slot: "wall",  d: "Every rep, written down." },
+  { id: "jersey",   name: "Team Jersey",     e: "🎽", r: 0, slot: "wall",  d: "Hang it with pride." },
+
+  { id: "barbell",  name: "Barbell Station", e: "🏋️", r: 1, slot: "floor", d: "The heart of every gym." },
+  { id: "punchbag", name: "Punching Bag",    e: "🥊", r: 1, slot: "floor", d: "Jab, jab, cross." },
+  { id: "spin",     name: "Spin Bike",       e: "🚴", r: 1, slot: "floor", d: "Goes nowhere fast." },
+  { id: "boombox",  name: "Boombox",         e: "📻", r: 1, slot: "floor", d: "Hype music, full volume." },
+  { id: "tumble",   name: "Tumble Mat",      e: "🤸", r: 1, slot: "floor", d: "Cartwheels allowed." },
+  { id: "mirror",   name: "Big Mirror",      e: "🪞", r: 1, slot: "wall",  d: "Check that form." },
+  { id: "medal",    name: "Gold Medal",      e: "🥇", r: 1, slot: "wall",  d: "First place, every time." },
+  { id: "tv",       name: "Hype TV",         e: "📺", r: 1, slot: "wall",  d: "Plays highlight reels on loop." },
+  { id: "brick",    name: "Brick Walls",     sw: "brick",  r: 1, slot: "wallSkin",  d: "Old-school warehouse gym." },
+  { id: "rubber",   name: "Rubber Tiles",    sw: "rubber", r: 1, slot: "floorSkin", d: "Drop the weights. It's fine." },
+
+  { id: "rower",    name: "Rowing Machine",  e: "🚣", r: 2, slot: "floor", d: "2,000 meters of pain." },
+  { id: "robot",    name: "Robot Spotter",   e: "🤖", r: 2, slot: "floor", d: "Never lets the bar drop." },
+  { id: "icebath",  name: "Ice Bath",        e: "🧊", r: 2, slot: "floor", d: "Recovery, the cold way." },
+  { id: "treadmill",name: "Treadmill",       e: "🏃", r: 2, slot: "floor", d: "Top speed: yes." },
+  { id: "gi",       name: "Dojo Gi",         e: "🥋", r: 2, slot: "floor", d: "Black belt energy." },
+  { id: "gains",    name: "Neon GAINS Sign", txt: "GAINS", r: 2, slot: "wall", d: "Glows pink at night." },
+  { id: "ribbon",   name: "Hall of Fame",    e: "🎖️", r: 2, slot: "wall",  d: "For legends in training." },
+  { id: "medals",   name: "Medal Wall",      e: "🏅", r: 2, slot: "wall",  d: "Every race, every meet." },
+  { id: "neonwall", name: "Neon Walls",      sw: "neon",  r: 2, slot: "wallSkin",  d: "Night-club cardio vibes." },
+  { id: "court",    name: "Hardwood Court",  sw: "court", r: 2, slot: "floorSkin", d: "Squeaky sneakers welcome." },
+
+  { id: "gorilla",  name: "Gorilla Statue",  e: "🦍", r: 3, slot: "floor", d: "The strongest member of the gym." },
+  { id: "trophy",   name: "Giant Trophy",    e: "🏆", r: 3, slot: "floor", d: "Taller than you." },
+  { id: "dragon",   name: "Dragon Squat Rack", e: "🐉", r: 3, slot: "floor", d: "Breathes fire on leg day." },
+  { id: "crown",    name: "Crown of Gains",  e: "👑", r: 3, slot: "wall",  d: "Only true legends wear it." },
+  { id: "beast",    name: "BEAST MODE Sign", txt: "BEAST MODE", r: 3, slot: "wall", d: "Turns on by itself." },
+  { id: "galaxy",   name: "Galaxy Walls",    sw: "galaxy", r: 3, slot: "wallSkin",  d: "Lift among the stars." },
+  { id: "gold",     name: "Solid Gold Floor", sw: "gold",  r: 3, slot: "floorSkin", d: "Pure flex." },
+
+  { id: "unicorn",  name: "Unicorn Spin Bike", e: "🦄", r: 4, slot: "floor", d: "Pedals so fast it leaves rainbows." },
+  { id: "ufo",      name: "UFO Cable Machine", e: "🛸", r: 4, slot: "floor", d: "Pulls with alien strength." },
+  { id: "volcano",  name: "Volcano Sauna",     e: "🌋", r: 4, slot: "floor", d: "Sweat level: lava." },
+  { id: "trident",  name: "Trident of Titans", e: "🔱", r: 4, slot: "wall",  d: "Hung by the gods of grip strength." },
+  { id: "prcity",   name: "PR CITY Sign",      txt: "PR CITY", r: 4, slot: "wall", d: "Everyone who walks in hits a personal record." },
+  { id: "lava",     name: "Lava Walls",        sw: "lava",   r: 4, slot: "wallSkin",  d: "Hot enough to melt plates." },
+  { id: "clouds",   name: "Cloud Floor",       sw: "clouds", r: 4, slot: "floorSkin", d: "Lift on cloud nine." },
+
+  { id: "elephant", name: "Elephant Deadlift", e: "🐘", r: 5, slot: "floor", d: "Only real powerlifters pull this." },
+  { id: "atlas",    name: "Atlas Stone",       e: "🌍", r: 5, slot: "floor", d: "Lift the whole world." },
+  { id: "belt",     name: "Diamond Lifting Belt", e: "💎", r: 5, slot: "wall", d: "Brace like a champion." },
+  { id: "club",     name: "1000 LB Club Sign", txt: "1000 LB", r: 5, slot: "wall", d: "Squat, bench and deadlift: a thousand pounds total." },
+  { id: "arena",    name: "Championship Arena", sw: "arena",    r: 5, slot: "wallSkin",  d: "Spotlights, crowd, chalk in the air." },
+  { id: "platform", name: "Competition Platform", sw: "platform", r: 5, slot: "floorSkin", d: "Where world records happen." },
+
+  // more of everything
+  { id: "chalk",    name: "Chalk Bucket",      e: "🪣", r: 0, slot: "floor", d: "Grip it and rip it." },
+  { id: "socks",    name: "Lucky Socks",       e: "🧦", r: 0, slot: "floor", d: "Never washed. Never lost." },
+  { id: "eggs",     name: "Protein Eggs",      e: "🥚", r: 0, slot: "floor", d: "A dozen before breakfast." },
+  { id: "cap",      name: "Gym Cap",           e: "🧢", r: 0, slot: "floor", d: "Backwards means business." },
+  { id: "juice",    name: "Juice Box",         e: "🧃", r: 0, slot: "floor", d: "Post-workout treat." },
+  { id: "calendar", name: "Workout Calendar",  e: "🗓️", r: 0, slot: "wall",  d: "Don't break the streak." },
+  { id: "prbell",   name: "PR Bell",           e: "🔔", r: 0, slot: "wall",  d: "Ring it when you hit a record." },
+
+  { id: "hoops",    name: "Basketball Rack",   e: "🏀", r: 1, slot: "floor", d: "Cardio, but fun." },
+  { id: "skates",   name: "Roller Skates",     e: "🛼", r: 1, slot: "floor", d: "Leg day on wheels." },
+  { id: "phones",   name: "Hype Headphones",   e: "🎧", r: 1, slot: "floor", d: "One more rep per song." },
+  { id: "tire",     name: "Flip Tire",         e: "🛞", r: 1, slot: "floor", d: "Flip it down the gym and back." },
+  { id: "map",      name: "Running Route Map", e: "🗺️", r: 1, slot: "wall",  d: "Five miles of your neighborhood." },
+  { id: "pics",     name: "Progress Pics",     e: "📸", r: 1, slot: "wall",  d: "Day 1 vs today." },
+  { id: "lockers",  name: "Locker Room Walls", sw: "lockers", r: 1, slot: "wallSkin",  d: "Rows of metal lockers." },
+  { id: "track",    name: "Running Track",     sw: "track",   r: 1, slot: "floorSkin", d: "Red lanes, white lines." },
+
+  { id: "pool",     name: "Lap Pool",          e: "🏊", r: 2, slot: "floor", d: "Swim day counts too." },
+  { id: "ninja",    name: "Ninja Course",      e: "🥷", r: 2, slot: "floor", d: "Warped walls not included." },
+  { id: "target",   name: "Agility Target",    e: "🎯", r: 2, slot: "floor", d: "Hit it, sprint, repeat." },
+  { id: "climb",    name: "Climbing Holds",    e: "🧗", r: 2, slot: "wall",  d: "Your wall is now a mountain." },
+  { id: "finish",   name: "Finish Line Banner", e: "🏁", r: 2, slot: "wall", d: "You always cross it." },
+  { id: "push",     name: "Neon PUSH Sign",    txt: "PUSH", r: 2, slot: "wall", d: "Glows blue when you're tired." },
+  { id: "turf",     name: "Turf Field",        sw: "turf", r: 2, slot: "floorSkin", d: "Sled pushes and sprints." },
+
+  { id: "lion",     name: "Lion Statue",       e: "🦁", r: 3, slot: "floor", d: "Guards the squat rack." },
+  { id: "stadium",  name: "Mini Stadium",      e: "🏟️", r: 3, slot: "floor", d: "Your own crowd, cheering every rep." },
+  { id: "moai",     name: "Strongman Statue",  e: "🗿", r: 3, slot: "floor", d: "Carved from solid muscle." },
+  { id: "rocket",   name: "Rocket Treadmill",  e: "🚀", r: 3, slot: "floor", d: "Top speed: liftoff." },
+  { id: "shield",   name: "Spartan Shield",    e: "🛡️", r: 3, slot: "wall",  d: "Come back with it, or on it." },
+  { id: "bolt",     name: "Lightning Bolt",    e: "⚡", r: 3, slot: "wall",  d: "Pure pre-workout energy." },
+
+  { id: "trex",     name: "T-Rex Rower",       e: "🦖", r: 4, slot: "floor", d: "Tiny arms, huge legs." },
+  { id: "genie",    name: "Genie Spotter",     e: "🧞", r: 4, slot: "floor", d: "Grants three more reps." },
+  { id: "planet",   name: "Planet Medicine Ball", e: "🪐", r: 4, slot: "floor", d: "Has its own moons." },
+  { id: "dragonhead", name: "Dragon Head Trophy", e: "🐲", r: 4, slot: "wall", d: "Won in the Dragon Squat Challenge." },
+  { id: "portal",   name: "Galaxy Portal",     e: "🌌", r: 4, slot: "wall",  d: "Leads to a gym in space." },
+
+  { id: "whale",    name: "Whale Bench Press", e: "🐋", r: 5, slot: "floor", d: "Bench a blue whale." },
+  { id: "bronto",   name: "Brontosaurus Squat", e: "🦕", r: 5, slot: "floor", d: "Prehistoric leg day." },
+  { id: "sunstone", name: "Sun Stone",         e: "🌞", r: 5, slot: "floor", d: "Lift the sun. Don't touch it." },
+  { id: "star",     name: "Hall of Strength Star", e: "🌟", r: 5, slot: "wall", d: "Only for the strongest of all." },
+  { id: "goat",     name: "GOAT Sign",         txt: "GOAT", r: 5, slot: "wall", d: "Greatest of all time. That's you." },
+];
+const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+const SKIN_CSS = { brick: "#7a3a2c", rubber: "#222429", neon: "linear-gradient(135deg,#3d1460,#ff3cf0)", court: "#b9824a", galaxy: "linear-gradient(135deg,#0a0b1e,#5b2ca0)", gold: "linear-gradient(135deg,#8a6417,#ffe08a)", concrete: "#3b404b", plain: "#23262d", lava: "linear-gradient(135deg,#1c0b06,#ff5a1a,#2a0f08)", clouds: "linear-gradient(135deg,#bfe3ff,#ffffff)", arena: "radial-gradient(circle at 50% 0,#fff8d6,#1b2340 70%)", platform: "linear-gradient(90deg,#111 0 20%,#c99358 20% 80%,#111 80%)", lockers: "repeating-linear-gradient(90deg,#4a5b73 0 10px,#2a3445 10px 12px)", track: "repeating-linear-gradient(0deg,#b5452f 0 8px,#f2e9e4 8px 9px)", turf: "repeating-linear-gradient(90deg,#2f8f3a 0 10px,#2a8034 10px 20px)" };
+
+// kind: reps | secs. spr = seconds per rep. min = lowest tier it shows up in. per = 2 for "each leg/side".
+// cam = how the camera checks it (home-screen app only):
+//   angle  a joint bends below lo degrees, then straightens past hi = 1 rep
+//   range  a body measure (in torso lengths) drops below lo, then rises past hi = 1 rep
+//   bob    the body drops by amp torso lengths and comes back up = 1 rep
+//   alt    a measure swings past +thr / -thr; each swing = 1 rep
+//   jacks  hands above shoulders, then back down = 1 rep
+//   hold   seconds spent in a pose;  active  seconds spent moving the listed joints
+const EXERCISES = [
+  { name: "Jumping Jacks",      kind: "reps", base: 20, spr: 1,   cam: { t: "jacks", tip: "Face the camera" } },
+  { name: "Push-ups",           kind: "reps", base: 10, spr: 2.5, hint: "Knees down is fine", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, tip: "Phone on the floor, side view" } },
+  { name: "Bodyweight Squats",  kind: "reps", base: 15, spr: 2,   cam: { t: "angle", limb: "knee", lo: 115, hi: 155, tip: "Stand sideways to the camera" } },
+  { name: "Plank",              kind: "secs", base: 30,           cam: { t: "hold", f: "flat", tip: "Phone on the floor, side view" } },
+  { name: "Lunges",             kind: "reps", base: 8,  spr: 3, per: 2, hint: "Each leg", cam: { t: "angle", limb: "knee", lo: 115, hi: 155, either: true, tip: "Stand sideways to the camera" } },
+  { name: "Mountain Climbers",  kind: "reps", base: 20, spr: 1, hint: "Count each knee", cam: { t: "alt", f: "knees", thr: 0.25, tip: "Phone on the floor, side view" } },
+  { name: "Sit-ups",            kind: "reps", base: 12, spr: 2.5, cam: { t: "range", f: "situp", lo: 0.35, hi: 0.7, tip: "Phone on the floor, side view" } },
+  { name: "High Knees",         kind: "secs", base: 30,           cam: { t: "active", pts: [25, 26, 27, 28], tip: "Face the camera" } },
+  { name: "Glute Bridges",      kind: "reps", base: 12, spr: 2,   cam: { t: "angle", limb: "hip", lo: 145, hi: 165, tip: "Phone on the floor, side view" } },
+  { name: "Wall Sit",           kind: "secs", base: 30,           cam: { t: "hold", f: "wallsit", tip: "Side view" } },
+  { name: "Chair Dips",         kind: "reps", base: 8,  spr: 2.5, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, tip: "Side view" } },
+  { name: "Superman Hold",      kind: "secs", base: 20,           cam: { t: "hold", f: "flat", tip: "Phone on the floor, side view" } },
+  { name: "Calf Raises",        kind: "reps", base: 20, spr: 1.5, cam: { t: "bob", f: "nose", amp: 0.08, up: true, tip: "Face the camera" } },
+  { name: "Flutter Kicks",      kind: "secs", base: 25,           cam: { t: "active", pts: [27, 28], tip: "Phone on the floor, side view" } },
+  { name: "Shadow Boxing",      kind: "secs", base: 40,           cam: { t: "active", pts: [15, 16], tip: "Face the camera" } },
+  { name: "Inchworms",          kind: "reps", base: 5,  spr: 6,   cam: { t: "bob", f: "nose", amp: 0.9, tip: "Side view" } },
+  { name: "Burpees",            kind: "reps", base: 6,  spr: 4, min: 1, cam: { t: "bob", f: "nose", amp: 1, tip: "Face the camera" } },
+  { name: "Jump Squats",        kind: "reps", base: 8,  spr: 2.5, min: 1, cam: { t: "angle", limb: "knee", lo: 115, hi: 155, tip: "Stand sideways to the camera" } },
+  { name: "Skater Hops",        kind: "reps", base: 12, spr: 1.5, min: 1, hint: "Side to side", cam: { t: "alt", f: "sway", thr: 0.35, center: true, tip: "Face the camera" } },
+  { name: "Bear Crawl",         kind: "secs", base: 20, min: 1,   cam: { t: "active", pts: [15, 16, 27, 28], tip: "Side view" } },
+  { name: "Side Plank",         kind: "secs", base: 20, min: 1, per: 2, hint: "Each side", cam: { t: "hold", f: "flat", tip: "Phone on the floor, facing you" } },
+  { name: "Pike Push-ups",      kind: "reps", base: 6,  spr: 3, min: 2, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, tip: "Side view" } },
+  { name: "Tuck Jumps",         kind: "reps", base: 6,  spr: 2.5, min: 2, cam: { t: "range", f: "tuck", lo: 0.45, hi: 0.8, tip: "Face the camera" } },
+];
+const EXERCISE = Object.fromEntries(EXERCISES.map(e => [e.name, e]));
+const WORDS_A = ["Iron", "Chalk", "Thunder", "Rocket", "Titan", "Sweat", "Steel", "Turbo", "Plate", "Savage"];
+const WORDS_B = ["Circuit", "Gauntlet", "Ladder", "Blitz", "Grinder", "Session", "Storm", "Rumble", "Crusher"];
+
+/* ================= state ================= */
+const LS_KEY = "lootlift.v1";
+function fresh() {
+  const wall = Array(6).fill(null), floor = Array(18).fill(null);
+  wall[1] = "clock"; floor[13] = "shake";
+  return { xp: 0, workouts: 0, perTier: [0, 0, 0, 0], crates: [0], cratesOpened: 0, inv: {}, room: { wall, floor, wallSkin: "concrete", floorSkin: "plain" }, log: [], updatedAt: 0 };
+}
+function lsGet() { try { return JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch { return null; } }
+function lsSet(v) { try { localStorage.setItem(LS_KEY, JSON.stringify(v)); } catch {} }
+
+// Everyone who plays on this device gets a profile; the active one is "me".
+let store = lsGet();
+if (!store || !store.players) store = { active: "p1", players: { p1: { name: "Player 1", state: null, current: null } } };
+if (!store.players[store.active]) store.active = Object.keys(store.players)[0];
+let me = store.players[store.active];
+let S = me.state ? normalize(me.state) : fresh();
+let current = me.current || null;
+if (current && !current.progress) current.progress = current.ex.map((_, k) => current.checks[k] ? current.rounds : 0);
+let pickedTier = current ? current.tier : 0;
+let justEarned = null;        // tier index of crate just earned
+let placing = null;           // item id being placed
+let tab = "workout";
+let boardSort = "xp";
+let quitArmed = false;
+let allOpen = false;
+try { allOpen = localStorage.getItem("lootlift.allOpen") === "1"; } catch {}
+
+function normalize(s) {
+  const f = fresh();
+  const o = Object.assign(f, s);
+  o.room = Object.assign(fresh().room, s.room || {});
+  if (!Array.isArray(o.room.wall) || o.room.wall.length !== 6) o.room.wall = fresh().room.wall;
+  if (!Array.isArray(o.room.floor) || o.room.floor.length !== 18) o.room.floor = fresh().room.floor;
+  if (!Array.isArray(o.perTier)) o.perTier = [0, 0, 0, 0];
+  if (!Array.isArray(o.crates)) o.crates = [];
+  if (!Array.isArray(o.log)) o.log = [];
+  o.inv = o.inv || {};
+  return o;
+}
+
+/* ================= helpers ================= */
+const $ = s => document.querySelector(s);
+const h = (tag, attrs = {}, ...kids) => {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "style") el.setAttribute("style", v);
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (k === "text") el.textContent = v;
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) el.append(c.nodeType ? c : document.createTextNode(c));
+  return el;
+};
+const rnd = n => Math.floor(Math.random() * n);
+const pick = a => a[rnd(a.length)];
+const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = rnd(i + 1); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const fmt = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+const levelOf = xp => Math.floor(Math.sqrt(xp / 20)) + 1;
+const xpFor = lvl => 20 * (lvl - 1) * (lvl - 1);
+function ratingOf(room) {
+  let r = 0;
+  for (const id of [...room.wall, ...room.floor, room.wallSkin, room.floorSkin]) if (id && ITEM[id]) r += RAR[ITEM[id].r].val;
+  return r;
+}
+let toastTimer;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* ================= workouts ================= */
+function makeWorkout(t) {
+  const T = TIERS[t];
+  const pool = EXERCISES.filter(e => (e.min || 0) <= t);
+  const ex = shuffle(pool).slice(0, T.count).map(e => {
+    const amt = e.kind === "reps" ? Math.max(1, Math.round(e.base * T.mult)) : Math.max(10, Math.round(e.base * T.mult / 5) * 5);
+    const secs = e.kind === "reps" ? amt * e.spr : amt;
+    return { name: e.name, kind: e.kind, amt, secs, hint: e.hint || "" };
+  });
+  const est = Math.round(T.rounds * ex.reduce((a, b) => a + b.secs + 10, 0) + (T.rounds - 1) * 45);
+  return { tier: t, title: pick(WORDS_A) + " " + pick(WORDS_B), ex, rounds: T.rounds, est, minSecs: Math.round(est * 0.5), startedAt: null, checks: ex.map(() => false), progress: ex.map(() => 0) };
+}
+function elapsed() { return current && current.startedAt ? (Date.now() - current.startedAt) / 1000 : 0; }
+
+/* ================= camera rep check (home-screen app only) =================
+   Body tracking runs on the phone with MediaPipe Pose. Camera frames never leave the device. */
+const CAM = !!window.LOOTLIFT_PWA && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+const TASKS = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+const POSE_MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
+let posePromise = null;
+function loadPose() {
+  if (!posePromise) {
+    posePromise = (async () => {
+      const { FilesetResolver, PoseLandmarker } = await import(TASKS + "/vision_bundle.mjs");
+      const files = await FilesetResolver.forVisionTasks(TASKS + "/wasm");
+      const opts = delegate => ({ baseOptions: { modelAssetPath: POSE_MODEL, delegate }, runningMode: "VIDEO", numPoses: 1 });
+      try { return await PoseLandmarker.createFromOptions(files, opts("GPU")); }
+      catch { return await PoseLandmarker.createFromOptions(files, opts("CPU")); }
+    })();
+    posePromise.catch(() => { posePromise = null; });
+  }
+  return posePromise;
+}
+
+// MediaPipe body landmark numbers
+const J = { nose: 0, ls: 11, rs: 12, le: 13, re: 14, lw: 15, rw: 16, lh: 23, rh: 24, lk: 25, rk: 26, la: 27, ra: 28 };
+const BONES = [[11, 12], [11, 13], [13, 15], [12, 14], [14, 16], [11, 23], [12, 24], [23, 24], [23, 25], [25, 27], [24, 26], [26, 28]];
+const LIMB = {
+  knee:  [[J.lh, J.lk, J.la], [J.rh, J.rk, J.ra]],
+  elbow: [[J.ls, J.le, J.lw], [J.rs, J.re, J.rw]],
+  hip:   [[J.ls, J.lh, J.lk], [J.rs, J.rh, J.rk]],
+};
+const seen = p => !!p && (p.visibility ?? 1) > 0.5;
+const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+const gap = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+function jointAngle(a, b, c) {
+  const ux = a.x - b.x, uy = a.y - b.y, vx = c.x - b.x, vy = c.y - b.y;
+  const d = Math.hypot(ux, uy) * Math.hypot(vx, vy) || 1;
+  return Math.acos(Math.max(-1, Math.min(1, (ux * vx + uy * vy) / d))) * 180 / Math.PI;
+}
+// Uses the side of the body the camera sees best, or the most-bent side when `either` (lunges).
+function angleOf(lm, limb, either) {
+  const sides = LIMB[limb].filter(ids => ids.every(i => seen(lm[i])));
+  if (!sides.length) return null;
+  const angs = sides.map(([a, b, c]) => jointAngle(lm[a], lm[b], lm[c]));
+  if (either) return Math.min(...angs);
+  const vis = ids => ids.reduce((s, i) => s + (lm[i].visibility ?? 1), 0);
+  return angs[sides.length > 1 && vis(sides[1]) > vis(sides[0]) ? 1 : 0];
+}
+const shoulders = lm => mid(lm[J.ls], lm[J.rs]);
+const hips = lm => mid(lm[J.lh], lm[J.rh]);
+const torso = lm => gap(shoulders(lm), hips(lm));
+const SIGNAL = {
+  nose:  lm => lm[J.nose].y,
+  hip:   lm => hips(lm).y,
+  situp: lm => hips(lm).y - shoulders(lm).y,
+  tuck:  lm => mid(lm[J.lk], lm[J.rk]).y - hips(lm).y,
+  knees: lm => gap(lm[J.lk], shoulders(lm)) - gap(lm[J.rk], shoulders(lm)),
+  sway:  lm => hips(lm).x,
+};
+const POSE = {
+  flat:    lm => { const s = shoulders(lm), a = mid(lm[J.la], lm[J.ra]); return Math.abs(s.y - a.y) < 0.4 * Math.abs(s.x - a.x); },
+  wallsit: lm => { const a = angleOf(lm, "knee"); return a != null && a > 60 && a < 125; },
+};
+function bodyVisible(lm, spec) {
+  const any = (a, b) => seen(lm[a]) || seen(lm[b]);
+  if (!any(J.ls, J.rs) || !any(J.lh, J.rh)) return false;
+  if (spec.t === "angle" || spec.f === "wallsit") return angleOf(lm, spec.limb || "knee", spec.either) != null;
+  if (spec.t === "jacks") return seen(lm[J.lw]) && seen(lm[J.rw]);
+  if (spec.f === "flat") return any(J.la, J.ra);
+  return any(J.lk, J.rk);
+}
+// One tracker per scan. step(lm, T, dt) takes landmarks (x already scaled to the picture's shape),
+// the torso length T and seconds since the last frame; progress is in .count (reps) or .secs.
+function makeTracker(spec) {
+  const st = { count: 0, secs: 0 };
+  st.step = (lm, T, dt) => {
+    switch (spec.t) {
+      case "angle": {
+        const a = angleOf(lm, spec.limb, spec.either);
+        if (a == null) return;
+        if (a <= spec.lo) st.down = true;
+        else if (st.down && a >= spec.hi) { st.down = false; st.count++; }
+        return;
+      }
+      case "range": {
+        const v = SIGNAL[spec.f](lm) / T;
+        if (v <= spec.lo) st.down = true;
+        else if (st.down && v >= spec.hi) { st.down = false; st.count++; }
+        return;
+      }
+      case "bob": {
+        // bigger = lower in the picture; `up` flips it for moves that rise first (calf raises)
+        const v = SIGNAL[spec.f](lm) / T * (spec.up ? -1 : 1);
+        if (!st.down) {
+          st.top = Math.min(st.top ?? v, v);
+          if (v - st.top >= spec.amp) { st.down = true; st.bottom = v; }
+        } else {
+          st.bottom = Math.max(st.bottom, v);
+          if (st.bottom - v >= spec.amp * 0.8) { st.down = false; st.count++; st.top = v; }
+        }
+        return;
+      }
+      case "alt": {
+        let v = SIGNAL[spec.f](lm) / T;
+        if (spec.center) { st.base = st.base == null ? v : st.base + (v - st.base) * 0.05; v -= st.base; }
+        if (v > spec.thr && st.side !== 1) { st.side = 1; st.count++; }
+        else if (v < -spec.thr && st.side !== -1) { st.side = -1; st.count++; }
+        return;
+      }
+      case "jacks": {
+        const s = shoulders(lm);
+        const up = lm[J.lw].y < s.y && lm[J.rw].y < s.y;
+        const down = lm[J.lw].y > s.y + 0.3 * T && lm[J.rw].y > s.y + 0.3 * T;
+        if (up) st.open = true;
+        else if (st.open && down) { st.open = false; st.count++; }
+        return;
+      }
+      case "hold":
+        if (POSE[spec.f](lm)) st.secs += dt;
+        return;
+      case "active": {
+        const pts = spec.pts.map(i => lm[i]);
+        if (st.prev && dt > 0) {
+          // average of the faster half of the joints, so one fast knee or fist counts
+          const moves = pts.map((p, k) => gap(p, st.prev[k])).sort((a, b) => b - a).slice(0, Math.ceil(pts.length / 2));
+          const speed = moves.reduce((a, b) => a + b, 0) / moves.length / T / dt;
+          st.speed = (st.speed || 0) * 0.7 + speed * 0.3;
+          if (st.speed > 0.9) st.secs += dt; // above camera jitter when standing still
+        }
+        st.prev = pts.map(p => ({ x: p.x, y: p.y }));
+        return;
+      }
+    }
+  };
+  return st;
+}
+
+let scan = null;
+const camEl = id => document.getElementById(id);
+function scanGoal(e) { return e.amt * ((EXERCISE[e.name] || {}).per || 1); }
+async function startScan(i) {
+  const W = current, e = W && W.ex[i], def = e && EXERCISE[e.name];
+  if (!def || !def.cam || scan) return;
+  const goal = scanGoal(e), round = Math.min((W.progress[i] || 0) + 1, W.rounds);
+  scan = { i, goal, kind: e.kind, spec: def.cam, tracker: makeTracker(def.cam), stream: null, raf: 0, last: 0, lastVT: -1, lm: null, T: null, done: false };
+  camEl("camName").textContent = e.name;
+  camEl("camRound").textContent = W.rounds > 1 ? `Round ${round} of ${W.rounds}` : "Camera check";
+  camEl("camTip").textContent = def.cam.tip + (def.per ? ` · ${e.amt} ${e.hint.toLowerCase()} = ${goal}` : "");
+  camEl("camGoal").textContent = e.kind === "reps" ? "/ " + goal : `/ ${goal}s`;
+  camEl("camCount").textContent = "0";
+  camEl("camOv").classList.remove("finished");
+  camStatus("Starting camera…");
+  camEl("camOv").hidden = false;
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+  } catch (err) {
+    camStatus(err && err.name === "NotAllowedError" ? "The camera is blocked. Allow camera access for Rep Quest in your phone's settings, then tap Scan again." : "Couldn't start the camera. Close other apps using it and try again.", true);
+    return;
+  }
+  if (!scan) { stream.getTracks().forEach(t => t.stop()); return; }
+  scan.stream = stream;
+  const video = camEl("camVideo");
+  video.srcObject = scan.stream;
+  try { await video.play(); } catch {}
+  try { scan.wake = await navigator.wakeLock?.request("screen"); } catch {}
+  camStatus("Loading body tracker…");
+  let pose;
+  try { pose = await loadPose(); }
+  catch { camStatus("Couldn't load the body tracker. Connect to the internet once so it can download, then try again.", true); return; }
+  if (!scan) return;
+  scan.pose = pose;
+  camStatus("Get your whole body in the picture");
+  scan.raf = requestAnimationFrame(scanLoop);
+}
+function camStatus(text, bad) {
+  const s = camEl("camStatus"); s.textContent = text; s.classList.toggle("bad", !!bad);
+}
+function scanLoop(now) {
+  if (!scan || scan.done) return;
+  const video = camEl("camVideo");
+  if (video.readyState >= 2 && video.currentTime !== scan.lastVT) {
+    scan.lastVT = video.currentTime;
+    let res = null;
+    try { res = scan.pose.detectForVideo(video, now); } catch {}
+    const raw = res && res.landmarks && res.landmarks[0];
+    const dt = scan.last ? Math.min(0.25, (now - scan.last) / 1000) : 0;
+    scan.last = now;
+    const aspect = video.videoWidth / video.videoHeight || 1;
+    if (raw) {
+      // smooth out jitter; x is scaled so distances match the real picture shape
+      const lm = raw.map((p, k) => {
+        const q = { x: p.x * aspect, y: p.y, visibility: p.visibility ?? 1 };
+        const o = scan.lm && scan.lm[k];
+        return o ? { x: o.x + (q.x - o.x) * 0.6, y: o.y + (q.y - o.y) * 0.6, visibility: q.visibility } : q;
+      });
+      scan.lm = lm;
+      const visible = bodyVisible(lm, scan.spec);
+      const t = torso(lm);
+      if (t > 0.02) scan.T = scan.T ? scan.T + (t - scan.T) * 0.1 : t;
+      if (visible && scan.T) {
+        const before = scan.tracker.count;
+        scan.tracker.step(lm, scan.T, dt);
+        camStatus("Tracking you. Keep going!");
+        if (scan.tracker.count > before) bump();
+      } else {
+        if (scan.tracker.prev) scan.tracker.prev = null;
+        camStatus("Step back so your whole body fits in the picture", true);
+      }
+      drawSkeleton(raw, visible);
+    } else {
+      scan.lm = null;
+      camStatus("Can't see you yet. Step into the picture.", true);
+      drawSkeleton(null);
+    }
+    const got = scan.kind === "reps" ? scan.tracker.count : Math.floor(scan.tracker.secs);
+    camEl("camCount").textContent = String(Math.min(got, scan.goal));
+    if (got >= scan.goal) return finishScan();
+  }
+  scan.raf = requestAnimationFrame(scanLoop);
+}
+function bump() {
+  const c = camEl("camCount"); c.classList.remove("bump"); void c.offsetWidth; c.classList.add("bump");
+}
+function drawSkeleton(raw, visible) {
+  const video = camEl("camVideo"), cv = camEl("camCanvas");
+  if (cv.width !== video.videoWidth || cv.height !== video.videoHeight) { cv.width = video.videoWidth || 640; cv.height = video.videoHeight || 480; }
+  const ctx = cv.getContext("2d");
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  if (!raw) return;
+  const W = cv.width, H = cv.height;
+  ctx.lineWidth = Math.max(3, W / 120); ctx.lineCap = "round";
+  ctx.strokeStyle = visible ? "#eef0f3" : "#e0393e";
+  for (const [a, b] of BONES) {
+    if (!seen(raw[a]) || !seen(raw[b])) continue;
+    ctx.beginPath(); ctx.moveTo(raw[a].x * W, raw[a].y * H); ctx.lineTo(raw[b].x * W, raw[b].y * H); ctx.stroke();
+  }
+  ctx.fillStyle = visible ? "#2fae5b" : "#e0393e";
+  for (const k of [0, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28]) {
+    if (!seen(raw[k])) continue;
+    ctx.beginPath(); ctx.arc(raw[k].x * W, raw[k].y * H, ctx.lineWidth * 1.4, 0, Math.PI * 2); ctx.fill();
+  }
+}
+function finishScan() {
+  const s = scan; s.done = true;
+  camEl("camOv").classList.add("finished");
+  camStatus("Done! Nice work.");
+  try { navigator.vibrate?.(200); } catch {}
+  const W = current;
+  if (W && W.progress) { W.progress[s.i] = Math.min(W.rounds, (W.progress[s.i] || 0) + 1); saveLocalOnly(); }
+  setTimeout(() => {
+    stopScan();
+    if (W && W.progress[s.i] < W.rounds) toast(`Round ${W.progress[s.i]} of ${W.rounds} done. Rest, then scan again.`);
+    renderWorkout();
+  }, 1300);
+}
+function stopTracks() {
+  if (scan && scan.stream) scan.stream.getTracks().forEach(t => t.stop());
+}
+function stopScan() {
+  if (!scan) { camEl("camOv").hidden = true; return; }
+  cancelAnimationFrame(scan.raf);
+  stopTracks();
+  try { scan.wake && scan.wake.release(); } catch {}
+  camEl("camVideo").srcObject = null;
+  camEl("camOv").hidden = true;
+  scan = null;
+}
+const doneMove = (W, i) => CAM ? (W.progress[i] || 0) >= W.rounds : W.checks[i];
+const allDone = W => W.ex.every((_, i) => doneMove(W, i));
+
+/* ================= persistence ================= */
+let db = null, userCap = null, uid = null, myRef = null, readOnly = false, writing = false, dirty = false, syncState = "connecting";
+function save() {
+  S.updatedAt = Date.now();
+  saveLocalOnly();
+  pushRemote();
+}
+function saveLocalOnly() { me.state = S; me.current = current; lsSet(store); }
+function switchPlayer(pid) {
+  if (!store.players[pid]) return;
+  saveLocalOnly();
+  store.active = pid; me = store.players[pid];
+  S = me.state ? normalize(me.state) : fresh();
+  current = me.current || null;
+  if (current && !current.progress) current.progress = current.ex.map((_, k) => current.checks[k] ? current.rounds : 0);
+  pickedTier = current ? current.tier : 0;
+  justEarned = null; placing = null;
+  saveLocalOnly(); renderAll();
+  toast("Now playing as " + me.name);
+}
+function addPlayer(name) {
+  name = name.trim().slice(0, 20);
+  if (!name) return;
+  if (Object.keys(store.players).length >= 12) { toast("This phone already has 12 players"); return; }
+  const pid = "p" + Date.now().toString(36);
+  store.players[pid] = { name, state: null, current: null };
+  switchPlayer(pid);
+  setTab("workout");
+}
+function publicDoc() {
+  return { ...S, rating: ratingOf(S.room), level: levelOf(S.xp) };
+}
+async function pushRemote() {
+  if (!myRef || readOnly || S.xp <= 0) return;
+  if (writing) { dirty = true; return; }
+  writing = true;
+  try {
+    do { dirty = false; await myRef.set(publicDoc()); } while (dirty);
+  } catch (e) {
+    if (e && (e.code === "invalid_argument" || e.code === "not_granted" || e.code === "revoked")) { readOnly = true; syncState = "readonly"; renderBoard(); }
+    else if (e && e.code === "unavailable") setTimeout(pushRemote, 1500 + Math.random() * 1500);
+    else if (e && e.code === "quota_exceeded") toast("The leaderboard is full right now. Progress is saved on this phone.");
+  } finally { writing = false; }
+}
+
+/* ================= header ================= */
+function renderHeader() {
+  const lvl = levelOf(S.xp), a = xpFor(lvl), b = xpFor(lvl + 1);
+  $("#lvlBadge").textContent = "Lvl " + lvl;
+  $("#xpFill").style.width = Math.round((S.xp - a) / (b - a) * 100) + "%";
+  $("#sXp").textContent = S.xp;
+  $("#sWo").textContent = S.workouts;
+  $("#sCr").textContent = S.crates.length;
+  $("#sRt").textContent = ratingOf(S.room);
+  const pn = $("#playerName");
+  pn.hidden = syncState === "online" || Object.keys(store.players).length < 2;
+  pn.textContent = me.name;
+  const badge = $("#crateBadge");
+  badge.hidden = S.crates.length === 0;
+  badge.textContent = S.crates.length;
+}
+
+/* ================= tab: workout ================= */
+function renderWorkout() {
+  const root = $("#tab-workout"); root.replaceChildren();
+  const active = current && current.startedAt;
+
+  // tier picker
+  const plates = h("div", { class: "plates", role: "group", "aria-label": "Workout level" });
+  TIERS.forEach((T, i) => plates.append(
+    h("button", { class: "plate", style: `--tc:${T.color}`, "aria-pressed": String(i === pickedTier), disabled: active || justEarned != null, onclick: () => { pickedTier = i; current = makeWorkout(i); saveLocalOnly(); renderWorkout(); } },
+      h("span", { class: "disc" }, h("b", { text: T.kg.replace(" KG", "") })),
+      h("span", { class: "nm", text: T.name }))
+  ));
+  const T = TIERS[pickedTier];
+  root.append(h("div", { class: "card" },
+    h("div", { class: "row" }, h("h2", { text: "Pick your plate" })),
+    plates,
+    h("div", { class: "tierinfo" },
+      h("span", {}, "Crates: ", rarText(T.odds.findIndex(o => o > 0), RAR[T.odds.findIndex(o => o > 0)].label), " to ", rarText(T.odds.findLastIndex(o => o > 0), RAR[T.odds.findLastIndex(o => o > 0)].label)),
+      h("span", {}, h("b", { text: "+" + T.xp }), " XP")),
+    oddsBar(T.odds),
+    h("div", { class: "tierinfo" },
+      h("span", {}, "Best crate chance: ", rarText(T.odds.findLastIndex(o => o > 0), RAR[T.odds.findLastIndex(o => o > 0)].label + " " + T.odds[T.odds.findLastIndex(o => o > 0)] + "%")))
+  ));
+
+  if (justEarned != null) {
+    const EC = justEarned.crate, ER = RAR[EC];
+    root.append(h("div", { class: "card earned", style: `--tc:${ER.color}` },
+      h("div", { class: "eyebrow", text: "Workout complete" }),
+      h("h2", {}, "You earned " + an(ER.label).split(" ")[0] + " ", rarText(EC, ER.label), " crate!"),
+      crateEl(EC, 120),
+      h("div", { class: "muted", text: "+" + justEarned.xp + " XP" }),
+      h("button", { class: "btn go wide", onclick: () => openCrate(S.crates.lastIndexOf(EC)) }, "Open it now"),
+      h("button", { class: "btn ghost wide", onclick: () => { justEarned = null; current = makeWorkout(pickedTier); saveLocalOnly(); renderWorkout(); } }, "Next workout")
+    ));
+    return;
+  }
+
+  if (!current || current.tier !== pickedTier) { current = makeWorkout(pickedTier); saveLocalOnly(); }
+  const W = current, WT = TIERS[W.tier];
+  const allChecked = allDone(W);
+  const left = W.minSecs - elapsed();
+
+  const list = h("ul", { class: "exlist" });
+  W.ex.forEach((e, i) => {
+    const id = "ex-" + i;
+    const amt = h("span", { class: "amt", text: e.kind === "reps" ? "×" + e.amt : e.amt + "s" });
+    if (CAM) {
+      const p = W.progress[i] || 0, done = p >= W.rounds;
+      const sub = [e.hint, W.rounds > 1 ? `${p} of ${W.rounds} rounds scanned` : null].filter(Boolean).join(" · ");
+      list.append(h("li", { class: "ex" + (done ? " done" : "") },
+        done ? h("span", { class: "scanned", "aria-label": "Scanned" }, "✓") :
+          h("button", { class: "scanbtn", disabled: !active, "aria-label": "Scan " + e.name, onclick: () => startScan(i) }, camIcon(), "Scan"),
+        h("div", { class: "exlabel" }, h("span", { class: "nm", text: e.name }), sub ? h("span", { class: "hint", text: sub }) : null),
+        amt));
+      return;
+    }
+    list.append(h("li", { class: "ex" + (W.checks[i] ? " done" : "") },
+      h("input", { type: "checkbox", id, checked: W.checks[i], disabled: !active, onchange: ev => { W.checks[i] = ev.target.checked; ev.target.closest(".ex").classList.toggle("done", ev.target.checked); saveLocalOnly(); tickWorkout(); } }),
+      h("label", { for: id }, h("span", { class: "nm", text: e.name }), e.hint ? h("span", { class: "hint", text: e.hint }) : null),
+      amt
+    ));
+  });
+
+  const card = h("div", { class: "card", style: `--tc:${WT.color}` },
+    h("div", { class: "wo-head" },
+      h("div", { style: "flex:1;min-width:0;display:flex;flex-direction:column;gap:6px" },
+        h("span", { class: "eyebrow", text: "Today's workout" }),
+        h("h2", { text: W.title })),
+      h("span", { class: "tchip", text: WT.kg + " · " + WT.name })),
+    h("div", { class: "wo-meta" },
+      h("span", {}, h("b", { text: W.rounds }), W.rounds === 1 ? " round" : " rounds"),
+      h("span", {}, "about ", h("b", { text: Math.max(1, Math.round(W.est / 60)) + " min" })),
+      W.rounds > 1 ? h("span", {}, "rest ", h("b", { text: "45s" }), " between rounds") : null),
+    list
+  );
+
+  if (!active) {
+    card.append(
+      h("p", { class: "note", text: CAM
+        ? (W.rounds > 1 ? `Do the list ${W.rounds} times. Tap Scan on a move, prop your phone where it can see your whole body, and the camera counts your reps. Scan each move once per round.` : "Tap Scan on a move, prop your phone where it can see your whole body, and the camera counts your reps.")
+        : (W.rounds > 1 ? `Do every move in order, then repeat the list ${W.rounds} times. Tick each move once you've done all its rounds.` : "Do each move once, in order. Tick them off as you go.") }),
+      h("div", { class: "row" },
+        h("button", { class: "btn ghost", onclick: () => { current = makeWorkout(pickedTier); saveLocalOnly(); renderWorkout(); } }, "Reroll"),
+        h("button", { class: "btn go", style: "flex:1", onclick: () => { W.startedAt = Date.now(); saveLocalOnly(); renderWorkout(); } }, "Start workout"))
+    );
+  } else {
+    const canClaim = allChecked && (CAM || left <= 0);
+    card.append(
+      h("div", { class: "row" },
+        h("div", {}, h("div", { class: "eyebrow", text: "Time" }), h("div", { class: "timer", id: "timer", text: fmt(elapsed()) })),
+        h("div", { class: "spacer" }),
+        h("div", { class: "lockline", id: "lockline", text: lockText(allChecked, left) })),
+      h("button", { class: "btn go wide", id: "claimBtn", disabled: !canClaim, onclick: claim }, "Done! Claim my crate"),
+      h("button", { class: "btn ghost wide", onclick: () => {
+        if (!quitArmed) { quitArmed = true; renderWorkout(); setTimeout(() => { quitArmed = false; if (tab === "workout") renderWorkout(); }, 3000); return; }
+        quitArmed = false; current = makeWorkout(pickedTier); saveLocalOnly(); renderWorkout();
+      } }, quitArmed ? "Tap again to quit" : "Quit workout")
+    );
+  }
+  root.append(card);
+}
+function lockText(allChecked, left) {
+  if (CAM) return allChecked ? "Crate ready!" : "Scan every move to finish";
+  if (left > 0) return "Crate unlocks in " + fmt(left);
+  if (!allChecked) return "Tick every move to finish";
+  return "Crate ready!";
+}
+function camIcon() {
+  const s = h("span", { class: "camicon", "aria-hidden": "true" });
+  s.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+  return s;
+}
+function claim() {
+  const W = current; if (!W || !W.startedAt) return;
+  if (!allDone(W) || (!CAM && elapsed() < W.minSecs)) return;
+  const T = TIERS[W.tier];
+  const c = rollFrom(T.odds);
+  S.xp += T.xp; S.workouts += 1; S.perTier[W.tier] += 1; S.crates.push(c);
+  justEarned = { crate: c, xp: T.xp }; current = null;
+  const before = levelOf(S.xp - T.xp);
+  save(); renderAll();
+  toast(levelOf(S.xp) > before ? `Level up! You're level ${levelOf(S.xp)}` : `+${T.xp} XP · ${RAR[c].label} crate earned`);
+}
+setInterval(tickWorkout, 1000);
+function tickWorkout() {
+  if (tab !== "workout" || !current || !current.startedAt) return;
+  const t = $("#timer"); if (t) t.textContent = fmt(elapsed());
+  const allChecked = allDone(current), left = current.minSecs - elapsed();
+  const l = $("#lockline"); if (l) l.textContent = lockText(allChecked, left);
+  const b = $("#claimBtn"); if (b) b.disabled = !(allChecked && (CAM || left <= 0));
+}
+
+/* ================= tab: crates ================= */
+function oddsBar(odds) {
+  return h("div", { class: "odds", title: odds.map((o, i) => `${RAR[i].label} ${o}%`).join(" · ") },
+    odds.map((o, i) => o ? h("i", { style: `width:${o}%;background:${i === TOP ? "var(--rainbow)" : RAR[i].color}` }) : null));
+}
+const oddsText = odds => odds.map((o, i) => o ? `${RAR[i].label[0]} ${o}%` : null).filter(Boolean).join(" · ");
+function renderCrates() {
+  const root = $("#tab-crates"); root.replaceChildren();
+  const card = h("div", { class: "card" }, h("h2", { text: S.crates.length ? `${S.crates.length} crate${S.crates.length > 1 ? "s" : ""} waiting` : "No crates waiting" }));
+  if (!S.crates.length) {
+    card.append(h("p", { class: "note", text: "Finish a workout to earn a crate. Heavier plates roll rarer crates." }),
+      h("button", { class: "btn primary wide", onclick: () => setTab("workout") }, "Go train"));
+  } else {
+    const grid = h("div", { class: "crategrid" });
+    S.crates.map((c, i) => [c, i]).sort((a, b) => b[0] - a[0]).forEach(([c, i]) => {
+      grid.append(h("div", { class: "cratecard", style: `--tc:${RAR[c].color}` },
+        crateEl(c, 96),
+        h("div", { class: "nm" }, S.cratesOpened === 0 && S.workouts === 0 && c === 0 ? "Welcome crate" : rarText(c, RAR[c].label + " crate")),
+        oddsBar(CRATE_DROPS[c]),
+        h("button", { class: "btn go wide", style: "min-height:42px;padding:8px", onclick: () => openCrate(i) }, "Open")));
+    });
+    card.append(grid);
+  }
+  root.append(card);
+
+  // odds: what each crate drops
+  const legend = h("div", { class: "legend" }, RAR.map((r, i) => h("span", { style: `--rc:${i === TOP ? "var(--rainbow)" : r.color}` }, h("i", { style: "background:var(--rc)" }), r.label)));
+  const dropOdds = h("div", { class: "card" }, h("h2", { text: "What's inside each crate" }), legend);
+  CRATE_DROPS.forEach((odds, c) => dropOdds.append(h("div", { class: "row", style: "flex-wrap:nowrap;gap:12px" },
+    crateEl(c, 44),
+    h("div", { style: "flex:1;min-width:0;display:flex;flex-direction:column;gap:4px" },
+      h("div", { class: "row", style: "justify-content:space-between" },
+        h("span", { class: "eyebrow" }, rarText(c, RAR[c].label)),
+        h("span", { class: "eyebrow", text: oddsText(odds) })),
+      oddsBar(odds)))));
+  root.append(dropOdds);
+
+  if (S.log.length) {
+    root.append(h("div", { class: "card" }, h("h2", { text: "Recent loot" }),
+      h("ul", { class: "loglist" }, S.log.slice(0, 8).map(l => {
+        const it = ITEM[l.item]; if (!it) return null;
+        return h("li", { style: `--rc:${RAR[it.r].color}` }, h("span", { class: "em", text: it.e || (it.txt ? "✨" : "🎨") }), h("span", { style: "flex:1", text: it.name }), h("span", { class: "rtag" + (it.r === TOP ? " rainbow-text" : ""), text: RAR[it.r].label }));
+      }))));
+  }
+}
+
+function rollItem(c) {
+  const r = rollFrom(CRATE_DROPS[c]);
+  return pick(ITEMS.filter(i => i.r === r));
+}
+function openCrate(idx) {
+  if (idx < 0 || idx >= S.crates.length) return;
+  const c = S.crates[idx];
+  const ov = $("#crateOv"), inner = $("#crateOvInner");
+  inner.replaceChildren();
+  let opened = false;
+  const crate = crateEl(c, 180, "button", { class: "bigcrate", "aria-label": "Open crate" });
+  crate.style.border = "0";
+  const go = () => {
+    if (opened) return; opened = true;
+    const item = rollItem(c);
+    S.crates.splice(idx, 1);
+    S.cratesOpened += 1;
+    S.inv[item.id] = (S.inv[item.id] || 0) + 1;
+    S.log.unshift({ item: item.id, crate: c, at: Date.now() }); S.log = S.log.slice(0, 20);
+    save();
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    crate.classList.add("shake");
+    setTimeout(() => showReveal(item), reduce ? 0 : 900);
+  };
+  crate.addEventListener("click", go);
+  inner.append(h("div", { class: "eyebrow" }, rarText(c, RAR[c].label + " crate")), crate, h("div", { class: "tapopen", text: "Tap the crate to open" }),
+    h("button", { class: "btn ghost", onclick: () => { ov.hidden = true; } }, "Later"));
+  ov.hidden = false;
+  justEarned = null;
+  renderAll();
+  crate.focus();
+}
+function showReveal(item) {
+  const inner = $("#crateOvInner"), R = RAR[item.r];
+  inner.replaceChildren(
+    h("div", { class: "reveal" + (item.r === TOP ? " top" : ""), style: `--rc:${R.color}` },
+      h("div", { class: "rays" }),
+      item.txt ? h("div", { class: "big neon", text: item.txt }) :
+      item.sw ? h("div", { class: "big" }, h("div", { class: "swatch", style: `width:120px;height:80px;border-radius:12px;background:${SKIN_CSS[item.sw]}` })) :
+      h("div", { class: "big", text: item.e }),
+      h("div", { class: "rtag" + (item.r === TOP ? " rainbow-text" : ""), text: R.label + (item.slot === "wall" ? " · wall decor" : item.slot === "floor" ? " · gym gear" : " · room style") }),
+      h("div", { class: "rname", text: item.name }),
+      h("p", { class: "rdesc", text: item.d })),
+    h("div", { class: "ov-actions" },
+      h("button", { class: "btn primary wide", onclick: () => { $("#crateOv").hidden = true; setTab("gym"); useItem(item.id); } }, item.sw ? "Put it on now" : "Place it in my gym"),
+      h("button", { class: "btn ghost wide", onclick: () => { $("#crateOv").hidden = true; renderAll(); } }, "Keep in storage"))
+  );
+  confetti(item.r);
+}
+
+/* confetti burst */
+function confetti(r) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = $("#fx"); c.hidden = false;
+  const dpr = devicePixelRatio || 1, W = c.width = innerWidth * dpr, H = c.height = innerHeight * dpr;
+  const ctx = c.getContext("2d");
+  const cs = getComputedStyle(document.documentElement);
+  const cols = [cs.getPropertyValue("--r" + r), cs.getPropertyValue("--p10"), cs.getPropertyValue("--p15"), cs.getPropertyValue("--p20"), cs.getPropertyValue("--p25"), "#ffffff"].map(s => s.trim());
+  const n = 40 + r * 40;
+  const ps = Array.from({ length: n }, () => ({ x: W / 2, y: H * 0.42, vx: (Math.random() - .5) * 22 * dpr, vy: (-Math.random() * 18 - 4) * dpr, s: (4 + Math.random() * 6) * dpr, a: Math.random() * 6, va: (Math.random() - .5) * .4, c: pick(cols) }));
+  let f = 0;
+  (function tick() {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of ps) { p.x += p.vx; p.y += p.vy; p.vy += .6 * dpr; p.vx *= .985; p.a += p.va; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore(); }
+    if (++f < 110) requestAnimationFrame(tick); else { ctx.clearRect(0, 0, W, H); c.hidden = true; }
+  })();
+}
+
+/* ================= tab: gym ================= */
+function slotView(id, extraClass, onClick, isTarget) {
+  const it = id ? ITEM[id] : null;
+  const btn = h(onClick ? "button" : "div", {
+    class: "slot " + extraClass + (it ? " filled" : "") + (it && it.r === TOP ? " top" : "") + (isTarget ? " target" : ""),
+    style: it ? `--rc:${RAR[it.r].color}` : null,
+    title: it ? it.name : null,
+    "aria-label": onClick ? (it ? it.name + " (tap to move to storage)" : isTarget ? "Empty spot, tap to place" : "Empty spot") : null,
+    onclick: onClick
+  });
+  if (it) btn.append(it.txt ? h("span", { class: "neon", text: it.txt }) : h("span", { class: "sprite", text: it.e }));
+  return btn;
+}
+function roomView(room, interactive) {
+  const placingSlot = interactive && placing ? ITEM[placing].slot : null;
+  const el = h("div", { class: "room" + (placingSlot ? " placing" : "") });
+  const wall = h("div", { class: "wall sk-" + room.wallSkin });
+  room.wall.forEach((id, i) => wall.append(slotView(id, "", interactive ? () => tapSlot("wall", i) : null, placingSlot === "wall")));
+  const flr = h("div", { class: "flr sk-" + room.floorSkin });
+  room.floor.forEach((id, i) => flr.append(slotView(id, "r" + Math.floor(i / 6), interactive ? () => tapSlot("floor", i) : null, placingSlot === "floor")));
+  el.append(h("span", { class: "room-label", text: "Score " + ratingOf(room) }), wall, flr);
+  return el;
+}
+function tapSlot(kind, i) {
+  const arr = S.room[kind];
+  if (placing) {
+    if (ITEM[placing].slot !== kind) { toast(ITEM[placing].slot === "wall" ? "That goes on the wall" : "That goes on the floor"); return; }
+    if (arr[i]) S.inv[arr[i]] = (S.inv[arr[i]] || 0) + 1;
+    arr[i] = placing;
+    S.inv[placing] -= 1; if (S.inv[placing] <= 0) delete S.inv[placing];
+    toast(ITEM[placing].name + " placed");
+    placing = null;
+    save(); renderAll();
+  } else if (arr[i]) {
+    const id = arr[i];
+    arr[i] = null; S.inv[id] = (S.inv[id] || 0) + 1;
+    toast(ITEM[id].name + " moved to storage");
+    save(); renderAll();
+  }
+}
+function useItem(id) {
+  const it = ITEM[id]; if (!it || !S.inv[id]) return;
+  if (it.slot === "wallSkin" || it.slot === "floorSkin") {
+    const key = it.slot;
+    const old = S.room[key];
+    if (ITEM[old]) S.inv[old] = (S.inv[old] || 0) + 1;
+    S.room[key] = id;
+    S.inv[id] -= 1; if (S.inv[id] <= 0) delete S.inv[id];
+    toast(it.name + " on");
+    save(); renderAll();
+    return;
+  }
+  placing = placing === id ? null : id;
+  renderGym();
+  if (placing) document.querySelector("#tab-gym .room").scrollIntoView({ block: "center", behavior: "smooth" });
+}
+function removeSkin(key) {
+  const old = S.room[key]; if (!ITEM[old]) return;
+  S.inv[old] = (S.inv[old] || 0) + 1;
+  S.room[key] = key === "wallSkin" ? "concrete" : "plain";
+  save(); renderAll();
+}
+function renderGym() {
+  const root = $("#tab-gym"); root.replaceChildren();
+  root.append(h("div", { class: "row" }, h("h2", { text: "My Gym" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: "Tap gear to move it" })));
+  if (placing) {
+    const it = ITEM[placing];
+    root.append(h("div", { class: "banner" }, h("span", { class: "em", text: it.e || "✨" }), h("span", { text: `Tap a glowing ${it.slot} spot` }), h("button", { onclick: () => { placing = null; renderGym(); } }, "Cancel")));
+  }
+  root.append(roomView(S.room, true));
+
+  // current styles
+  const skinBox = (key, label, def) => {
+    const id = S.room[key], it = ITEM[id];
+    return h("div", { class: "stylebox" },
+      h("div", { class: "swatch", style: `background:${SKIN_CSS[it ? it.sw : def]}` }),
+      h("div", {}, h("small", { class: "eyebrow", text: label }), h("b", { text: it ? it.name : (def === "concrete" ? "Concrete" : "Plain floor") })),
+      it ? h("button", { onclick: () => removeSkin(key) }, "Off") : null);
+  };
+  root.append(h("div", { class: "styles" }, skinBox("wallSkin", "Walls", "concrete"), skinBox("floorSkin", "Floor", "plain")));
+
+  // storage
+  const owned = ITEMS.filter(i => S.inv[i.id] > 0);
+  const card = h("div", { class: "card" }, h("h2", { text: "Storage" }));
+  if (!owned.length) {
+    card.append(h("p", { class: "note", text: "Everything you own is in your gym. Open crates to get more gear, decor and room styles." }));
+  } else {
+    const groups = [["floor", "Gym gear"], ["wall", "Wall decor"], ["skin", "Room styles"]];
+    for (const [g, label] of groups) {
+      const items = owned.filter(i => g === "skin" ? i.slot.endsWith("Skin") : i.slot === g).sort((a, b) => b.r - a.r);
+      if (!items.length) continue;
+      const grid = h("div", { class: "invgrid" });
+      items.forEach(it => grid.append(h("button", { class: "item", style: `--rc:${RAR[it.r].color}`, "aria-pressed": String(placing === it.id), onclick: () => useItem(it.id) },
+        S.inv[it.id] > 1 ? h("span", { class: "ct", text: "×" + S.inv[it.id] }) : null,
+        it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` }) : h("span", { class: "em", text: it.e || "✨" }),
+        h("span", { class: "nm", text: it.name }),
+        h("span", { class: "rtag", text: RAR[it.r].label }))));
+      card.append(h("div", { class: "invgroup" }, h("div", { class: "eyebrow", text: label }), grid));
+    }
+  }
+  root.append(card);
+
+  // every item you can get from crates, by rarity
+  const found = new Set([...Object.keys(S.inv), ...S.room.wall, ...S.room.floor, S.room.wallSkin, S.room.floorSkin].filter(id => ITEM[id]));
+  const all = h("div", { class: "card" },
+    h("button", { class: "fold", "aria-expanded": String(allOpen), "aria-controls": "allItems", onclick: () => { allOpen = !allOpen; try { localStorage.setItem("lootlift.allOpen", allOpen ? "1" : "0"); } catch {} renderGym(); } },
+      h("h2", { text: "All items" }), h("span", { class: "spacer" }),
+      h("span", { class: "eyebrow", text: `${found.size} of ${ITEMS.length} found` }),
+      h("span", { class: "chev", "aria-hidden": "true" })));
+  all.querySelector(".chev").innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  root.append(all);
+  if (!allOpen) return;
+  all.id = "allItems";
+  all.append(h("p", { class: "note", text: "Everything you can get from crates. Faded items are ones you haven't found yet." }));
+  RAR.forEach((R, r) => {
+    const items = ITEMS.filter(i => i.r === r);
+    const have = items.filter(i => found.has(i.id)).length;
+    const from = CRATE_DROPS.map((o, c) => o[r] ? RAR[c].label : null).filter(Boolean);
+    const grid = h("div", { class: "invgrid" });
+    items.forEach(it => grid.append(h("div", { class: "item" + (found.has(it.id) ? "" : " missing"), style: `--rc:${r === TOP ? "var(--r5)" : R.color}`, title: it.d },
+      found.has(it.id) ? h("span", { class: "ct got", "aria-label": "Found", text: "✓" }) : null,
+      it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` }) : it.txt ? h("span", { class: "neon", style: "padding:9px 0", text: it.txt }) : h("span", { class: "em", text: it.e }),
+      h("span", { class: "nm", text: it.name }),
+      h("span", { class: "kind", text: it.slot === "wall" ? "Wall decor" : it.slot === "floor" ? "Gym gear" : it.slot === "wallSkin" ? "Wall style" : "Floor style" }))));
+    all.append(h("div", { class: "invgroup" },
+      h("div", { class: "row", style: "justify-content:space-between" },
+        h("span", { class: "eyebrow", style: "font-size:14px" }, rarText(r, R.label)),
+        h("span", { class: "eyebrow", text: `${have} / ${items.length}` })),
+      h("div", { class: "kind", text: "Found in " + from.join(", ") + " crates" }),
+      grid));
+  });
+}
+
+/* ================= tab: leaderboard ================= */
+let boardDocs = null, boardErr = null, boardSlow = false;
+async function renderBoard() {
+  const root = $("#tab-board");
+  root.replaceChildren();
+  root.append(h("div", { class: "row" }, h("h2", { text: "Leaderboard" }), h("span", { class: "spacer" }),
+    h("div", { class: "seg", role: "group", "aria-label": "Rank by" },
+      h("button", { "aria-pressed": String(boardSort === "xp"), onclick: () => { boardSort = "xp"; renderBoard(); } }, "XP"),
+      h("button", { "aria-pressed": String(boardSort === "rating"), onclick: () => { boardSort = "rating"; renderBoard(); } }, "Gym"))));
+
+  const note = h("div", { class: "syncnote" });
+  const say = (on, txt) => note.append(h("span", { class: "dot" + (on ? " on" : "") }), h("span", { text: txt }));
+  if (syncState === "online") say(true, S.xp > 0 ? "You're on the board. Progress saves to your account." : "Finish one workout to join the board.");
+  else if (syncState === "readonly") say(false, "You can see the board, but only people the owner shares this app with as Contributor can join. Progress saves on this phone.");
+  else if (syncState === "connecting") say(false, "Connecting to the leaderboard…");
+  else say(false, "Players on this phone. Add friends or family who train with you.");
+  root.append(note);
+
+  const list = h("ol", { class: "board" });
+  root.append(list);
+
+  if (!db) {
+    if (syncState !== "connecting") renderLocalBoard(root, list);
+    return;
+  }
+  if (boardErr) { list.append(h("li", { class: "empty", text: "Couldn't load the leaderboard. Reopen the app to try again." })); return; }
+  if (!boardDocs) { list.append(h("li", { class: "empty", text: boardSlow ? "Can't reach the leaderboard yet. Still trying…" : "Loading…" })); return; }
+
+  const rows = boardDocs.filter(d => (d.xp || 0) > 0).sort((a, b) => boardSort === "xp" ? (b.xp - a.xp) || (b.rating - a.rating) : (b.rating - a.rating) || (b.xp - a.xp));
+  if (!rows.length) { list.append(h("li", { class: "empty", text: "Nobody's on the board yet. Finish a workout to take first place." })); return; }
+
+  const profs = userCap ? await userCap.profiles(rows.map(r => r.id)) : {};
+  if (tab !== "board") return;
+  list.replaceChildren();
+  rows.forEach((r, i) => {
+    const p = profs[r.id] || {};
+    const isMe = r.id === uid;
+    const name = isMe ? (p.name ? p.name + " (you)" : "You") : (p.name || "Lifter");
+    list.append(h("li", { style: "display:contents" },
+      h("button", { class: "lb" + (isMe ? " me" : ""), onclick: () => showGym(r, name) },
+        h("span", { class: "rk", text: i + 1 }),
+        p.avatarUrl ? h("img", { src: p.avatarUrl, alt: "" }) : h("span", { class: "dot", style: "width:38px;height:38px" }),
+        h("span", { class: "who" }, h("b", { text: name }), h("small", { text: `Lvl ${levelOf(r.xp || 0)} · ${r.workouts || 0} workouts · tap to see gym` })),
+        h("span", { class: "sc" }, boardSort === "xp" ? (r.xp || 0) : (r.rating || 0), h("small", { text: boardSort === "xp" ? "XP" : "Gym" })))));
+  });
+}
+function renderLocalBoard(root, list) {
+  const rows = Object.entries(store.players).map(([pid, p]) => {
+    const st = pid === store.active ? S : normalize(p.state || {});
+    return { id: pid, name: p.name, xp: st.xp, workouts: st.workouts, perTier: st.perTier, room: st.room, rating: ratingOf(st.room) };
+  }).sort((a, b) => boardSort === "xp" ? (b.xp - a.xp) || (b.rating - a.rating) : (b.rating - a.rating) || (b.xp - a.xp));
+  rows.forEach((r, i) => {
+    const isMe = r.id === store.active;
+    list.append(h("li", { style: "display:contents" },
+      h("button", { class: "lb" + (isMe ? " me" : ""), onclick: () => showGym(r, r.name, isMe ? null : () => switchPlayer(r.id)) },
+        h("span", { class: "rk", text: i + 1 }),
+        h("span", { class: "avatar", text: r.name.slice(0, 1).toUpperCase() }),
+        h("span", { class: "who" }, h("b", { text: r.name + (isMe ? " (playing)" : "") }), h("small", { text: `Lvl ${levelOf(r.xp)} · ${r.workouts} workouts · ${isMe ? "tap to see gym" : "tap to see gym or switch"}` })),
+        h("span", { class: "sc" }, boardSort === "xp" ? r.xp : r.rating, h("small", { text: boardSort === "xp" ? "XP" : "Gym" })))));
+  });
+
+  const input = h("input", { id: "newPlayer", type: "text", maxlength: "20", placeholder: "Name", autocomplete: "off", "aria-label": "New player name" });
+  const form = h("form", { class: "card", onsubmit: e => { e.preventDefault(); addPlayer(input.value); } },
+    h("h2", { text: "Add a player" }),
+    h("p", { class: "note", text: "Everyone gets their own workouts, crates and gym. Switch players from this list." }),
+    h("div", { class: "row" }, input, h("button", { class: "btn primary", type: "submit" }, "Add")));
+  const ren = h("form", { class: "row", onsubmit: e => { e.preventDefault(); const v = renIn.value.trim().slice(0, 20); if (v) { me.name = v; saveLocalOnly(); renderAll(); toast("Name saved"); } } });
+  const renIn = h("input", { id: "renamePlayer", type: "text", maxlength: "20", value: me.name, "aria-label": "Your player name" });
+  ren.append(renIn, h("button", { class: "btn ghost", type: "submit" }, "Rename"));
+  root.append(form, h("div", { class: "card" }, h("span", { class: "eyebrow", text: "Your name" }), ren));
+}
+function showGym(r, name, onSwitch) {
+  const room = normalize({ room: r.room || {} }).room;
+  const inner = $("#gymOvInner");
+  const per = Array.isArray(r.perTier) ? r.perTier : [0, 0, 0, 0];
+  inner.replaceChildren(
+    h("button", { class: "closex", "aria-label": "Close", onclick: () => { $("#gymOv").hidden = true; } }, "×"),
+    h("div", { class: "eyebrow", text: `Level ${levelOf(r.xp || 0)} · ${r.xp || 0} XP` }),
+    h("h2", { style: "padding-right:48px", text: name + "'s gym" }),
+    roomView(room, false),
+    h("div", { class: "plates" }, TIERS.map((T, i) => h("div", { class: "stat", style: `border-top:3px solid ${T.color}` }, h("b", { text: per[i] || 0 }), h("small", { text: T.name })))),
+    onSwitch ? h("button", { class: "btn primary wide", onclick: () => { $("#gymOv").hidden = true; onSwitch(); } }, "Play as " + name) : null,
+    h("button", { class: "btn ghost wide", onclick: () => { $("#gymOv").hidden = true; } }, "Close"));
+  $("#gymOv").hidden = false;
+}
+
+/* ================= tabs ================= */
+function setTab(t) {
+  tab = t;
+  document.querySelectorAll(".nav button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
+  document.querySelectorAll("section[role=tabpanel]").forEach(s => { s.hidden = s.id !== "tab-" + t; });
+  if (t !== "gym") placing = null;
+  renderTab();
+  window.scrollTo({ top: 0 });
+}
+function renderTab() {
+  if (tab === "workout") renderWorkout();
+  else if (tab === "crates") renderCrates();
+  else if (tab === "gym") renderGym();
+  else renderBoard();
+}
+function renderAll() { renderHeader(); renderTab(); }
+document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
+for (const id of ["#crateOv", "#gymOv"]) $(id).addEventListener("click", e => { if (e.target.id === id.slice(1) && id === "#gymOv") $(id).hidden = true; });
+document.addEventListener("keydown", e => { if (e.key === "Escape") { $("#gymOv").hidden = true; if (scan) stopScan(); } });
+$("#camStop").addEventListener("click", () => stopScan());
+document.addEventListener("visibilitychange", () => { if (document.hidden && scan) stopScan(); });
+
+renderAll();
+
+/* ================= installable app (PWA build only) ================= */
+if (window.LOOTLIFT_PWA) {
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let dismissed = false; try { dismissed = localStorage.getItem("lootlift.installHidden") === "1"; } catch {}
+  let deferred = null;
+  const renderInstall = () => {
+    const slot = $("#installSlot"); slot.replaceChildren();
+    if (standalone || dismissed) return;
+    const hide = h("button", { class: "x", "aria-label": "Hide", onclick: () => { dismissed = true; try { localStorage.setItem("lootlift.installHidden", "1"); } catch {} renderInstall(); } }, "×");
+    if (deferred) slot.append(h("div", { class: "install" }, h("p", { text: "Put Rep Quest on your home screen. It works offline too." }),
+      h("button", { class: "btn primary", onclick: async () => { deferred.prompt(); await deferred.userChoice.catch(() => {}); deferred = null; renderInstall(); } }, "Install"), hide));
+    else if (isIOS) slot.append(h("div", { class: "install" }, h("p", { text: "To install: tap the Share button, then “Add to Home Screen”." }), hide));
+  };
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; renderInstall(); });
+  window.addEventListener("appinstalled", () => { deferred = null; dismissed = true; renderInstall(); });
+  renderInstall();
+}
+
+/* ================= connect to shared leaderboard ================= */
+(async () => {
+  if (window.LOOTLIFT_PWA || !window.claude || !window.claude.use) { syncState = "offline"; renderAll(); return; }
+  try {
+    [db, userCap] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    uid = userCap ? await userCap.id() : null;
+  } catch { db = null; }
+  if (!db) { syncState = "offline"; renderAll(); return; }
+
+  // leaderboard subscription
+  const slowTimer = setTimeout(() => { boardSlow = true; if (tab === "board") renderBoard(); }, 10000);
+  db.collection("players").orderBy("xp", "desc").limit(100).onSnapshot(snap => {
+    if (!snap.metadata.fromCache) { clearTimeout(slowTimer); boardSlow = false; }
+    boardDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (tab === "board") renderBoard();
+  }, err => { clearTimeout(slowTimer); boardErr = err; if (tab === "board") renderBoard(); });
+
+  if (!uid) { syncState = "signedout"; renderAll(); return; }
+  myRef = db.doc("players/" + uid);
+  const canWrite = userCap ? await userCap.can("data.write") : null;
+  try {
+    const snap = await myRef.get();
+    if (snap.exists) {
+      const remote = snap.data();
+      if ((remote.xp || 0) > S.xp || ((remote.xp || 0) === S.xp && (remote.updatedAt || 0) >= (S.updatedAt || 0))) {
+        const { rating, level, ...rest } = remote;
+        S = normalize(JSON.parse(JSON.stringify(rest)));
+        saveLocalOnly(); renderAll();
+      } else pushRemote();
+    } else pushRemote();
+  } catch {}
+  if (canWrite === false) readOnly = true;
+  syncState = readOnly ? "readonly" : "online";
+  renderAll();
+})();
+</script>
+</body>
+</html>
