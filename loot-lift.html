@@ -342,6 +342,25 @@ input[type="text"]::placeholder { color: var(--dim); }
 .ov-actions { display: flex; flex-direction: column; gap: 8px; width: 100%; }
 .closex { position: absolute; top: 0; right: 0; background: var(--panel-2); border: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; }
 
+/* ---------- exercise info ---------- */
+.infobtn { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--dim); background: none; color: var(--chalk); font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 700; font-size: 17px; line-height: 1; display: grid; place-items: center; padding: 0; }
+.infobtn:active { background: var(--line); }
+#infoOvInner { gap: 14px; }
+.mm { background: var(--panel); border-radius: 14px; padding: 10px 8px 4px; }
+.mm svg { display: block; width: 100%; max-width: 320px; height: auto; margin: 0 auto; }
+.mm-body { fill: var(--panel-2); stroke: var(--line); stroke-width: 1.5; }
+.mm-idle { fill: var(--line); }
+.mm-main { fill: var(--p25); }
+.mm-also { fill: var(--p25); fill-opacity: .38; }
+.mm-label { fill: var(--dim); font-family: var(--label); font-size: 11px; font-weight: 600; letter-spacing: .12em; text-anchor: middle; }
+.mm-legend { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+.mm-legend > div { display: flex; align-items: baseline; gap: 8px; }
+.mm-key { flex: none; width: 12px; height: 12px; border-radius: 3px; background: var(--p25); transform: translateY(1px); }
+.mm-key.mm-also { opacity: .38; }
+.steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; font-size: 16px; }
+.steps li::marker { font-family: var(--label); font-weight: 700; color: var(--dim); }
+.infotip { margin: 0; font-size: 15px; background: var(--panel); border-radius: 10px; padding: 10px 12px; color: var(--chalk); }
+
 /* ---------- camera rep check ---------- */
 .scanbtn { flex: none; display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 9px; padding: 0 12px; min-height: 40px; background: var(--tc); color: var(--ink); font-family: var(--label); font-weight: 700; font-size: 15px; letter-spacing: .06em; text-transform: uppercase; }
 .scanbtn:disabled { opacity: .4; cursor: not-allowed; }
@@ -417,6 +436,7 @@ input[type="text"]::placeholder { color: var(--dim); }
 
 <div class="overlay" id="crateOv" hidden><div class="ov-inner" id="crateOvInner"></div></div>
 <div class="overlay" id="gymOv" hidden><div class="ov-inner left" id="gymOvInner"></div></div>
+<div class="overlay" id="infoOv" hidden><div class="ov-inner left" id="infoOvInner"></div></div>
 <div class="overlay cam" id="camOv" hidden>
   <video id="camVideo" playsinline muted autoplay></video>
   <canvas id="camCanvas"></canvas>
@@ -587,34 +607,117 @@ const SKIN_CSS = { brick: "#7a3a2c", rubber: "#222429", neon: "linear-gradient(1
 //   range  a body measure (in torso lengths) drops below lo, then rises past hi = 1 rep
 //   bob    the body drops by amp torso lengths and comes back up = 1 rep
 //   alt    a measure swings past +thr / -thr; each swing = 1 rep
-//   jacks  hands above shoulders, then back down = 1 rep
-//   hold   seconds spent in a pose;  active  seconds spent moving the listed joints
+//   jacks  hands above shoulders with feet apart, then back down = 1 rep
+//   hold   seconds spent in the pose;  active  seconds spent moving the listed joints
+// pose = the body position the move has to be done in (nothing counts outside it)
+// start = position to hold for 1s before counting (defaults to pose)
+// via = position each rep has to pass through (burpees go through a plank)
+// event = something that has to keep happening during an active move
+// minRep = fastest believable rep, in seconds (default 0.5)
 const EXERCISES = [
-  { name: "Jumping Jacks",      kind: "reps", base: 20, spr: 1,   cam: { t: "jacks", tip: "Face the camera" } },
-  { name: "Push-ups",           kind: "reps", base: 10, spr: 2.5, hint: "Knees down is fine", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, tip: "Phone on the floor, side view" } },
-  { name: "Bodyweight Squats",  kind: "reps", base: 15, spr: 2,   cam: { t: "angle", limb: "knee", lo: 115, hi: 155, tip: "Stand sideways to the camera" } },
-  { name: "Plank",              kind: "secs", base: 30,           cam: { t: "hold", f: "flat", tip: "Phone on the floor, side view" } },
-  { name: "Lunges",             kind: "reps", base: 8,  spr: 3, per: 2, hint: "Each leg", cam: { t: "angle", limb: "knee", lo: 115, hi: 155, either: true, tip: "Stand sideways to the camera" } },
-  { name: "Mountain Climbers",  kind: "reps", base: 20, spr: 1, hint: "Count each knee", cam: { t: "alt", f: "knees", thr: 0.25, tip: "Phone on the floor, side view" } },
-  { name: "Sit-ups",            kind: "reps", base: 12, spr: 2.5, cam: { t: "range", f: "situp", lo: 0.35, hi: 0.7, tip: "Phone on the floor, side view" } },
-  { name: "High Knees",         kind: "secs", base: 30,           cam: { t: "active", pts: [25, 26, 27, 28], tip: "Face the camera" } },
-  { name: "Glute Bridges",      kind: "reps", base: 12, spr: 2,   cam: { t: "angle", limb: "hip", lo: 145, hi: 165, tip: "Phone on the floor, side view" } },
-  { name: "Wall Sit",           kind: "secs", base: 30,           cam: { t: "hold", f: "wallsit", tip: "Side view" } },
-  { name: "Chair Dips",         kind: "reps", base: 8,  spr: 2.5, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, tip: "Side view" } },
-  { name: "Superman Hold",      kind: "secs", base: 20,           cam: { t: "hold", f: "flat", tip: "Phone on the floor, side view" } },
-  { name: "Calf Raises",        kind: "reps", base: 20, spr: 1.5, cam: { t: "bob", f: "nose", amp: 0.08, up: true, tip: "Face the camera" } },
-  { name: "Flutter Kicks",      kind: "secs", base: 25,           cam: { t: "active", pts: [27, 28], tip: "Phone on the floor, side view" } },
-  { name: "Shadow Boxing",      kind: "secs", base: 40,           cam: { t: "active", pts: [15, 16], tip: "Face the camera" } },
-  { name: "Inchworms",          kind: "reps", base: 5,  spr: 6,   cam: { t: "bob", f: "nose", amp: 0.9, tip: "Side view" } },
-  { name: "Burpees",            kind: "reps", base: 6,  spr: 4, min: 1, cam: { t: "bob", f: "nose", amp: 1, tip: "Face the camera" } },
-  { name: "Jump Squats",        kind: "reps", base: 8,  spr: 2.5, min: 1, cam: { t: "angle", limb: "knee", lo: 115, hi: 155, tip: "Stand sideways to the camera" } },
-  { name: "Skater Hops",        kind: "reps", base: 12, spr: 1.5, min: 1, hint: "Side to side", cam: { t: "alt", f: "sway", thr: 0.35, center: true, tip: "Face the camera" } },
-  { name: "Bear Crawl",         kind: "secs", base: 20, min: 1,   cam: { t: "active", pts: [15, 16, 27, 28], tip: "Side view" } },
-  { name: "Side Plank",         kind: "secs", base: 20, min: 1, per: 2, hint: "Each side", cam: { t: "hold", f: "flat", tip: "Phone on the floor, facing you" } },
-  { name: "Pike Push-ups",      kind: "reps", base: 6,  spr: 3, min: 2, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, tip: "Side view" } },
-  { name: "Tuck Jumps",         kind: "reps", base: 6,  spr: 2.5, min: 2, cam: { t: "range", f: "tuck", lo: 0.45, hi: 0.8, tip: "Face the camera" } },
+  { name: "Jumping Jacks",      kind: "reps", base: 20, spr: 1,   cam: { t: "jacks", pose: "standing", start: "upright", minRep: 0.4, tip: "Face the camera" } },
+  { name: "Push-ups",           kind: "reps", base: 10, spr: 2.5, hint: "Knees down is fine", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "horizontal", tip: "Phone on the floor, side view" } },
+  { name: "Bodyweight Squats",  kind: "reps", base: 15, spr: 2,   cam: { t: "angle", limb: "knee", lo: 115, hi: 155, pose: "standing", start: "upright", tip: "Stand sideways to the camera" } },
+  { name: "Plank",              kind: "secs", base: 30,           cam: { t: "hold", pose: "flat", tip: "Phone on the floor, side view" } },
+  { name: "Lunges",             kind: "reps", base: 8,  spr: 3, per: 2, hint: "Each leg", cam: { t: "angle", limb: "knee", lo: 115, hi: 155, either: true, pose: "standing", start: "upright", minRep: 0.6, tip: "Stand sideways to the camera" } },
+  { name: "Mountain Climbers",  kind: "reps", base: 20, spr: 1, hint: "Count each knee", cam: { t: "alt", f: "knees", thr: 0.25, pose: "horizontal", minRep: 0.15, tip: "Phone on the floor, side view" } },
+  { name: "Sit-ups",            kind: "reps", base: 12, spr: 2.5, cam: { t: "range", f: "situp", lo: 0.35, hi: 0.7, pose: "floor", minRep: 0.8, tip: "Phone on the floor, side view" } },
+  { name: "High Knees",         kind: "secs", base: 30,           cam: { t: "active", pts: [25, 26, 27, 28], dir: "y", pose: "standing", start: "upright", event: "kneeLift", tip: "Face the camera" } },
+  { name: "Glute Bridges",      kind: "reps", base: 12, spr: 2,   cam: { t: "angle", limb: "hip", lo: 145, hi: 165, pose: "lying", minRep: 0.8, tip: "Phone on the floor, side view" } },
+  { name: "Wall Sit",           kind: "secs", base: 30,           cam: { t: "hold", pose: "wallsit", tip: "Side view" } },
+  { name: "Chair Dips",         kind: "reps", base: 8,  spr: 2.5, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "dips", tip: "Side view" } },
+  { name: "Superman Hold",      kind: "secs", base: 20,           cam: { t: "hold", pose: "flat", tip: "Phone on the floor, side view" } },
+  { name: "Calf Raises",        kind: "reps", base: 20, spr: 1.5, cam: { t: "bob", f: "stand", amp: 0.1, up: true, planted: true, pose: "straight", tip: "Face the camera, feet in the picture" } },
+  { name: "Flutter Kicks",      kind: "secs", base: 25,           cam: { t: "active", pts: [27, 28], dir: "y", pose: "lying", tip: "Phone on the floor, side view" } },
+  { name: "Shadow Boxing",      kind: "secs", base: 40,           cam: { t: "active", pts: [15, 16], rel: "shoulders", dir: "x", pose: "standing", start: "upright", event: "punch", tip: "Stand sideways to the camera" } },
+  { name: "Inchworms",          kind: "reps", base: 5,  spr: 6,   cam: { t: "bob", f: "nose", amp: 0.9, start: "upright", via: "horizontal", minRep: 2, tip: "Side view" } },
+  { name: "Burpees",            kind: "reps", base: 6,  spr: 4, min: 1, cam: { t: "bob", f: "nose", amp: 1, start: "upright", via: "horizontal", minRep: 1.5, tip: "Side view works best" } },
+  { name: "Jump Squats",        kind: "reps", base: 8,  spr: 2.5, min: 1, cam: { t: "angle", limb: "knee", lo: 115, hi: 155, pose: "standing", start: "upright", tip: "Stand sideways to the camera" } },
+  { name: "Skater Hops",        kind: "reps", base: 12, spr: 1.5, min: 1, hint: "Side to side", cam: { t: "alt", f: "sway", thr: 0.35, center: true, lift: 0.3, pose: "standing", start: "upright", minRep: 0.3, tip: "Face the camera" } },
+  { name: "Bear Crawl",         kind: "secs", base: 20, min: 1,   cam: { t: "active", pts: [15, 16, 27, 28], pose: "bear", tip: "Side view" } },
+  { name: "Side Plank",         kind: "secs", base: 20, min: 1, per: 2, hint: "Each side", cam: { t: "hold", pose: "flat", tip: "Phone on the floor, facing you" } },
+  { name: "Pike Push-ups",      kind: "reps", base: 6,  spr: 3, min: 2, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "pike", tip: "Side view" } },
+  { name: "Tuck Jumps",         kind: "reps", base: 6,  spr: 2.5, min: 2, cam: { t: "range", f: "tuck", lo: 0.45, hi: 0.8, start: "upright", pose: "torsoUp", tip: "Face the camera" } },
 ];
 const EXERCISE = Object.fromEntries(EXERCISES.map(e => [e.name, e]));
+
+// What each move works (main = the muscles doing most of the work) and how to do it.
+const MUSCLES = {
+  chest: "Chest", shoulders: "Shoulders", biceps: "Biceps", triceps: "Triceps", abs: "Abs", obliques: "Obliques",
+  back: "Upper back", lowerBack: "Lower back", glutes: "Glutes", quads: "Quads", hamstrings: "Hamstrings",
+  calves: "Calves", hipFlexors: "Hip flexors",
+};
+const HOWTO = {
+  "Jumping Jacks": { main: ["calves", "shoulders"], also: ["glutes", "quads"],
+    steps: ["Stand tall with your feet together and arms at your sides.", "Jump your feet out wide while swinging your arms up over your head.", "Jump back to the start. That's one."],
+    tip: "Land softly on the balls of your feet." },
+  "Push-ups": { main: ["chest", "triceps"], also: ["shoulders", "abs"],
+    steps: ["Put your hands on the floor a little wider than your shoulders.", "Step your feet back so your body is a straight line from head to heels.", "Bend your elbows and lower your chest until it's close to the floor.", "Push back up until your arms are straight."],
+    tip: "Don't let your hips sag. Knees on the floor makes it easier." },
+  "Bodyweight Squats": { main: ["quads", "glutes"], also: ["hamstrings", "abs"],
+    steps: ["Stand with your feet shoulder-width apart, toes pointing slightly out.", "Push your hips back and bend your knees like you're sitting in a chair.", "Go down until your thighs are about level with the floor.", "Push through your heels to stand back up."],
+    tip: "Keep your chest up and your knees in line with your toes." },
+  "Plank": { main: ["abs"], also: ["shoulders", "glutes", "lowerBack"],
+    steps: ["Put your forearms on the floor with your elbows under your shoulders.", "Step your feet back so your body is a straight line.", "Squeeze your belly and glutes and hold."],
+    tip: "Don't let your hips droop or stick up in the air." },
+  "Lunges": { main: ["quads", "glutes"], also: ["hamstrings", "calves"],
+    steps: ["Stand tall with your feet together.", "Take a big step forward with one foot.", "Lower down until both knees are bent at about a right angle.", "Push off your front foot to step back. Switch legs."],
+    tip: "Your back knee should hover just above the floor." },
+  "Mountain Climbers": { main: ["abs", "hipFlexors"], also: ["shoulders", "quads"],
+    steps: ["Start in a high plank with your hands under your shoulders.", "Drive one knee toward your chest.", "Switch legs quickly, like you're running in place."],
+    tip: "Keep your hips low and level." },
+  "Sit-ups": { main: ["abs"], also: ["hipFlexors", "obliques"],
+    steps: ["Lie on your back with your knees bent and feet flat.", "Cross your arms over your chest.", "Curl up until you're sitting, then lower back down slowly."],
+    tip: "Lead with your chest, not your neck." },
+  "High Knees": { main: ["hipFlexors", "quads"], also: ["calves", "abs"],
+    steps: ["Stand tall.", "Run in place, driving each knee up to hip height.", "Pump your arms as you go."],
+    tip: "Stay light on the balls of your feet." },
+  "Glute Bridges": { main: ["glutes"], also: ["hamstrings", "lowerBack"],
+    steps: ["Lie on your back with your knees bent and feet flat, close to your butt.", "Push through your heels and lift your hips up.", "Stop when your body is a straight line from shoulders to knees.", "Squeeze, then lower slowly."],
+    tip: "Hold the squeeze at the top for a second." },
+  "Wall Sit": { main: ["quads"], also: ["glutes", "calves"],
+    steps: ["Stand with your back flat against a wall.", "Walk your feet out and slide down until your thighs are level with the floor.", "Keep your knees right above your ankles and hold."],
+    tip: "Keep your weight in your heels." },
+  "Chair Dips": { main: ["triceps"], also: ["shoulders", "chest"],
+    steps: ["Sit on the edge of a sturdy chair and grip the edge next to your hips.", "Slide your butt off the chair with your legs out in front.", "Bend your elbows to lower yourself down.", "Push back up until your arms are straight."],
+    tip: "Use a chair that can't slide or tip. Keep your back close to it." },
+  "Superman Hold": { main: ["lowerBack"], also: ["glutes", "shoulders"],
+    steps: ["Lie face down with your arms stretched out in front.", "Lift your arms, chest and legs off the floor at the same time.", "Hold, looking down at the floor."],
+    tip: "Lift gently. Don't crank your neck up." },
+  "Calf Raises": { main: ["calves"], also: [],
+    steps: ["Stand tall with your feet hip-width apart.", "Rise up onto your toes as high as you can.", "Lower back down slowly."],
+    tip: "Hold a wall for balance if you need to." },
+  "Flutter Kicks": { main: ["abs", "hipFlexors"], also: ["quads"],
+    steps: ["Lie on your back with your legs straight and hands under your hips.", "Lift your heels a few inches off the floor.", "Kick your legs up and down in small, fast movements."],
+    tip: "Keep your lower back pressed into the floor." },
+  "Shadow Boxing": { main: ["shoulders"], also: ["abs", "obliques", "calves"],
+    steps: ["Stand with one foot forward and your fists up by your chin.", "Throw quick punches straight out, twisting your hips.", "Bring each fist back to your chin after you punch."],
+    tip: "Keep your feet moving." },
+  "Inchworms": { main: ["hamstrings", "abs"], also: ["shoulders", "chest"],
+    steps: ["Stand tall, bend over and put your hands on the floor.", "Walk your hands out until you're in a plank.", "Walk your hands back to your feet and stand up."],
+    tip: "Bend your knees a little if your legs feel tight." },
+  "Burpees": { main: ["quads", "chest"], also: ["shoulders", "abs", "glutes"],
+    steps: ["Squat down and put your hands on the floor.", "Jump your feet back into a plank.", "Jump your feet back up to your hands.", "Stand up and jump with your arms overhead."],
+    tip: "Add a push-up at the bottom for an extra challenge." },
+  "Jump Squats": { main: ["quads", "glutes"], also: ["calves", "hamstrings"],
+    steps: ["Stand with your feet shoulder-width apart.", "Squat down.", "Explode up into a jump.", "Land softly and go right into the next squat."],
+    tip: "Land with bent knees to protect your joints." },
+  "Skater Hops": { main: ["glutes", "quads"], also: ["calves"],
+    steps: ["Stand on your right leg.", "Jump sideways to the left and land on your left foot, sweeping your right leg behind you.", "Jump back to the right. Keep going side to side."],
+    tip: "Swing your arms like a speed skater." },
+  "Bear Crawl": { main: ["shoulders", "abs"], also: ["quads"],
+    steps: ["Get on your hands and feet with your knees bent, hovering just off the floor.", "Crawl forward, moving your opposite hand and foot together.", "Keep your back flat like a table."],
+    tip: "Keep your knees low the whole time." },
+  "Side Plank": { main: ["obliques"], also: ["shoulders", "glutes"],
+    steps: ["Lie on your side with your elbow under your shoulder.", "Lift your hips so your body is a straight line.", "Hold, then switch sides."],
+    tip: "Put your bottom knee down to make it easier." },
+  "Pike Push-ups": { main: ["shoulders"], also: ["triceps", "back"],
+    steps: ["Put your hands and feet on the floor with your hips high, like an upside-down V.", "Bend your elbows to lower the top of your head toward the floor.", "Push back up."],
+    tip: "Look back toward your feet." },
+  "Tuck Jumps": { main: ["quads", "calves"], also: ["abs", "hipFlexors", "glutes"],
+    steps: ["Stand with your feet hip-width apart.", "Jump up and pull your knees toward your chest.", "Land softly with bent knees."],
+    tip: "Use your arms to swing yourself up." },
+};
 const WORDS_A = ["Iron", "Chalk", "Thunder", "Rocket", "Titan", "Sweat", "Steel", "Turbo", "Plate", "Savage"];
 const WORDS_B = ["Circuit", "Gauntlet", "Ladder", "Blitz", "Grinder", "Session", "Storm", "Rumble", "Crusher"];
 
@@ -715,7 +818,8 @@ function loadPose() {
     posePromise = (async () => {
       const { FilesetResolver, PoseLandmarker } = await import(TASKS + "/vision_bundle.mjs");
       const files = await FilesetResolver.forVisionTasks(TASKS + "/wasm");
-      const opts = delegate => ({ baseOptions: { modelAssetPath: POSE_MODEL, delegate }, runningMode: "VIDEO", numPoses: 1 });
+      const opts = delegate => ({ baseOptions: { modelAssetPath: POSE_MODEL, delegate }, runningMode: "VIDEO", numPoses: 1,
+        minPoseDetectionConfidence: 0.6, minPosePresenceConfidence: 0.6, minTrackingConfidence: 0.6 });
       try { return await PoseLandmarker.createFromOptions(files, opts("GPU")); }
       catch { return await PoseLandmarker.createFromOptions(files, opts("CPU")); }
     })();
@@ -732,7 +836,7 @@ const LIMB = {
   elbow: [[J.ls, J.le, J.lw], [J.rs, J.re, J.rw]],
   hip:   [[J.ls, J.lh, J.lk], [J.rs, J.rh, J.rk]],
 };
-const seen = p => !!p && (p.visibility ?? 1) > 0.5;
+const seen = p => !!p && (p.visibility ?? 1) > 0.65;
 const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
 const gap = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 function jointAngle(a, b, c) {
@@ -752,83 +856,159 @@ function angleOf(lm, limb, either) {
 const shoulders = lm => mid(lm[J.ls], lm[J.rs]);
 const hips = lm => mid(lm[J.lh], lm[J.rh]);
 const torso = lm => gap(shoulders(lm), hips(lm));
+const feet = lm => mid(lm[J.la], lm[J.ra]);
+const knees = lm => mid(lm[J.lk], lm[J.rk]);
+// toes (31, 32) stay on the floor during calf raises, unlike ankles and heels
+const toes = lm => { const v = [lm[31], lm[32]].filter(seen); return v.length ? { x: v.reduce((s, p) => s + p.x, 0) / v.length, y: v.reduce((s, p) => s + p.y, 0) / v.length } : null; };
+// how far the torso leans: 0 = standing straight up, 90 = lying flat
+const tilt = lm => { const s = shoulders(lm), h = hips(lm); return Math.atan2(Math.abs(h.x - s.x), Math.abs(h.y - s.y)) * 180 / Math.PI; };
 const SIGNAL = {
   nose:  lm => lm[J.nose].y,
-  hip:   lm => hips(lm).y,
+  stand: lm => lm[J.nose].y - toes(lm).y,
   situp: lm => hips(lm).y - shoulders(lm).y,
-  tuck:  lm => mid(lm[J.lk], lm[J.rk]).y - hips(lm).y,
+  tuck:  lm => knees(lm).y - hips(lm).y,
   knees: lm => gap(lm[J.lk], shoulders(lm)) - gap(lm[J.rk], shoulders(lm)),
   sway:  lm => hips(lm).x,
 };
-const POSE = {
-  flat:    lm => { const s = shoulders(lm), a = mid(lm[J.la], lm[J.ra]); return Math.abs(s.y - a.y) < 0.4 * Math.abs(s.x - a.x); },
-  wallsit: lm => { const a = angleOf(lm, "knee"); return a != null && a > 60 && a < 125; },
+// Body positions. A move only counts while you're in its position, so waving, walking
+// or adjusting the phone doesn't add reps. T = torso length.
+const POSTURE = {
+  any:        () => true,
+  upright:    (lm, T) => tilt(lm) < 30 && shoulders(lm).y < hips(lm).y && feet(lm).y - hips(lm).y > 1.1 * T,
+  standing:   (lm, T) => tilt(lm) < 60 && shoulders(lm).y < hips(lm).y && feet(lm).y - hips(lm).y > 0.5 * T,
+  straight:   (lm, T) => POSTURE.upright(lm, T) && (angleOf(lm, "knee") ?? 0) > 155,
+  // legs out level too, so bending over to set the phone down isn't a plank
+  horizontal: (lm, T) => tilt(lm) > 55 && Math.abs(feet(lm).y - hips(lm).y) < 0.7 * T,
+  flat:       lm => { const s = shoulders(lm), a = feet(lm); return Math.abs(s.y - a.y) < 0.4 * Math.abs(s.x - a.x); },
+  floor:      (lm, T) => Math.abs(feet(lm).y - hips(lm).y) < 0.6 * T,
+  lying:      (lm, T) => tilt(lm) > 55 && Math.abs(feet(lm).y - shoulders(lm).y) < 0.7 * T,
+  pike:       (lm, T) => hips(lm).y < shoulders(lm).y - 0.2 * T,
+  // hips down low by the chair with hands behind you, so bending your arms while standing doesn't count
+  dips:       (lm, T) => tilt(lm) < 45 && shoulders(lm).y < hips(lm).y && feet(lm).y - hips(lm).y < 1.0 * T &&
+                         lm[J.lw].y > shoulders(lm).y + 0.3 * T && lm[J.rw].y > shoulders(lm).y + 0.3 * T,
+  torsoUp:    lm => tilt(lm) < 45 && shoulders(lm).y < hips(lm).y,
+  bear:       (lm, T) => tilt(lm) > 50 && feet(lm).y - hips(lm).y < 1.1 * T && lm[J.lw].y > shoulders(lm).y && lm[J.rw].y > shoulders(lm).y,
+  wallsit:    (lm, T) => { const a = angleOf(lm, "knee"); return tilt(lm) < 35 && Math.abs(hips(lm).y - knees(lm).y) < 0.4 * T && a != null && a > 60 && a < 125; },
+};
+const SETUP = {
+  any: "Get in the picture", upright: "Stand up straight", standing: "Stand up", straight: "Stand up straight",
+  horizontal: "Get into plank position", flat: "Get into position", floor: "Sit on the floor, knees bent",
+  lying: "Lie on your back", pike: "Hands and feet down, hips up high", dips: "Hands on the chair behind you",
+  bear: "Hands and feet on the floor", wallsit: "Slide down into your wall sit",
+};
+// Things that must keep happening during timed moves
+const EVENT = {
+  kneeLift: (lm, T) => Math.min(lm[J.lk].y, lm[J.rk].y) < hips(lm).y + 0.45 * T,
+  // arm straight out at shoulder height, like a jab (not waving up and down)
+  punch:    (lm, T) => LIMB.elbow.some(([s, e, w]) => seen(lm[w]) && jointAngle(lm[s], lm[e], lm[w]) > 150 && Math.abs(lm[w].x - lm[s].x) > 0.6 * T && Math.abs(lm[w].y - lm[s].y) < 0.35 * T),
 };
 function bodyVisible(lm, spec) {
   const any = (a, b) => seen(lm[a]) || seen(lm[b]);
-  if (!any(J.ls, J.rs) || !any(J.lh, J.rh)) return false;
-  if (spec.t === "angle" || spec.f === "wallsit") return angleOf(lm, spec.limb || "knee", spec.either) != null;
-  if (spec.t === "jacks") return seen(lm[J.lw]) && seen(lm[J.rw]);
-  if (spec.f === "flat") return any(J.la, J.ra);
-  return any(J.lk, J.rk);
+  if (!any(J.ls, J.rs) || !any(J.lh, J.rh) || !any(J.lk, J.rk) || !any(J.la, J.ra)) return false;
+  if (spec.t === "angle" || spec.pose === "wallsit") return angleOf(lm, spec.limb || "knee", spec.either) != null;
+  if (spec.t === "jacks" || spec.event === "punch") return seen(lm[J.lw]) && seen(lm[J.rw]);
+  if (spec.f === "stand") return !!toes(lm);
+  return true;
 }
 // One tracker per scan. step(lm, T, dt) takes landmarks (x already scaled to the picture's shape),
 // the torso length T and seconds since the last frame; progress is in .count (reps) or .secs.
+// .phase is "setup" (waiting for the start position), "go" or "off" (out of position).
 function makeTracker(spec) {
-  const st = { count: 0, secs: 0 };
+  const st = { count: 0, secs: 0, t: 0, phase: "setup", readyFor: 0, lost: 0, lastRep: -9, lastEvent: -9 };
+  const minRep = spec.minRep ?? 0.5;
+  const start = POSTURE[spec.start || spec.pose || "any"];
+  const gate = POSTURE[spec.pose || "any"];
+  const twice = (key, cond) => (st[key] = cond ? (st[key] || 0) + 1 : 0) >= 2; // true 2 frames in a row
+  const resetRep = () => { st.down = st.open = st.via = false; st.top = st.bottom = st.prev = null; st.speed = 0; };
+  const rep = () => { if (st.t - st.lastRep >= minRep) { st.count++; st.lastRep = st.t; } };
+  st.setupText = SETUP[spec.start || spec.pose || "any"];
+  // body went out of view or the frame glitched: drop the half-done rep, and after 1.5s start over
+  st.lose = dt => {
+    resetRep(); st.lost += dt;
+    if (st.lost > 1.5 && st.phase !== "setup") { st.phase = "setup"; st.readyFor = 0; }
+  };
   st.step = (lm, T, dt) => {
+    st.t += dt; st.lost = 0;
+    if (st.phase === "setup") {
+      st.readyFor = start(lm, T) ? st.readyFor + dt : 0;
+      if (st.readyFor >= 1) { st.phase = "go"; resetRep(); }
+      return;
+    }
+    if (!gate(lm, T)) { if (st.phase === "go") resetRep(); st.phase = "off"; return; }
+    st.phase = "go";
+    if (spec.via && POSTURE[spec.via](lm, T)) st.via = true;
     switch (spec.t) {
       case "angle": {
         const a = angleOf(lm, spec.limb, spec.either);
         if (a == null) return;
-        if (a <= spec.lo) st.down = true;
-        else if (st.down && a >= spec.hi) { st.down = false; st.count++; }
+        const low = twice("lowN", a <= spec.lo), high = twice("highN", a >= spec.hi);
+        if (low) st.down = true;
+        else if (st.down && high) { st.down = false; rep(); }
         return;
       }
       case "range": {
         const v = SIGNAL[spec.f](lm) / T;
-        if (v <= spec.lo) st.down = true;
-        else if (st.down && v >= spec.hi) { st.down = false; st.count++; }
+        const low = twice("lowN", v <= spec.lo), high = twice("highN", v >= spec.hi);
+        if (low) st.down = true;
+        else if (st.down && high) { st.down = false; rep(); }
         return;
       }
       case "bob": {
         // bigger = lower in the picture; `up` flips it for moves that rise first (calf raises)
-        const v = SIGNAL[spec.f](lm) / T * (spec.up ? -1 : 1);
+        const raw = SIGNAL[spec.f](lm) / T * (spec.up ? -1 : 1);
+        const v = st.sm = st.sm == null ? raw : st.sm + (raw - st.sm) * 0.35;
+        if (spec.planted) { // feet sliding around means walking, not a calf raise
+          const f = feet(lm);
+          if (st.feet && gap(f, st.feet) > 0.06 * T) { st.feet = f; st.down = false; st.top = v; return; }
+          st.feet = f;
+        }
         if (!st.down) {
           st.top = Math.min(st.top ?? v, v);
           if (v - st.top >= spec.amp) { st.down = true; st.bottom = v; }
         } else {
           st.bottom = Math.max(st.bottom, v);
-          if (st.bottom - v >= spec.amp * 0.8) { st.down = false; st.count++; st.top = v; }
+          if (st.bottom - v >= spec.amp * 0.8) {
+            st.down = false; st.top = v;
+            if (!spec.via || st.via) rep();
+            st.via = false;
+          }
         }
         return;
       }
       case "alt": {
         let v = SIGNAL[spec.f](lm) / T;
         if (spec.center) { st.base = st.base == null ? v : st.base + (v - st.base) * 0.05; v -= st.base; }
-        if (v > spec.thr && st.side !== 1) { st.side = 1; st.count++; }
-        else if (v < -spec.thr && st.side !== -1) { st.side = -1; st.count++; }
+        const lifted = !spec.lift || Math.abs(lm[J.la].y - lm[J.ra].y) > spec.lift * T; // skaters land on one foot
+        const right = twice("rN", v > spec.thr && lifted), left = twice("lN", v < -spec.thr && lifted);
+        if (right && st.side !== 1) { st.side = 1; rep(); }
+        else if (left && st.side !== -1) { st.side = -1; rep(); }
         return;
       }
       case "jacks": {
         const s = shoulders(lm);
-        const up = lm[J.lw].y < s.y && lm[J.rw].y < s.y;
-        const down = lm[J.lw].y > s.y + 0.3 * T && lm[J.rw].y > s.y + 0.3 * T;
-        if (up) st.open = true;
-        else if (st.open && down) { st.open = false; st.count++; }
+        const shoulderW = gap(lm[J.ls], lm[J.rs]);
+        const open = twice("openN", lm[J.lw].y < s.y && lm[J.rw].y < s.y && gap(lm[J.la], lm[J.ra]) > shoulderW);
+        const closed = twice("closedN", lm[J.lw].y > s.y + 0.3 * T && lm[J.rw].y > s.y + 0.3 * T);
+        if (open) st.open = true;
+        else if (st.open && closed) { st.open = false; rep(); }
         return;
       }
       case "hold":
-        if (POSE[spec.f](lm)) st.secs += dt;
+        st.secs += dt;
         return;
       case "active": {
-        const pts = spec.pts.map(i => lm[i]);
+        if (spec.event && EVENT[spec.event](lm, T)) st.lastEvent = st.t;
+        // joints are measured against the body (rel), so walking around doesn't count as moving;
+        // dir keeps only side-to-side (x, punches) or up-and-down (y, knees and kicks) motion
+        const base = spec.rel === "shoulders" ? shoulders(lm) : hips(lm);
+        const pts = spec.pts.map(i => ({ x: lm[i].x - base.x, y: lm[i].y - base.y }));
+        const step = (p, q) => spec.dir === "x" ? Math.abs(p.x - q.x) : spec.dir === "y" ? Math.abs(p.y - q.y) : gap(p, q);
         if (st.prev && dt > 0) {
           // average of the faster half of the joints, so one fast knee or fist counts
-          const moves = pts.map((p, k) => gap(p, st.prev[k])).sort((a, b) => b - a).slice(0, Math.ceil(pts.length / 2));
+          const moves = pts.map((p, k) => step(p, st.prev[k])).sort((a, b) => b - a).slice(0, Math.ceil(pts.length / 2));
           const speed = moves.reduce((a, b) => a + b, 0) / moves.length / T / dt;
           st.speed = (st.speed || 0) * 0.7 + speed * 0.3;
-          if (st.speed > 0.9) st.secs += dt; // above camera jitter when standing still
+          if (st.speed > 0.9 && (!spec.event || st.t - st.lastEvent < 1)) st.secs += dt; // above camera jitter when standing still
         }
         st.prev = pts.map(p => ({ x: p.x, y: p.y }));
         return;
@@ -845,7 +1025,7 @@ async function startScan(i) {
   const W = current, e = W && W.ex[i], def = e && EXERCISE[e.name];
   if (!def || !def.cam || scan) return;
   const goal = scanGoal(e), round = Math.min((W.progress[i] || 0) + 1, W.rounds);
-  scan = { i, goal, kind: e.kind, spec: def.cam, tracker: makeTracker(def.cam), stream: null, raf: 0, last: 0, lastVT: -1, lm: null, T: null, done: false };
+  scan = { i, goal, kind: e.kind, spec: def.cam, tracker: makeTracker(def.cam), stream: null, raf: 0, last: 0, lastVT: -1, lm: null, T: null, glitches: 0, done: false };
   camEl("camName").textContent = e.name;
   camEl("camRound").textContent = W.rounds > 1 ? `Round ${round} of ${W.rounds}` : "Camera check";
   camEl("camTip").textContent = def.cam.tip + (def.per ? ` · ${e.amt} ${e.hint.toLowerCase()} = ${goal}` : "");
@@ -890,7 +1070,20 @@ function scanLoop(now) {
     const dt = scan.last ? Math.min(0.25, (now - scan.last) / 1000) : 0;
     scan.last = now;
     const aspect = video.videoWidth / video.videoHeight || 1;
-    if (raw) {
+    const tr = scan.tracker;
+    // A body that jumps across the picture in one frame is the tracker glitching
+    // (or grabbing something else), not you moving. Skip up to 3 such frames in a row.
+    let glitch = false;
+    if (raw && scan.lm && scan.T) {
+      const jump = [11, 12, 23, 24].reduce((s, k) => s + Math.hypot(raw[k].x * aspect - scan.lm[k].x, raw[k].y - scan.lm[k].y), 0) / 4;
+      if (jump > 0.5 * scan.T) {
+        glitch = ++scan.glitches <= 3;
+        if (!glitch) { scan.lm = null; tr.lose(dt); } // it really moved: start smoothing fresh
+      } else scan.glitches = 0;
+    }
+    if (glitch) {
+      tr.lose(0);
+    } else if (raw) {
       // smooth out jitter; x is scaled so distances match the real picture shape
       const lm = raw.map((p, k) => {
         const q = { x: p.x * aspect, y: p.y, visibility: p.visibility ?? 1 };
@@ -902,17 +1095,20 @@ function scanLoop(now) {
       const t = torso(lm);
       if (t > 0.02) scan.T = scan.T ? scan.T + (t - scan.T) * 0.1 : t;
       if (visible && scan.T) {
-        const before = scan.tracker.count;
-        scan.tracker.step(lm, scan.T, dt);
-        camStatus("Tracking you. Keep going!");
-        if (scan.tracker.count > before) bump();
+        const before = tr.count;
+        tr.step(lm, scan.T, dt);
+        if (tr.phase === "setup") camStatus(tr.readyFor > 0 ? `Hold it… starting in ${Math.ceil(1 - tr.readyFor)}` : tr.setupText + " to start");
+        else if (tr.phase === "off") camStatus(tr.setupText + " to keep counting", true);
+        else camStatus("Go! Counting your reps.");
+        if (tr.count > before) bump();
       } else {
-        if (scan.tracker.prev) scan.tracker.prev = null;
+        tr.lose(dt);
         camStatus("Step back so your whole body fits in the picture", true);
       }
-      drawSkeleton(raw, visible);
+      drawSkeleton(raw, visible && tr.phase !== "off");
     } else {
       scan.lm = null;
+      tr.lose(dt);
       camStatus("Can't see you yet. Step into the picture.", true);
       drawSkeleton(null);
     }
@@ -1080,6 +1276,7 @@ function renderWorkout() {
   W.ex.forEach((e, i) => {
     const id = "ex-" + i;
     const amt = h("span", { class: "amt", text: e.kind === "reps" ? "×" + e.amt : e.amt + "s" });
+    const info = HOWTO[e.name] ? h("button", { class: "infobtn", "aria-label": "How to do " + e.name, onclick: () => showInfo(e.name) }, "i") : null;
     if (CAM) {
       const p = W.progress[i] || 0, done = p >= W.rounds;
       const sub = [e.hint, W.rounds > 1 ? `${p} of ${W.rounds} rounds scanned` : null].filter(Boolean).join(" · ");
@@ -1087,13 +1284,13 @@ function renderWorkout() {
         done ? h("span", { class: "scanned", "aria-label": "Scanned" }, "✓") :
           h("button", { class: "scanbtn", disabled: !active, "aria-label": "Scan " + e.name, onclick: () => startScan(i) }, camIcon(), "Scan"),
         h("div", { class: "exlabel" }, h("span", { class: "nm", text: e.name }), sub ? h("span", { class: "hint", text: sub }) : null),
-        amt));
+        amt, info));
       return;
     }
     list.append(h("li", { class: "ex" + (W.checks[i] ? " done" : "") },
       h("input", { type: "checkbox", id, checked: W.checks[i], disabled: !active, onchange: ev => { W.checks[i] = ev.target.checked; ev.target.closest(".ex").classList.toggle("done", ev.target.checked); saveLocalOnly(); tickWorkout(); } }),
       h("label", { for: id }, h("span", { class: "nm", text: e.name }), e.hint ? h("span", { class: "hint", text: e.hint }) : null),
-      amt
+      amt, info
     ));
   });
 
@@ -1145,6 +1342,54 @@ function camIcon() {
   const s = h("span", { class: "camicon", "aria-hidden": "true" });
   s.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
   return s;
+}
+// Front and back body outline with each muscle group as a shape; main muscles are solid, the rest faint.
+function muscleMap(main, also) {
+  const fill = id => main.includes(id) ? "mm-main" : also.includes(id) ? "mm-also" : "mm-idle";
+  const both = (cx, dx, y, rx, ry, id) => `<ellipse class="${fill(id)}" cx="${cx - dx}" cy="${y}" rx="${rx}" ry="${ry}"/><ellipse class="${fill(id)}" cx="${cx + dx}" cy="${y}" rx="${rx}" ry="${ry}"/>`;
+  const body = cx => `
+    <circle class="mm-body" cx="${cx}" cy="22" r="13"/>
+    <rect class="mm-body" x="${cx - 6}" y="33" width="12" height="9"/>
+    <path class="mm-body" d="M${cx - 30} 42 Q${cx} 36 ${cx + 30} 42 L${cx + 24} 118 Q${cx} 124 ${cx - 24} 118 Z"/>
+    <rect class="mm-body" x="${cx - 44}" y="44" width="13" height="46" rx="6"/><rect class="mm-body" x="${cx + 31}" y="44" width="13" height="46" rx="6"/>
+    <rect class="mm-body" x="${cx - 47}" y="90" width="12" height="42" rx="6"/><rect class="mm-body" x="${cx + 35}" y="90" width="12" height="42" rx="6"/>
+    <circle class="mm-body" cx="${cx - 41}" cy="138" r="6"/><circle class="mm-body" cx="${cx + 41}" cy="138" r="6"/>
+    <rect class="mm-body" x="${cx - 23}" y="118" width="21" height="60" rx="9"/><rect class="mm-body" x="${cx + 2}" y="118" width="21" height="60" rx="9"/>
+    <rect class="mm-body" x="${cx - 21}" y="178" width="17" height="46" rx="8"/><rect class="mm-body" x="${cx + 4}" y="178" width="17" height="46" rx="8"/>
+    <ellipse class="mm-body" cx="${cx - 13}" cy="228" rx="9" ry="4"/><ellipse class="mm-body" cx="${cx + 13}" cy="228" rx="9" ry="4"/>`;
+  const F = 70, B = 190;
+  const front = body(F) +
+    both(F, 33, 50, 9, 9, "shoulders") + both(F, 12, 58, 13, 9, "chest") + both(F, 37.5, 70, 5, 14, "biceps") +
+    `<rect class="${fill("abs")}" x="${F - 9}" y="70" width="18" height="40" rx="5"/>` +
+    both(F, 19, 92, 5, 15, "obliques") + both(F, 9, 124, 6, 6, "hipFlexors") + both(F, 12.5, 150, 9, 22, "quads");
+  const back = body(B) +
+    both(B, 33, 50, 9, 9, "shoulders") + `<ellipse class="${fill("back")}" cx="${B}" cy="52" rx="16" ry="9"/>` +
+    both(B, 16, 78, 10, 18, "back") + both(B, 37.5, 70, 5, 14, "triceps") +
+    `<ellipse class="${fill("lowerBack")}" cx="${B}" cy="106" rx="13" ry="8"/>` +
+    both(B, 11, 127, 11, 10, "glutes") + both(B, 12.5, 157, 8, 18, "hamstrings") + both(B, 12.5, 198, 7, 14, "calves");
+  const wrap = h("div", { class: "mm" });
+  wrap.innerHTML = `<svg viewBox="0 0 260 250" role="img" aria-label="Muscle map, front and back"><g>${front}</g><g>${back}</g>
+    <text class="mm-label" x="${F}" y="246">FRONT</text><text class="mm-label" x="${B}" y="246">BACK</text></svg>`;
+  return wrap;
+}
+function showInfo(name) {
+  const info = HOWTO[name], def = EXERCISE[name];
+  if (!info) return;
+  const names = ids => ids.map(id => MUSCLES[id]).join(", ");
+  const close = () => { $("#infoOv").hidden = true; };
+  $("#infoOvInner").replaceChildren(...[
+    h("button", { class: "closex", "aria-label": "Close", onclick: close }, "×"),
+    h("div", { class: "eyebrow", text: "How to do it" }),
+    h("h2", { style: "padding-right:48px", text: name }),
+    muscleMap(info.main, info.also),
+    h("div", { class: "mm-legend" },
+      h("div", {}, h("i", { class: "mm-key mm-main" }), h("span", {}, h("b", { text: "Main muscles: " }), names(info.main))),
+      info.also.length ? h("div", {}, h("i", { class: "mm-key mm-also" }), h("span", {}, h("b", { text: "Also works: " }), names(info.also))) : null),
+    h("ol", { class: "steps" }, info.steps.map(s => h("li", { text: s }))),
+    h("p", { class: "infotip" }, h("b", { text: "Tip: " }), info.tip),
+    CAM && def && def.cam ? h("p", { class: "infotip" }, h("b", { text: "Camera: " }), def.cam.tip + ". Hold the start position for a second and it'll start counting.") : null,
+    h("button", { class: "btn primary wide", onclick: close }, "Got it")].filter(Boolean));
+  $("#infoOv").hidden = false;
 }
 function claim() {
   const W = current; if (!W || !W.startedAt) return;
@@ -1517,7 +1762,8 @@ function renderTab() {
 function renderAll() { renderHeader(); renderTab(); }
 document.querySelectorAll(".nav button").forEach(b => b.addEventListener("click", () => setTab(b.dataset.tab)));
 for (const id of ["#crateOv", "#gymOv"]) $(id).addEventListener("click", e => { if (e.target.id === id.slice(1) && id === "#gymOv") $(id).hidden = true; });
-document.addEventListener("keydown", e => { if (e.key === "Escape") { $("#gymOv").hidden = true; if (scan) stopScan(); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape") { $("#gymOv").hidden = true; $("#infoOv").hidden = true; if (scan) stopScan(); } });
+$("#infoOv").addEventListener("click", e => { if (e.target.id === "infoOv") $("#infoOv").hidden = true; });
 $("#camStop").addEventListener("click", () => stopScan());
 document.addEventListener("visibilitychange", () => { if (document.hidden && scan) stopScan(); });
 
