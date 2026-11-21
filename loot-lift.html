@@ -2584,6 +2584,18 @@ function buyDeal(id) {
   save(); renderAll();
   toast(`Bought ${it.name}! It's in your storage.`);
 }
+// Secret codes typed in Settings. Only a fingerprint of each code is kept here, not the code itself.
+const codeHash = str => { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h; };
+const CODES = { 2973782296: { what: "every color theme", use: () => { S.themes = THEMES.map(t => t.id); } } };
+function redeemCode(raw) {
+  const code = (raw || "").trim();
+  if (!code) { toast("Type a code first"); return false; }
+  const hit = CODES[codeHash(code)];
+  if (!hit) { toast("That code doesn't work"); return false; }
+  hit.use(); save(); renderAll();
+  toast(`Code accepted! You unlocked ${hit.what}.`);
+  return true;
+}
 function buyTheme(id) {
   const t = THEME_BY_ID[id];
   if (!t || ownsTheme(id) || !spend(THEME_PRICE)) return;
@@ -2710,6 +2722,11 @@ function renderSettings() {
     h("div", { class: "themepick", role: "group", "aria-label": "App theme" }, mine.map(t =>
       h("button", { "aria-pressed": String(cur === t.id), onclick: () => { setTheme(t.id); renderSettings(); toast(t.name.replace("👑 ", "") + " theme on"); } }, themePreview(t), t.name))),
     mine.length < THEMES.length + 1 ? h("p", { class: "note" }, "Buy more color themes in the ", h("b", { text: "Shop" }), ".") : null));
+  const codeIn = h("input", { id: "secretCode", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", enterkeyhint: "done", placeholder: "Enter code", "aria-label": "Secret code" });
+  root.append(h("form", { class: "card", onsubmit: e => { e.preventDefault(); if (redeemCode(codeIn.value)) codeIn.value = ""; codeIn.blur(); } },
+    h("span", { class: "eyebrow", text: "Secret code" }),
+    h("p", { class: "note", text: "Got a code? Type it exactly, capitals and all." }),
+    h("div", { class: "row", style: "flex-wrap:nowrap" }, codeIn, h("button", { class: "btn primary", type: "submit" }, "Redeem"))));
   const moves = EXERCISES.filter(e => e.db);
   root.append(h("div", { class: "card" },
     h("span", { class: "eyebrow", text: on ? "Dumbbell moves in your workouts" : "Dumbbell moves you'll unlock" }),
