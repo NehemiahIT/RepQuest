@@ -116,7 +116,31 @@ html[data-theme] .nav .badge { color: var(--ink); }
 /* Christmas: the one light theme. Red logo and accents, green buttons, snow falling. */
 html[data-theme="xmas"] { color-scheme: light; }
 html[data-theme="xmas"] .brand { color: #1f8a46; }
-html[data-theme="xmas"] .card { box-shadow: 0 1px 0 #ffffff inset, 0 2px 8px #6d9dc21f; }
+html[data-theme="xmas"] section > .card, html[data-theme="xmas"] section > form.card { box-shadow: inset 0 4px 0 #d42a2f, 0 2px 8px #6d9dc21f; }
+html[data-theme="xmas"] section > .card:nth-of-type(even), html[data-theme="xmas"] section > form.card:nth-of-type(even) { box-shadow: inset 0 4px 0 #1f8a46, 0 2px 8px #6d9dc21f; }
+/* candy-cane stripe under the header */
+html[data-theme="xmas"] .top { border-bottom: 0; box-shadow: 0 5px 0 -1px transparent; background-image: linear-gradient(var(--floor), var(--floor)), repeating-linear-gradient(-45deg, #d42a2f 0 10px, #ffffff 10px 20px, #1f8a46 20px 30px, #ffffff 30px 40px); background-size: 100% calc(100% - 6px), 100% 6px; background-position: top, bottom; background-repeat: no-repeat; padding-bottom: 16px; }
+/* stat boxes alternate red and green */
+html[data-theme="xmas"] .stat:nth-child(odd) { background: #fde6e6; }
+html[data-theme="xmas"] .stat:nth-child(odd) b { color: #b8222a; }
+html[data-theme="xmas"] .stat:nth-child(even) { background: #e2f4e8; }
+html[data-theme="xmas"] .stat:nth-child(even) b { color: #18723a; }
+html[data-theme="xmas"] .lvl-badge { background: #d42a2f; color: #fff; }
+html[data-theme="xmas"] .xpbar i { background: repeating-linear-gradient(-45deg, #d42a2f 0 8px, #1f8a46 8px 16px); }
+/* green headings, red labels */
+html[data-theme="xmas"] h2 { color: #18723a; }
+html[data-theme="xmas"] .eyebrow { color: #c42228; }
+/* green bottom bar with white icons and a red marker */
+html[data-theme="xmas"] .nav { background: #18723a; border-top: 3px solid #d42a2f; }
+html[data-theme="xmas"] .nav button { color: #cfead8; }
+html[data-theme="xmas"] .nav button[aria-selected="true"] { color: #ffffff; }
+html[data-theme="xmas"] .nav button[aria-selected="true"]::after { background: #ff5a5f; height: 4px; }
+html[data-theme="xmas"] .nav .badge { background: #d42a2f; color: #fff; box-shadow: 0 0 0 2px #18723a; }
+/* workout rows and items edged in red and green */
+html[data-theme="xmas"] .ex { border-left: 4px solid #d42a2f; border-radius: 0 10px 10px 0; }
+html[data-theme="xmas"] .ex:nth-child(even) { border-left-color: #1f8a46; }
+html[data-theme="xmas"] .chip { border-color: #1f8a46; color: #18723a; }
+html[data-theme="xmas"] .toast { background: #18723a; color: #fff; }
 #snow { position: fixed; inset: 0; pointer-events: none; z-index: 30; overflow: hidden; }
 #snow i { position: absolute; top: -12px; border-radius: 50%; background: #ffffff; box-shadow: 0 0 3px #9cc7ea; opacity: .9; animation: snowfall linear infinite; }
 @keyframes snowfall { 0% { transform: translate(0, -12px); } 25% { transform: translate(12px, 25vh); } 50% { transform: translate(-8px, 50vh); } 75% { transform: translate(10px, 75vh); } 100% { transform: translate(0, 105vh); } }
