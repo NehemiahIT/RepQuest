@@ -89,7 +89,7 @@ def shade(rgb, f):
 def theme_palettes(src):
     """Icon colors for each app theme, read from the THEMES list in the page plus Gold."""
     pals = {"gold": ((0x0B, 0x0A, 0x08), (0xF2, 0xC9, 0x4C), (0xB8, 0x86, 0x2B), (0x3D, 0x32, 0x20), (0x05, 0x04, 0x03))}
-    for m in re.finditer(r'\{ id: "(\w+)",\s*name: "[^"]*",\s*v: \{([^}]*)\} \}', src):
+    for m in re.finditer(r'\{ id: "(\w+)",\s*name: "[^"]*",[^{]*?v: \{([^}]*)\} \}', src):
         v = dict(re.findall(r'"?([\w-]+)"?: "(#[0-9a-fA-F]{6})"', m.group(2)))
         bg, acc = hex_rgb(v["floor"]), hex_rgb(v["accent"])
         pals[m.group(1)] = (bg, acc, shade(acc, 0.78), hex_rgb(v["panel-2"]), shade(bg, 0.6))

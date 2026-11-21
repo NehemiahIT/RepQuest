@@ -2678,7 +2678,7 @@ const THEMES = [
   { id: "blossom", name: "Cherry Blossom", v: { floor: "#140a10", panel: "#22111b", "panel-2": "#301827", line: "#4a253b", chalk: "#ffeef6", dim: "#c9a3b6", ink: "#1a0a12", accent: "#ff8fc7", btn: "#ffc2df" } },
   { id: "steel",   name: "Steel",          v: { floor: "#101418", panel: "#1a2027", "panel-2": "#242c35", line: "#36414d", chalk: "#eef3f8", dim: "#94a3b3", ink: "#0f1418", accent: "#7cc4ff", btn: "#cfd8e3" } },
   { id: "royalblue", name: "Royal Blue & White", v: { floor: "#0c2266", panel: "#14318a", "panel-2": "#1d3fa6", line: "#3558c4", chalk: "#ffffff", dim: "#c9d6ff", ink: "#0c2266", accent: "#ffffff", btn: "#ffffff", knob: "#0c2266" } },
-  { id: "xmas",    name: "Christmas",          v: { floor: "#cfe7f8", panel: "#f4faff", "panel-2": "#e2f0fb", line: "#a9cbe6", chalk: "#10283b", dim: "#4c6a80", ink: "#ffffff", accent: "#d42a2f", btn: "#1f8a46", knob: "#ffffff" } },
+  { id: "xmas",    name: "Christmas", codeOnly: true, v: { floor: "#cfe7f8", panel: "#f4faff", "panel-2": "#e2f0fb", line: "#a9cbe6", chalk: "#10283b", dim: "#4c6a80", ink: "#ffffff", accent: "#d42a2f", btn: "#1f8a46", knob: "#ffffff" } },
   { id: "cocoa",   name: "Light Blue & Brown", v: { floor: "#1c120b", panel: "#2a1b11", "panel-2": "#3a2618", line: "#553925", chalk: "#eef8ff", dim: "#bfa892", ink: "#1c120b", accent: "#8fd3ff", btn: "#a9ddff" } },
 ];
 const THEME_BY_ID = Object.fromEntries(THEMES.map(t => [t.id, t]));
@@ -3026,7 +3026,8 @@ async function restoreBackup(code) {
 const codeHash = str => { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h; };
 // once: each player can only use that code one time
 const CODES = {
-  2973782296: { what: "every color theme", use: () => { S.themes = THEMES.map(t => t.id); } },
+  2973782296: { what: "every color theme", use: () => { S.themes = [...new Set([...(S.themes || []), ...THEMES.filter(t => !t.codeOnly).map(t => t.id)])]; } },
+  3141767601: { what: "the Christmas theme", use: () => { S.themes = [...new Set([...(S.themes || []), "xmas"])]; setTheme("xmas"); } },
   4231158410: { what: "a Powerlifter crate", once: true, use: () => { S.crates.push(TOP); } },
 };
 function redeemCode(raw) {
@@ -3092,7 +3093,7 @@ function renderShop() {
   const cur = activeTheme();
   root.append(h("div", { class: "card" },
     h("div", { class: "row" }, h("h2", { text: "Themes" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: "Recolor the whole app" })),
-    h("div", { class: "shopgrid" }, THEMES.map(t => {
+    h("div", { class: "shopgrid" }, THEMES.filter(t => !t.codeOnly || ownsTheme(t.id)).map(t => {
       const have = ownsTheme(t.id), using = cur === t.id;
       return h("div", { class: "item", style: `--rc:${t.v.accent}` },
         themePreview(t), h("span", { class: "nm", text: t.name }),
@@ -3174,7 +3175,7 @@ function renderSettings() {
     h("div", { class: "row" }, h("h2", { text: "Theme" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: `${mine.length - 1} unlocked` })),
     h("div", { class: "themepick", role: "group", "aria-label": "App theme" }, mine.map(t =>
       h("button", { "aria-pressed": String(cur === t.id), onclick: () => { setTheme(t.id); renderSettings(); toast(t.name.replace("👑 ", "") + " theme on"); } }, themePreview(t), t.name))),
-    mine.length < THEMES.length + 1 ? h("p", { class: "note" }, "Buy more color themes in the ", h("b", { text: "Shop" }), ".") : null,
+    THEMES.some(t => !t.codeOnly && !ownsTheme(t.id)) ? h("p", { class: "note" }, "Buy more color themes in the ", h("b", { text: "Shop" }), ".") : null,
     window.LOOTLIFT_PWA ? h("details", { class: "infotip" },
       h("summary", { text: "Make the home-screen icon match your theme" }),
       h("p", { class: "note", style: "margin:8px 0 6px", text: "Phones only pick up the icon when you add the app, so you'll add it again. Your progress comes with you through a backup:" }),
