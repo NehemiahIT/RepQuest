@@ -342,8 +342,11 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 .item .ct { position: absolute; top: 6px; right: 8px; font-family: var(--label); font-weight: 700; font-size: 13px; color: var(--dim); }
 .item[aria-pressed="true"] { border-color: var(--chalk); }
 .item .got { color: var(--p10); }
-.item.missing > :not(.nm):not(.kind) { opacity: .35; filter: grayscale(1); }
-.item.missing .nm { color: var(--dim); }
+/* items you haven't found yet: a dark silhouette, no name, so you can't tell exactly what it is */
+.item.missing .em { filter: brightness(0) drop-shadow(0 0 1px #ffffff40); opacity: .85; }
+.item.missing .swatch { filter: brightness(0); box-shadow: 0 0 0 1px #ffffff26; }
+.item.missing .neon { filter: brightness(0) blur(2.5px); opacity: .9; animation: none; }
+.item.missing .nm { color: var(--dim); letter-spacing: .12em; }
 .kind { font-size: 12px; color: var(--dim); }
 /* settings */
 .setrow { display: flex; align-items: center; gap: 14px; }
@@ -2141,18 +2144,20 @@ function renderGym() {
   root.append(all);
   if (!allOpen) return;
   all.id = "allItems";
-  all.append(h("p", { class: "note", text: "Everything you can get from crates. Faded items are ones you haven't found yet." }));
+  all.append(h("p", { class: "note", text: "Everything you can get from crates. Shadows are items you haven't found yet. Open crates to reveal them." }));
   RAR.forEach((R, r) => {
     const items = ITEMS.filter(i => i.r === r);
     const have = items.filter(i => found.has(i.id)).length;
     const from = CRATE_DROPS.map((o, c) => o[r] ? RAR[c].label : null).filter(Boolean);
     const where = r === OLY ? "Earned by collecting every other item" : "Found in " + from.join(", ") + " crates";
     const grid = h("div", { class: "invgrid" });
-    items.forEach(it => grid.append(h("div", { class: "item" + (found.has(it.id) ? "" : " missing"), style: `--rc:${R.color}`, title: it.d },
-      found.has(it.id) ? h("span", { class: "ct got", "aria-label": "Found", text: "✓" }) : null,
-      it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` }) : it.txt ? h("span", { class: neonClass(it), style: "padding:9px 0", text: it.txt }) : h("span", { class: "em", text: it.e }),
-      h("span", { class: "nm", text: it.name }),
-      h("span", { class: "kind", text: it.slot === "wall" ? "Wall decor" : it.slot === "floor" ? "Gym gear" : it.slot === "wallSkin" ? "Wall style" : "Floor style" }))));
+    items.forEach(it => { const got = found.has(it.id); grid.append(h("div", { class: "item" + (got ? "" : " missing"), style: `--rc:${R.color}`, title: got ? it.d : null },
+      got ? h("span", { class: "ct got", "aria-label": "Found", text: "✓" }) : null,
+      it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}`, "aria-hidden": got ? null : "true" })
+        : it.txt ? h("span", { class: neonClass(it), style: "padding:9px 0", "aria-hidden": got ? null : "true", text: it.txt })
+        : h("span", { class: "em", "aria-hidden": got ? null : "true", text: it.e }),
+      h("span", { class: "nm", "aria-label": got ? null : "Not found yet", text: got ? it.name : "???" }),
+      h("span", { class: "kind", text: it.slot === "wall" ? "Wall decor" : it.slot === "floor" ? "Gym gear" : it.slot === "wallSkin" ? "Wall style" : "Floor style" }))); });
     all.append(h("div", { class: "invgroup" },
       h("div", { class: "row", style: "justify-content:space-between" },
         h("span", { class: "eyebrow", style: "font-size:14px" }, rarText(r, R.label)),
