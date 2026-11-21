@@ -30,6 +30,8 @@
   --olympian: linear-gradient(110deg, #fff6c9 0%, #e7b53c 16%, #9c6b12 28%, #f4f7fb 42%, #9aa6b8 54%, #ffffff 62%, #d9a53a 76%, #fff1b0 88%, #b9c3d1 100%);
   --rainbow: linear-gradient(90deg, #ff3b3b, #ffb627, #f2ff3b, #3bff8a, #3bb5ff, #b46cff, #ff4fa3);
   --ink: #101216;
+  --accent: var(--p25);   /* logo, selected tab, toggles, muscle map: themes change this */
+  --btn: var(--chalk);    /* main buttons */
   --display: "Saira Stencil One", "Impact", "Arial Narrow Bold", sans-serif;
   --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
   --label: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
@@ -75,7 +77,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--chalk); out
 .top { display: flex; flex-direction: column; gap: 12px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--floor); padding-block: 8px 10px; border-bottom: 1px solid var(--line); }
 .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .brand { font-family: var(--display); font-size: 28px; letter-spacing: .02em; line-height: 1; margin: 0; }
-.brand span { color: var(--p25); }
+.brand span { color: var(--accent); }
 .lvl { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .lvl-badge { font-family: var(--label); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; background: var(--chalk); color: var(--ink); padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
 .xpbar { flex: 1; height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; min-width: 32px; }
@@ -98,8 +100,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--chalk); out
 .nav button { background: none; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--dim); font-family: var(--label); font-weight: 600; font-size: 12px; letter-spacing: .03em; padding: 0; min-width: 0; text-transform: uppercase; position: relative; }
 .nav button svg { width: 24px; height: 24px; }
 .nav button[aria-selected="true"] { color: var(--chalk); }
-.nav button[aria-selected="true"]::after { content: ""; position: absolute; top: 0; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; background: var(--p25); }
-.nav .badge { position: absolute; top: 8px; left: calc(50% + 6px); background: var(--p25); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 9px; display: grid; place-items: center; padding: 0 4px; letter-spacing: 0; }
+.nav button[aria-selected="true"]::after { content: ""; position: absolute; top: 0; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; background: var(--accent); }
+.nav .badge { position: absolute; top: 8px; left: calc(50% + 6px); background: var(--accent); color: #fff; font-size: 11px; min-width: 18px; height: 18px; border-radius: 9px; display: grid; place-items: center; padding: 0 4px; letter-spacing: 0; }
 
 /* ---------- generic ---------- */
 h2 { font-family: var(--display); font-size: 22px; font-weight: 400; margin: 0; line-height: 1.1; text-wrap: balance; }
@@ -108,7 +110,19 @@ h2 { font-family: var(--display); font-size: 22px; font-weight: 400; margin: 0; 
 .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .spacer { flex: 1; }
 .btn { border: 0; border-radius: 10px; padding: 14px 18px; font-family: var(--label); font-weight: 700; font-size: 17px; letter-spacing: .06em; text-transform: uppercase; background: var(--panel-2); color: var(--chalk); min-height: 50px; }
-.btn.primary { background: var(--chalk); color: var(--ink); }
+.btn.primary { background: var(--btn); color: var(--ink); }
+/* bought color themes (html[data-theme]); their colors are set from THEMES in the script */
+html[data-theme] .nav .badge { color: var(--ink); }
+html[data-theme] .chip[aria-pressed="true"], html[data-theme] .seg button[aria-pressed="true"] { background: var(--btn); border-color: var(--btn); color: var(--ink); }
+html[data-theme] .card { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent); }
+.themeprev { width: 100%; aspect-ratio: 1.6; border-radius: 10px; background: var(--tf); padding: 8px; display: flex; flex-direction: column; gap: 5px; border: 1px solid #ffffff1a; }
+.themeprev .tp-bar { height: 10px; width: 55%; border-radius: 3px; background: var(--ta); }
+.themeprev .tp-card { flex: 1; border-radius: 6px; background: var(--tp); display: flex; align-items: flex-end; padding: 5px; gap: 4px; }
+.themeprev .tp-btn { height: 10px; flex: 1; border-radius: 3px; background: var(--tb); }
+.themeprev .tp-dot { height: 10px; width: 10px; border-radius: 50%; background: var(--ta); }
+.themepick { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+.themepick button { background: var(--panel-2); border: 2px solid transparent; border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 6px; align-items: stretch; font-family: var(--label); font-weight: 700; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+.themepick button[aria-pressed="true"] { border-color: var(--accent); }
 .btn.go { background: var(--tc, var(--p10)); color: var(--ink); }
 .btn.ghost { background: transparent; border: 1px solid var(--line); }
 .btn.wide { width: 100%; }
@@ -382,7 +396,7 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 .switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
 .switch .track { position: absolute; inset: 0; border-radius: 16px; background: var(--panel-2); border: 2px solid var(--line, rgba(255,255,255,.18)); transition: background .2s, border-color .2s; }
 .switch .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--dim); transition: transform .2s, background .2s; }
-.switch input:checked + .track { background: var(--p25); border-color: var(--p25); }
+.switch input:checked + .track { background: var(--accent); border-color: var(--accent); }
 .switch input:checked + .track::after { transform: translateX(24px); background: #fff; }
 .switch input:focus-visible + .track { outline: 3px solid var(--chalk); outline-offset: 2px; }
 .dbtag { display: inline-block; font-family: var(--label); font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; background: var(--panel-2); color: var(--chalk); border-radius: 6px; padding: 2px 6px; margin-right: 6px; vertical-align: 1px; }
@@ -481,12 +495,12 @@ input[type="text"]::placeholder { color: var(--dim); }
 .mm svg { display: block; width: 100%; max-width: 320px; height: auto; margin: 0 auto; }
 .mm-body { fill: var(--panel-2); stroke: var(--line); stroke-width: 1.5; }
 .mm-idle { fill: var(--line); }
-.mm-main { fill: var(--p25); }
-.mm-also { fill: var(--p25); fill-opacity: .38; }
+.mm-main { fill: var(--accent); }
+.mm-also { fill: var(--accent); fill-opacity: .38; }
 .mm-label { fill: var(--dim); font-family: var(--label); font-size: 11px; font-weight: 600; letter-spacing: .12em; text-anchor: middle; }
 .mm-legend { display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
 .mm-legend > div { display: flex; align-items: baseline; gap: 8px; }
-.mm-key { flex: none; width: 12px; height: 12px; border-radius: 3px; background: var(--p25); transform: translateY(1px); }
+.mm-key { flex: none; width: 12px; height: 12px; border-radius: 3px; background: var(--accent); transform: translateY(1px); }
 .mm-key.mm-also { opacity: .38; }
 .steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; font-size: 16px; }
 .steps li::marker { font-family: var(--label); font-weight: 700; color: var(--dim); }
@@ -2309,10 +2323,39 @@ function achUnlocked(st) {
   return got;
 }
 const isChampion = () => Array.isArray(S.achSeen) && S.achSeen.includes("champion");
+// Color themes for the whole app, sold in the Shop. Plates keep their green/yellow/blue/red.
+const THEME_PRICE = 5000;
+const THEMES = [
+  { id: "ocean",   name: "Deep Ocean",     v: { floor: "#08131c", panel: "#0f2130", "panel-2": "#163044", line: "#21425c", chalk: "#e6f6ff", dim: "#8fb3c9", ink: "#04121c", accent: "#22d3ee", btn: "#22d3ee" } },
+  { id: "neon",    name: "Neon Night",     v: { floor: "#0a0710", panel: "#151024", "panel-2": "#1f1735", line: "#33255a", chalk: "#f6ecff", dim: "#a596c4", ink: "#0a0710", accent: "#ff3df2", btn: "#29f0ff" } },
+  { id: "forest",  name: "Forest",         v: { floor: "#0b130d", panel: "#132219", "panel-2": "#1b3024", line: "#284633", chalk: "#ecf7e8", dim: "#9cb7a0", ink: "#0b130d", accent: "#9be15d", btn: "#c6f06b" } },
+  { id: "sunset",  name: "Sunset",         v: { floor: "#170b14", panel: "#24111f", "panel-2": "#32182b", line: "#4a2440", chalk: "#fff0e8", dim: "#c9a0a8", ink: "#1a0910", accent: "#ff7a45", btn: "#ffb36b" } },
+  { id: "lava",    name: "Lava",           v: { floor: "#0d0706", panel: "#1c0e0b", "panel-2": "#2a1410", line: "#4a2118", chalk: "#fff1e6", dim: "#c29a8a", ink: "#140806", accent: "#ff4d1a", btn: "#ff8a3d" } },
+  { id: "royal",   name: "Royal",          v: { floor: "#0d0a18", panel: "#181230", "panel-2": "#221a42", line: "#352a63", chalk: "#f3eeff", dim: "#a89cc9", ink: "#0d0a18", accent: "#f2c94c", btn: "#b794ff" } },
+  { id: "blossom", name: "Cherry Blossom", v: { floor: "#140a10", panel: "#22111b", "panel-2": "#301827", line: "#4a253b", chalk: "#ffeef6", dim: "#c9a3b6", ink: "#1a0a12", accent: "#ff8fc7", btn: "#ffc2df" } },
+  { id: "steel",   name: "Steel",          v: { floor: "#101418", panel: "#1a2027", "panel-2": "#242c35", line: "#36414d", chalk: "#eef3f8", dim: "#94a3b3", ink: "#0f1418", accent: "#7cc4ff", btn: "#cfd8e3" } },
+];
+const THEME_BY_ID = Object.fromEntries(THEMES.map(t => [t.id, t]));
+document.head.append(h("style", { text: THEMES.map(t => `html[data-theme="${t.id}"]{${Object.entries(t.v).map(([k, v]) => `--${k}:${v}`).join(";")}}`).join("\n") }));
+const ownsTheme = id => id === "default" || (id === "gold" ? isChampion() : (S.themes || []).includes(id));
+// the theme this player picked; older saves: Grand Champions default to gold unless they turned it off
+function activeTheme() {
+  let t = me.theme || (isChampion() && me.gold !== false ? "gold" : "default");
+  return ownsTheme(t) ? t : "default";
+}
+function setTheme(id) { me.theme = id; me.gold = id === "gold"; saveLocalOnly(); applyTheme(); }
 function applyTheme() {
-  const gold = isChampion() && me.gold !== false;
-  document.documentElement.classList.toggle("gold", gold);
-  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = gold ? "#0b0a08" : "#14161b";
+  const t = activeTheme(), root = document.documentElement;
+  root.classList.toggle("gold", t === "gold");
+  if (THEME_BY_ID[t]) root.dataset.theme = t; else delete root.dataset.theme;
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.content = t === "gold" ? "#0b0a08" : THEME_BY_ID[t] ? THEME_BY_ID[t].v.floor : "#14161b";
+}
+function themePreview(t) {
+  const v = t.id === "gold" ? { floor: "#0b0a08", panel: "#221d12", accent: "#f2c94c", btn: "#f7dc85" }
+    : t.id === "default" ? { floor: "#14161b", panel: "#282c36", accent: "#e0393e", btn: "#eef0f3" } : t.v;
+  return h("span", { class: "themeprev", "aria-hidden": "true", style: `--tf:${v.floor};--tp:${v["panel-2"] || v.panel};--ta:${v.accent};--tb:${v.btn}` },
+    h("span", { class: "tp-bar" }), h("span", { class: "tp-card" }, h("span", { class: "tp-dot" }), h("span", { class: "tp-btn" })));
 }
 // Called on every save: pops a message for anything you just unlocked. The first time a player
 // is seen (no achSeen yet), what they've already done is marked quietly.
@@ -2323,7 +2366,7 @@ function checkAchievements() {
   if (!fresh.length) return;
   S.achSeen = [...S.achSeen, ...fresh];
   if (fresh.includes("champion")) {
-    me.gold = true; applyTheme();
+    me.theme = "gold"; me.gold = true; applyTheme();
     setTimeout(() => toast("👑 Grand Champion! You unlocked the Gold theme. You can turn it off in Settings."), 1700);
     return;
   }
@@ -2539,6 +2582,13 @@ function buyDeal(id) {
   save(); renderAll();
   toast(`Bought ${it.name}! It's in your storage.`);
 }
+function buyTheme(id) {
+  const t = THEME_BY_ID[id];
+  if (!t || ownsTheme(id) || !spend(THEME_PRICE)) return;
+  S.themes = [...(S.themes || []), id];
+  save(); setTheme(id); renderAll();
+  toast(`${t.name} theme unlocked! Switch themes any time in Settings.`);
+}
 function buyCrate(c) {
   if (!spend(CRATE_PRICE[c])) return;
   S.crates.push(c);
@@ -2578,6 +2628,19 @@ function renderShop() {
         : h("button", { class: "btn " + (coins >= price ? "primary" : ""), "aria-label": `Buy ${it.name} for ${price} coins`, onclick: () => buyDeal(it.id) }, coinAmt(price)));
   })));
   root.append(dealsCard);
+
+  // color themes
+  const cur = activeTheme();
+  root.append(h("div", { class: "card" },
+    h("div", { class: "row" }, h("h2", { text: "Themes" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: "Recolor the whole app" })),
+    h("div", { class: "shopgrid" }, THEMES.map(t => {
+      const have = ownsTheme(t.id), using = cur === t.id;
+      return h("div", { class: "item", style: `--rc:${t.v.accent}` },
+        themePreview(t), h("span", { class: "nm", text: t.name }),
+        using ? h("button", { class: "btn", disabled: true }, "Using ✓")
+          : have ? h("button", { class: "btn", onclick: () => { setTheme(t.id); renderShop(); toast(t.name + " theme on"); } }, "Use")
+          : h("button", { class: "btn " + (coins >= THEME_PRICE ? "primary" : ""), "aria-label": `Buy the ${t.name} theme for ${THEME_PRICE} coins`, onclick: () => buyTheme(t.id) }, coinAmt(THEME_PRICE)));
+    }))));
 
   // crates for sale
   root.append(h("div", { class: "card" },
@@ -2637,16 +2700,14 @@ function renderSettings() {
         h("input", { type: "checkbox", role: "switch", id: "dbSwitch", "aria-labelledby": "dbName", "aria-describedby": "dbDesc", checked: on, onchange: ev => setDumbbells(ev.target.checked) }),
         h("span", { class: "track", "aria-hidden": "true" }))),
     on ? h("p", { class: "infotip" }, h("b", { text: "Tip: " }), "Pick a weight you can lift with good form for every rep. If the last few reps get sloppy, go lighter.") : null));
-  if (isChampion()) root.append(h("div", { class: "card" },
-    h("span", { class: "eyebrow", text: "Grand Champion prize" }),
-    h("div", { class: "setrow" },
-      h("label", { class: "txt", for: "goldSwitch" },
-        h("b", { id: "goldName", text: "👑 Gold theme" }),
-        h("small", { id: "goldDesc", text: "Black and gold everything. You earned it by unlocking every achievement." })),
-      h("span", { class: "switch" },
-        h("input", { type: "checkbox", role: "switch", id: "goldSwitch", "aria-labelledby": "goldName", "aria-describedby": "goldDesc", checked: me.gold !== false,
-          onchange: ev => { me.gold = ev.target.checked; saveLocalOnly(); applyTheme(); toast(ev.target.checked ? "Gold theme on" : "Gold theme off"); } }),
-        h("span", { class: "track", "aria-hidden": "true" })))));
+  // themes you own: Default, any bought in the Shop, and Gold if you're a Grand Champion
+  const mine = [{ id: "default", name: "Default" }, ...(isChampion() ? [{ id: "gold", name: "👑 Gold" }] : []), ...THEMES.filter(t => ownsTheme(t.id))];
+  const cur = activeTheme();
+  root.append(h("div", { class: "card" },
+    h("div", { class: "row" }, h("h2", { text: "Theme" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: `${mine.length - 1} unlocked` })),
+    h("div", { class: "themepick", role: "group", "aria-label": "App theme" }, mine.map(t =>
+      h("button", { "aria-pressed": String(cur === t.id), onclick: () => { setTheme(t.id); renderSettings(); toast(t.name.replace("👑 ", "") + " theme on"); } }, themePreview(t), t.name))),
+    mine.length < THEMES.length + 1 ? h("p", { class: "note" }, "Buy more color themes in the ", h("b", { text: "Shop" }), ".") : null));
   const moves = EXERCISES.filter(e => e.db);
   root.append(h("div", { class: "card" },
     h("span", { class: "eyebrow", text: on ? "Dumbbell moves in your workouts" : "Dumbbell moves you'll unlock" }),
