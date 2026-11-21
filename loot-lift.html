@@ -2334,6 +2334,8 @@ const THEMES = [
   { id: "royal",   name: "Royal",          v: { floor: "#0d0a18", panel: "#181230", "panel-2": "#221a42", line: "#352a63", chalk: "#f3eeff", dim: "#a89cc9", ink: "#0d0a18", accent: "#f2c94c", btn: "#b794ff" } },
   { id: "blossom", name: "Cherry Blossom", v: { floor: "#140a10", panel: "#22111b", "panel-2": "#301827", line: "#4a253b", chalk: "#ffeef6", dim: "#c9a3b6", ink: "#1a0a12", accent: "#ff8fc7", btn: "#ffc2df" } },
   { id: "steel",   name: "Steel",          v: { floor: "#101418", panel: "#1a2027", "panel-2": "#242c35", line: "#36414d", chalk: "#eef3f8", dim: "#94a3b3", ink: "#0f1418", accent: "#7cc4ff", btn: "#cfd8e3" } },
+  { id: "royalblue", name: "Royal Blue & White", v: { floor: "#0c2266", panel: "#14318a", "panel-2": "#1d3fa6", line: "#3558c4", chalk: "#ffffff", dim: "#c9d6ff", ink: "#0c2266", accent: "#ffffff", btn: "#ffffff" } },
+  { id: "cocoa",   name: "Light Blue & Brown", v: { floor: "#1c120b", panel: "#2a1b11", "panel-2": "#3a2618", line: "#553925", chalk: "#eef8ff", dim: "#bfa892", ink: "#1c120b", accent: "#8fd3ff", btn: "#a9ddff" } },
 ];
 const THEME_BY_ID = Object.fromEntries(THEMES.map(t => [t.id, t]));
 document.head.append(h("style", { text: THEMES.map(t => `html[data-theme="${t.id}"]{${Object.entries(t.v).map(([k, v]) => `--${k}:${v}`).join(";")}}`).join("\n") }));
