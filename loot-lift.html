@@ -94,8 +94,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--chalk); out
   padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
 }
-.nav-inner { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); height: var(--nav-h); }
-.nav button { background: none; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--dim); font-family: var(--label); font-weight: 600; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; position: relative; }
+.nav-inner { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, 1fr); height: var(--nav-h); }
+.nav button { background: none; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--dim); font-family: var(--label); font-weight: 600; font-size: 12px; letter-spacing: .03em; padding: 0; min-width: 0; text-transform: uppercase; position: relative; }
 .nav button svg { width: 24px; height: 24px; }
 .nav button[aria-selected="true"] { color: var(--chalk); }
 .nav button[aria-selected="true"]::after { content: ""; position: absolute; top: 0; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; background: var(--p25); }
@@ -220,6 +220,25 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 @keyframes flick { 50% { transform: scale(1.08) rotate(-3deg); } }
 @media (prefers-reduced-motion: reduce) { .streak.lit .flame { animation: none; } }
 .streak .streakn { font-family: var(--display); font-size: 22px; line-height: 1.1; }
+/* shop */
+.coins { display: flex; align-items: center; gap: 12px; }
+.coins .big { font-family: var(--display); font-size: 34px; line-height: 1; }
+.coin { display: inline-block; flex: none; vertical-align: -0.2em; filter: drop-shadow(0 1px 1px #0006); }
+.coin svg { width: 100%; height: 100%; display: block; }
+.coinamt { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.price { font-family: var(--label); font-weight: 700; letter-spacing: .04em; white-space: nowrap; }
+.shopgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.shopgrid .item { gap: 6px; padding-bottom: 10px; }
+.shopgrid .btn, .sellrow .btn { min-height: 40px; padding: 6px 12px; font-size: 15px; width: 100%; }
+.shopgrid .item.owned { opacity: .55; }
+.sellrow { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; background: var(--panel-2); border-radius: 10px; padding: 8px 10px; border-left: 4px solid var(--rc); }
+.sellrow .em { font-size: 24px; text-align: center; }
+.sellrow .nm { display: flex; flex-direction: column; min-width: 0; font-weight: 600; }
+.sellrow .nm small { color: var(--dim); font-weight: 500; font-size: 13px; }
+.sellrow .btns { display: flex; gap: 6px; }
+.sellrow .btn { width: auto; }
+.cratebuy { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 12px; background: var(--panel-2); border-radius: 10px; padding: 8px 10px; }
+.cratebuy .btn { min-height: 40px; padding: 6px 12px; font-size: 15px; }
 .olyprog { height: 8px; border-radius: 4px; background: var(--panel); overflow: hidden; }
 .olyprog i { display: block; height: 100%; background: var(--olympian); background-size: 200% 100%; }
 .crate::before { content: ""; position: absolute; left: 42%; right: 42%; top: 18%; height: 14%; background: #0000004d; border-radius: 3px; }
@@ -530,6 +549,7 @@ input[type="text"]::placeholder { color: var(--dim); }
     <section role="tabpanel" id="tab-crates" hidden></section>
     <section role="tabpanel" id="tab-gym" hidden></section>
     <section role="tabpanel" id="tab-board" hidden></section>
+    <section role="tabpanel" id="tab-shop" hidden></section>
     <section role="tabpanel" id="tab-settings" hidden></section>
   </main>
 </div>
@@ -544,6 +564,8 @@ input[type="text"]::placeholder { color: var(--dim); }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 10l9-6 9 6v10H3z"/><path d="M9 20v-6h6v6"/></svg>My Gym</button>
     <button role="tab" data-tab="board" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg>Ranks</button>
+    <button role="tab" data-tab="shop" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>Shop</button>
     <button role="tab" data-tab="settings" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Settings</button>
   </div>
@@ -2450,6 +2472,145 @@ function showGym(r, name, onSwitch) {
   $("#gymOv").hidden = false;
 }
 
+/* ================= tab: shop ================= */
+// Coins: sell duplicate items for coins, spend them on new items or crates.
+const sellPrice = r => RAR[r].val;              // Common 5 … Powerlifter 600, Olympian 1500
+const buyPrice = r => RAR[r].val * 4;           // Common 20 … Powerlifter 2400
+const CRATE_PRICE = [30, 90, 250, 600, 1500, 3500];
+const DEALS_PER_DAY = 6;
+const fmtCoins = n => n.toLocaleString();
+// The coin: gold with a dumbbell stamped in the middle (drawn here so it looks the same on every phone)
+const COIN_SVG = '<svg viewBox="0 0 32 32" aria-hidden="true"><defs><radialGradient id="coinGold" cx="35%" cy="30%" r="78%">' +
+  '<stop offset="0" stop-color="#fff4b8"/><stop offset=".45" stop-color="#f6c744"/><stop offset="1" stop-color="#b37a10"/></radialGradient></defs>' +
+  '<circle cx="16" cy="16" r="15.2" fill="#8a5a0b"/><circle cx="16" cy="16" r="13.8" fill="url(#coinGold)"/>' +
+  '<circle cx="16" cy="16" r="11.2" fill="none" stroke="#a8730f" stroke-width="1.1" opacity=".75"/>' +
+  '<g fill="#7a4d06"><rect x="10" y="15" width="12" height="2" rx="1"/><rect x="7.2" y="11" width="2.7" height="10" rx="1.1"/>' +
+  '<rect x="10.2" y="12.6" width="2" height="6.8" rx=".8"/><rect x="22.1" y="11" width="2.7" height="10" rx="1.1"/><rect x="19.8" y="12.6" width="2" height="6.8" rx=".8"/></g>' +
+  '<path d="M9 9.5a9.5 9.5 0 0 1 9-4" fill="none" stroke="#fffbe0" stroke-width="1.2" stroke-linecap="round" opacity=".7"/></svg>';
+function coinIcon(size = 18) { const s = h("span", { class: "coin", style: `width:${size}px;height:${size}px` }); s.innerHTML = COIN_SVG; return s; }
+const coinAmt = (n, size) => h("span", { class: "coinamt" }, coinIcon(size), fmtCoins(n));
+let sellAllArmed = false;
+const placedCount = id => [...S.room.wall, ...S.room.floor, S.room.wallSkin, S.room.floorSkin].filter(x => x === id).length;
+// how many copies you can sell: always keeps at least one, and never takes what's placed in your gym
+const sellable = id => { const inv = S.inv[id] || 0; return Math.max(0, Math.min(inv, inv + placedCount(id) - 1)); };
+function seeded(str) { // small repeatable random generator, so the day's deals stay the same all day
+  let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return () => { h += 0x6D2B79F5; let t = h; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function todaysDeals() {
+  const day = todayStr();
+  if (!S.deals || S.deals.day !== day) {
+    const owned = ownedIds(), rand = seeded(day + "|" + store.active);
+    const pool = ITEMS.filter(i => i.r !== OLY && !owned.has(i.id));
+    const ids = [];
+    while (ids.length < DEALS_PER_DAY && pool.length) ids.push(pool.splice(Math.floor(rand() * pool.length), 1)[0].id);
+    S.deals = { day, ids, bought: [] };
+    saveLocalOnly();
+  }
+  return S.deals;
+}
+function spend(cost) {
+  if ((S.coins || 0) < cost) { toast(`You need ${fmtCoins(cost - (S.coins || 0))} more coins`); return false; }
+  S.coins -= cost; return true;
+}
+function sellItem(id, n) {
+  n = Math.min(n, sellable(id)); if (!n) return;
+  const it = ITEM[id], got = n * sellPrice(it.r);
+  S.inv[id] -= n; if (!S.inv[id]) delete S.inv[id];
+  S.coins = (S.coins || 0) + got; S.coinsEarned = (S.coinsEarned || 0) + got;
+  save(); renderHeader(); renderShop();
+  toast(`Sold ${n > 1 ? n + "× " : ""}${it.name} for ${fmtCoins(got)} coins`);
+}
+function sellAllDuplicates() {
+  let total = 0, count = 0;
+  for (const id of Object.keys(S.inv)) { const n = sellable(id); if (n && ITEM[id]) { total += n * sellPrice(ITEM[id].r); count += n; S.inv[id] -= n; if (!S.inv[id]) delete S.inv[id]; } }
+  sellAllArmed = false;
+  if (!count) return;
+  S.coins = (S.coins || 0) + total; S.coinsEarned = (S.coinsEarned || 0) + total;
+  save(); renderHeader(); renderShop();
+  toast(`Sold ${count} duplicate${count > 1 ? "s" : ""} for ${fmtCoins(total)} coins`);
+}
+function buyDeal(id) {
+  const it = ITEM[id], d = todaysDeals();
+  if (d.bought.includes(id) || !spend(buyPrice(it.r))) return;
+  d.bought.push(id);
+  S.inv[id] = (S.inv[id] || 0) + 1;
+  S.log.unshift({ item: id, crate: it.r, at: Date.now() }); S.log = S.log.slice(0, 20);
+  save(); renderAll();
+  toast(`Bought ${it.name}! It's in your storage.`);
+}
+function buyCrate(c) {
+  if (!spend(CRATE_PRICE[c])) return;
+  S.crates.push(c);
+  save(); renderAll();
+  toast(`${RAR[c].label} crate bought! Open it in the Crates tab.`);
+}
+function itemIcon(it) {
+  return it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` })
+    : it.txt ? h("span", { class: neonClass(it), style: "padding:9px 0", text: it.txt })
+    : h("span", { class: "em", text: it.e || "✨" });
+}
+const slotName = it => it.slot === "wall" ? "Wall decor" : it.slot === "floor" ? "Gym gear" : it.slot === "wallSkin" ? "Wall style" : "Floor style";
+function renderShop() {
+  const root = $("#tab-shop"); root.replaceChildren();
+  const coins = S.coins || 0;
+  root.append(h("div", { class: "row" }, h("h2", { text: "Shop" })));
+  root.append(h("div", { class: "card" },
+    h("div", { class: "coins" }, coinIcon(44),
+      h("div", { style: "display:flex;flex-direction:column;gap:2px" },
+        h("span", { class: "big", text: fmtCoins(coins) }),
+        h("span", { class: "eyebrow", text: "Coins" }))),
+    h("p", { class: "note", text: "Sell extra copies of items for coins, then spend them on new items and crates." })));
+
+  // daily deals: items you don't have yet
+  const d = todaysDeals(), owned = ownedIds();
+  const deals = d.ids.map(id => ITEM[id]).filter(Boolean).sort((a, b) => b.r - a.r);
+  const dealsCard = h("div", { class: "card" },
+    h("div", { class: "row" }, h("h2", { text: "Today's deals" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: "New items every day" })));
+  if (!deals.length) dealsCard.append(h("p", { class: "note", text: "You own every item that can be sold here. Nice work!" }));
+  else dealsCard.append(h("div", { class: "shopgrid" }, deals.map(it => {
+    const bought = d.bought.includes(it.id), have = owned.has(it.id), price = buyPrice(it.r);
+    return h("div", { class: "item" + (bought || have ? " owned" : ""), style: `--rc:${RAR[it.r].color}` },
+      itemIcon(it), h("span", { class: "nm", text: it.name }),
+      h("span", { class: "kind" }, rarText(it.r, RAR[it.r].label), " · " + slotName(it)),
+      bought ? h("button", { class: "btn", disabled: true }, "Bought ✓")
+        : have ? h("button", { class: "btn", disabled: true }, "You have it")
+        : h("button", { class: "btn " + (coins >= price ? "primary" : ""), "aria-label": `Buy ${it.name} for ${price} coins`, onclick: () => buyDeal(it.id) }, coinAmt(price)));
+  })));
+  root.append(dealsCard);
+
+  // crates for sale
+  root.append(h("div", { class: "card" },
+    h("h2", { text: "Crates" }),
+    ...CRATE_PRICE.map((price, c) => h("div", { class: "cratebuy" },
+      crateEl(c, 52),
+      h("div", { style: "display:flex;flex-direction:column;gap:4px;min-width:0" }, h("b", {}, rarText(c, RAR[c].label + " crate")), oddsBar(CRATE_DROPS[c])),
+      h("button", { class: "btn " + (coins >= price ? "primary" : ""), "aria-label": `Buy a ${RAR[c].label} crate for ${price} coins`, onclick: () => buyCrate(c) }, coinAmt(price))))));
+
+  // sell duplicates
+  const dups = Object.keys(S.inv).filter(id => ITEM[id] && sellable(id) > 0).map(id => ITEM[id]).sort((a, b) => b.r - a.r || a.name.localeCompare(b.name));
+  const total = dups.reduce((a, it) => a + sellable(it.id) * sellPrice(it.r), 0);
+  const count = dups.reduce((a, it) => a + sellable(it.id), 0);
+  const sellCard = h("div", { class: "card" },
+    h("div", { class: "row" }, h("h2", { text: "Sell duplicates" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: `${count} extra` })),
+    h("p", { class: "note", text: "Only extra copies are sold. You always keep one of everything, and nothing placed in your gym is sold." }));
+  if (!dups.length) sellCard.append(h("p", { class: "empty", text: "No duplicates right now. Open more crates!" }));
+  else {
+    sellCard.append(h("button", { class: "btn wide " + (sellAllArmed ? "primary" : "go"), style: "--tc:var(--r3)", onclick: () => { if (sellAllArmed) sellAllDuplicates(); else { sellAllArmed = true; renderShop(); setTimeout(() => { if (sellAllArmed) { sellAllArmed = false; if (tab === "shop") renderShop(); } }, 4000); } } },
+      ...(sellAllArmed ? [`Tap again to sell ${count} for `, coinAmt(total)] : ["Sell all duplicates · ", coinAmt(total)])));
+    sellCard.append(h("div", { style: "display:flex;flex-direction:column;gap:6px" }, dups.map(it => {
+      const n = sellable(it.id), each = sellPrice(it.r);
+      return h("div", { class: "sellrow", style: `--rc:${RAR[it.r].color}` },
+        it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]};width:30px;height:22px;border-radius:5px` }) : it.txt ? h("span", { class: neonClass(it), style: "font-size:8px", text: it.txt }) : h("span", { class: "em", text: it.e || "✨" }),
+        h("span", { class: "nm" }, it.name, h("small", {}, `${n} extra · `, coinAmt(each, 14), " each")),
+        h("span", { class: "btns" },
+          h("button", { class: "btn", onclick: () => sellItem(it.id, 1) }, "Sell 1"),
+          n > 1 ? h("button", { class: "btn", onclick: () => sellItem(it.id, n) }, `All ${n}`) : null));
+    })));
+  }
+  root.append(sellCard);
+}
+
 /* ================= tab: settings ================= */
 const dbTag = () => h("span", { class: "dbtag", text: "Dumbbell" });
 function setDumbbells(on) {
@@ -2509,6 +2670,7 @@ function renderTab() {
   else if (tab === "crates") renderCrates();
   else if (tab === "gym") renderGym();
   else if (tab === "settings") renderSettings();
+  else if (tab === "shop") renderShop();
   else renderBoard();
 }
 function renderAll() { renderHeader(); renderTab(); }
