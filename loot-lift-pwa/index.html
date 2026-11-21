@@ -2609,40 +2609,77 @@ function buyDeal(id) {
   save(); renderAll();
   toast(`Bought ${it.name}! It's in your storage.`);
 }
-// Backup: everything on this phone (all players) as one code you can paste somewhere safe.
-const BACKUP_PREFIX = "REPQUEST1:";
-function backupCode() {
+// Backup: everything on this phone (all players) as one code or file you can keep somewhere safe.
+// Format: REPQUEST2:<length>:<base64 of gzipped JSON>. The length lets Restore tell you if the code got cut off.
+// REPQUEST1:<base64 JSON> (no compression) is still accepted, and used where the browser can't compress.
+const b64encode = bytes => { let bin = ""; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000)); return btoa(bin); };
+const b64decode = str => Uint8Array.from(atob(str), ch => ch.charCodeAt(0));
+async function pipeBytes(bytes, stream) { return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer()); }
+async function makeBackup() {
   saveLocalOnly();
-  const bytes = new TextEncoder().encode(JSON.stringify(store));
-  let bin = ""; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  return BACKUP_PREFIX + btoa(bin);
+  const json = new TextEncoder().encode(JSON.stringify(store));
+  if (window.CompressionStream) {
+    try { const b = b64encode(await pipeBytes(json, new CompressionStream("gzip"))); return `REPQUEST2:${b.length}:${b}`; } catch {}
+  }
+  return "REPQUEST1:" + b64encode(json);
 }
-function readBackup(code) {
-  code = (code || "").replace(/\s+/g, "");
-  if (!code.startsWith(BACKUP_PREFIX)) return null;
+// Reads a code out of whatever was pasted (extra words, spaces, line breaks are ignored).
+// Returns { data } or { error: "message" }.
+async function readBackup(text) {
+  const clean = (text || "").replace(/[\s​-‍⁠﻿]+/g, "");
+  const m = clean.match(/REPQUEST([12]):(?:(\d+):)?([A-Za-z0-9+/_-]+=*)/);
+  if (!m) return { error: clean ? "That isn't a Rep Quest backup code. It should start with REPQUEST." : "Paste your backup code in the box first" };
+  let b64 = m[3].replace(/-/g, "+").replace(/_/g, "/");
+  if (m[2] && b64.length < +m[2]) return { error: `This code is cut off: it has ${b64.length.toLocaleString()} of ${(+m[2]).toLocaleString()} characters. Copy it again, or use a backup file.` };
+  if (m[2]) b64 = b64.slice(0, +m[2]);
   try {
-    const bin = atob(code.slice(BACKUP_PREFIX.length));
-    const data = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, ch => ch.charCodeAt(0))));
-    return data && data.players && typeof data.players === "object" && Object.keys(data.players).length ? data : null;
-  } catch { return null; }
+    let bytes = b64decode(b64.padEnd(Math.ceil(b64.length / 4) * 4, "="));
+    if (m[1] === "2") bytes = await pipeBytes(bytes, new DecompressionStream("gzip"));
+    const data = JSON.parse(new TextDecoder().decode(bytes));
+    if (data && data.players && typeof data.players === "object" && Object.keys(data.players).length) return { data };
+  } catch {}
+  return { error: "This code is damaged or cut off. Copy it again, or use a backup file." };
 }
-let restoreArmed = false, restoreDraft = ""; // the pasted code survives the redraw between the two Restore taps
-async function copyBackup() {
-  const code = backupCode();
-  try { await navigator.clipboard.writeText(code); toast("Backup code copied. Paste it in Notes to keep it safe."); return; } catch {}
-  // no clipboard: show it so it can be copied by hand
+let restoreArmed = false, restoreDraft = "", restoreTimer = 0; // the pasted code survives the redraw between the two Restore taps
+function showBackupText(code) {
   const box = document.getElementById("backupOut");
-  if (box) { box.hidden = false; box.value = code; box.focus(); box.select(); toast("Select the code and copy it"); }
+  if (!box) return;
+  box.hidden = false; box.value = code;
+  const n = document.getElementById("backupLen"); if (n) { n.hidden = false; n.textContent = `${code.length.toLocaleString()} characters. If copying failed, select all of it and copy.`; }
 }
-async function shareBackup() {
-  try { await navigator.share({ title: "Rep Quest backup", text: backupCode() }); } catch (e) { if (!e || e.name !== "AbortError") copyBackup(); }
+async function copyBackup() {
+  // Safari only allows copying during the tap, so hand it the code as a promise it can wait for
+  const codeP = makeBackup();
+  try {
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      await navigator.clipboard.write([new ClipboardItem({ "text/plain": codeP.then(c => new Blob([c], { type: "text/plain" })) })]);
+    } else await navigator.clipboard.writeText(await codeP);
+    toast("Backup code copied. Paste it in Notes to keep it safe.");
+  } catch { toast("Couldn't copy automatically. Select the code below and copy it."); }
+  showBackupText(await codeP);
 }
-let restoreTimer = 0;
-function restoreBackup(code) {
+async function saveBackupFile() {
+  const code = await makeBackup();
+  const d = new Date(), name = `rep-quest-backup-${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}.txt`;
+  const file = new File([code], name, { type: "text/plain" });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: "Rep Quest backup" }); toast("Backup file ready. Choose Save to Files to keep it."); return; }
+  } catch (e) { if (e && e.name === "AbortError") return; }
+  const a = h("a", { href: URL.createObjectURL(file), download: name }); document.body.append(a); a.click(); a.remove();
+  toast("Backup file saved");
+}
+async function openBackupFile(input) {
+  const f = input.files && input.files[0]; input.value = "";
+  if (!f) return;
+  restoreDraft = await f.text(); restoreArmed = false;
+  renderSettings();
+  const r = await readBackup(restoreDraft);
+  toast(r.error ? r.error : "Backup file loaded. Tap Restore to use it.");
+}
+async function restoreBackup(code) {
   restoreDraft = code || "";
-  if (!restoreDraft.trim()) { toast("Paste your backup code in the box first"); return; }
-  const data = readBackup(restoreDraft);
-  if (!data) { toast("That isn't a Rep Quest backup code. Make sure you copied all of it."); restoreArmed = false; renderSettings(); return; }
+  const r = await readBackup(restoreDraft);
+  if (r.error) { toast(r.error); if (restoreArmed) { restoreArmed = false; renderSettings(); } return; }
   if (!restoreArmed) {
     restoreArmed = true; renderSettings();
     toast("Tap again to replace everything on this phone");
@@ -2651,6 +2688,7 @@ function restoreBackup(code) {
     return;
   }
   clearTimeout(restoreTimer); restoreArmed = false; restoreDraft = "";
+  const data = r.data;
   if (!data.settings) data.settings = { dumbbells: false };
   if (!data.players[data.active]) data.active = Object.keys(data.players)[0];
   lsSet(data);
@@ -2800,21 +2838,25 @@ function renderSettings() {
       h("summary", { text: "Make the home-screen icon match your theme" }),
       h("p", { class: "note", style: "margin:8px 0 6px", text: "Phones only pick up the icon when you add the app, so you'll add it again. Your progress comes with you through a backup:" }),
       h("ol", { class: "steps", style: "margin:0" },
-        h("li", { text: "Pick your theme here, then tap Copy backup code below and paste it in Notes." }),
-        h("li", { text: "Open Rep Quest's website in Safari (or Chrome), go to Settings, paste the code under Restore and tap Restore twice." }),
+        h("li", { text: "Pick your theme here, then tap Save backup file below and choose Save to Files." }),
+        h("li", { text: "Open Rep Quest's website in Safari (or Chrome), go to Settings, tap Open backup file, pick your backup, and tap Restore twice." }),
         h("li", { text: "In the browser, tap Share, then Add to Home Screen. The new icon uses your theme's colors." }),
-        h("li", { text: "Open the new icon, go to Settings and restore the same code again." }),
+        h("li", { text: "Open the new icon, go to Settings and restore the same backup file again." }),
         h("li", { text: "Once your progress shows up in the new icon, delete the old icon from your home screen." }))) : null));
-  const restoreIn = h("textarea", { id: "restoreIn", rows: "3", placeholder: "Paste a backup code here", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": "Backup code to restore", class: "codebox",
+  const restoreIn = h("textarea", { id: "restoreIn", rows: "3", placeholder: "…or paste a backup code here", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": "Backup code to restore", class: "codebox",
     oninput: e => { restoreDraft = e.target.value; if (restoreArmed) { restoreArmed = false; clearTimeout(restoreTimer); renderSettings(); document.getElementById("restoreIn").focus(); } } });
   restoreIn.value = restoreDraft;
   root.append(h("div", { class: "card" },
     h("span", { class: "eyebrow", text: "Backup & restore" }),
-    h("p", { class: "note", text: "Save everything on this phone (all players, items, coins and streaks) as a code. Use it before deleting the app, or to move to a new phone." }),
+    h("p", { class: "note", text: "Save everything on this phone (all players, items, coins and streaks). Use it before deleting the app, or to move to a new phone. A backup file is the safest way." }),
     h("div", { class: "row" },
-      h("button", { class: "btn primary", type: "button", style: "flex:1", onclick: copyBackup }, "Copy backup code"),
-      navigator.share ? h("button", { class: "btn ghost", type: "button", onclick: shareBackup }, "Share") : null),
-    h("textarea", { id: "backupOut", rows: "3", readonly: true, hidden: true, class: "codebox", "aria-label": "Your backup code" }),
+      h("button", { class: "btn primary", type: "button", style: "flex:1", onclick: saveBackupFile }, "Save backup file"),
+      h("button", { class: "btn ghost", type: "button", style: "flex:1", onclick: copyBackup }, "Copy code")),
+    h("textarea", { id: "backupOut", rows: "3", readonly: true, hidden: true, class: "codebox", "aria-label": "Your backup code", onfocus: e => e.target.select() }),
+    h("small", { id: "backupLen", class: "note", hidden: true }),
+    h("span", { class: "eyebrow", style: "margin-top:6px", text: "Restore" }),
+    h("label", { class: "btn ghost", style: "display:flex;align-items:center;justify-content:center;cursor:pointer" }, "Open backup file",
+      h("input", { type: "file", accept: ".txt,text/plain", hidden: true, onchange: e => openBackupFile(e.target) })),
     restoreIn,
     h("button", { class: "btn " + (restoreArmed ? "go" : "ghost"), type: "button", style: restoreArmed ? "--tc:var(--p25)" : null, onclick: () => restoreBackup(restoreIn.value) },
       restoreArmed ? "Tap again to replace everything" : "Restore")));
