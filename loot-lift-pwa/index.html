@@ -170,6 +170,8 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 /* ---------- workout ---------- */
 .wo-head { display: flex; align-items: flex-start; gap: 12px; }
 .wo-head .tchip { font-family: var(--label); font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: var(--tc); color: var(--ink); padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+.modeseg { display: flex; width: 100%; }
+.modeseg button { flex: 1; min-height: 44px; font-size: 16px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { border: 1px solid var(--line); background: var(--panel-2); color: var(--chalk); border-radius: 999px; padding: 8px 14px; min-height: 40px; font-family: var(--label); font-weight: 700; font-size: 15px; letter-spacing: .05em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; }
 .chip[aria-pressed="true"] { background: var(--chalk); color: var(--ink); border-color: var(--chalk); }
@@ -1701,9 +1703,27 @@ function streakCard() {
       h("i", { style: `width:${Math.round(100 * (n % STREAK_GOAL) / STREAK_GOAL)}%` })),
     (S.bestStreak || 0) > n ? h("div", { class: "tierinfo" }, h("span", { text: "Best streak" }), h("span", {}, h("b", { text: `${S.bestStreak} days` }))) : null);
 }
+// Training style at the top of the Train tab. Calisthenics is empty for now; its workouts get added later.
+const MODES = [{ id: "lifting", label: "Lifting" }, { id: "calisthenics", label: "Calisthenics" }];
+const trainMode = () => me.mode === "calisthenics" ? "calisthenics" : "lifting";
+function modeSwitch() {
+  const m = trainMode();
+  return h("div", { class: "seg modeseg", role: "group", "aria-label": "Training style" },
+    MODES.map(x => h("button", { "aria-pressed": String(m === x.id), onclick: () => { if (trainMode() === x.id) return; me.mode = x.id; saveLocalOnly(); renderWorkout(); window.scrollTo(0, 0); } }, x.label)));
+}
 function renderWorkout() {
   const root = $("#tab-workout"); root.replaceChildren();
   const active = current && current.startedAt;
+
+  root.append(modeSwitch());
+  if (trainMode() === "calisthenics") {
+    root.append(h("div", { class: "card empty", style: "align-items:center;text-align:center;padding:32px 16px" },
+      h("span", { style: "font-size:44px;line-height:1", "aria-hidden": "true", text: "🤸" }),
+      h("h2", { text: "Calisthenics" }),
+      h("p", { class: "note", text: "Coming soon. Calisthenics workouts haven't been added yet." }),
+      active ? h("p", { class: "note", text: "Your lifting workout is still going. Switch back to Lifting to finish it." }) : null));
+    return;
+  }
 
   root.append(streakCard());
 
