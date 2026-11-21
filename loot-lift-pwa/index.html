@@ -859,7 +859,6 @@ const EXERCISES = [
   { name: "Frog Stand",              cali: true, skills: ["planche", "ninety"], kind: "secs", base: 20, cam: { t: "hold", pose: "frog", tip: "Side view, whole body in the picture" } },
   { name: "Tuck Planche",            cali: true, skills: ["planche"], kind: "secs", base: 10, min: 1, cam: { t: "hold", pose: "tuckPlanche", tip: "Side view, whole body in the picture" } },
   { name: "Advanced Tuck Planche",   cali: true, skills: ["planche"], kind: "secs", base: 8, min: 2, cam: { t: "hold", pose: "tuckPlanche", tip: "Side view, whole body in the picture" } },
-  { name: "Straddle Planche",        cali: true, skills: ["planche"], kind: "secs", base: 5, min: 3, cam: { t: "hold", pose: "planche", tip: "Side view, whole body in the picture" } },
   { name: "Wall Walks",              cali: true, skills: ["handstand", "hspu"], kind: "reps", base: 4, spr: 8, hint: "Feet against a wall", cam: { t: "range", f: "invert", lo: 0.3, hi: 1.6, start: "horizontal", minRep: 3, tip: "Side view, whole body in the picture" } },
   { name: "Chest-to-Wall Handstand", cali: true, skills: ["handstand", "hspu"], kind: "secs", base: 30, hint: "Use a wall", cam: { t: "hold", pose: "inverted", tip: "Side view, whole body in the picture" } },
   { name: "Pike Hold",               cali: true, skills: ["handstand", "hspu"], kind: "secs", base: 30, cam: { t: "hold", pose: "pike", tip: "Side view, whole body in the picture" } },
@@ -1056,9 +1055,6 @@ const HOWTO = {
   "Advanced Tuck Planche": { main: ["shoulders"], also: ["chest", "abs", "triceps", "lowerBack"],
     steps: ["Start in a tuck planche.", "Flatten your back and push your hips back until they're level with your shoulders.", "Your thighs and torso should make a right angle. Hold."],
     tip: "Lean further forward as your hips move back." },
-  "Straddle Planche": { main: ["shoulders"], also: ["chest", "abs", "triceps", "glutes"],
-    steps: ["Start in an advanced tuck planche.", "Spread your legs wide and straighten them out behind you.", "Keep your body level with the floor and hold."],
-    tip: "Squeeze your glutes and point your toes." },
   "Wall Walks": { main: ["shoulders"], also: ["abs", "triceps", "chest"],
     steps: ["Start in a push-up position with your feet against a wall.", "Walk your feet up the wall while walking your hands back toward it.", "Stop when your chest is close to the wall, then walk back down the same way."],
     tip: "Only go as high as you can control." },
@@ -1271,7 +1267,8 @@ function makeCaliWorkout(t) {
   const T = TIERS[t], focus = myFocus();
   // a drill fits the focus if it trains one of the picked skills
   const score = e => focus.length && e.skills.some(k => focus.includes(k)) ? 1 : 0;
-  const pool = shuffle(EXERCISES.filter(e => e.cali && (e.min || 0) <= t)).sort((a, b) => score(b) - score(a));
+  // only drills for the picked skills, even if that makes the workout a move shorter
+  const pool = shuffle(EXERCISES.filter(e => e.cali && (e.min || 0) <= t && (!focus.length || score(e))));
   return finishWorkout(t, focus, shuffle(pool.slice(0, T.count)), "calisthenics");
 }
 function finishWorkout(t, focus, moves, mode) {
