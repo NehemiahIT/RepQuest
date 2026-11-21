@@ -2626,7 +2626,7 @@ function readBackup(code) {
     return data && data.players && typeof data.players === "object" && Object.keys(data.players).length ? data : null;
   } catch { return null; }
 }
-let restoreArmed = false;
+let restoreArmed = false, restoreDraft = ""; // the pasted code survives the redraw between the two Restore taps
 async function copyBackup() {
   const code = backupCode();
   try { await navigator.clipboard.writeText(code); toast("Backup code copied. Paste it in Notes to keep it safe."); return; } catch {}
@@ -2637,10 +2637,20 @@ async function copyBackup() {
 async function shareBackup() {
   try { await navigator.share({ title: "Rep Quest backup", text: backupCode() }); } catch (e) { if (!e || e.name !== "AbortError") copyBackup(); }
 }
+let restoreTimer = 0;
 function restoreBackup(code) {
-  const data = readBackup(code);
-  if (!data) { toast("That isn't a Rep Quest backup code"); restoreArmed = false; return; }
-  if (!restoreArmed) { restoreArmed = true; renderSettings(); toast("Tap Restore again to replace everything on this phone"); setTimeout(() => { restoreArmed = false; if (tab === "settings") renderSettings(); }, 6000); return; }
+  restoreDraft = code || "";
+  if (!restoreDraft.trim()) { toast("Paste your backup code in the box first"); return; }
+  const data = readBackup(restoreDraft);
+  if (!data) { toast("That isn't a Rep Quest backup code. Make sure you copied all of it."); restoreArmed = false; renderSettings(); return; }
+  if (!restoreArmed) {
+    restoreArmed = true; renderSettings();
+    toast("Tap again to replace everything on this phone");
+    clearTimeout(restoreTimer);
+    restoreTimer = setTimeout(() => { restoreArmed = false; if (tab === "settings") renderSettings(); }, 8000);
+    return;
+  }
+  clearTimeout(restoreTimer); restoreArmed = false; restoreDraft = "";
   if (!data.settings) data.settings = { dumbbells: false };
   if (!data.players[data.active]) data.active = Object.keys(data.players)[0];
   lsSet(data);
@@ -2795,7 +2805,9 @@ function renderSettings() {
         h("li", { text: "In the browser, tap Share, then Add to Home Screen. The new icon uses your theme's colors." }),
         h("li", { text: "Open the new icon, go to Settings and restore the same code again." }),
         h("li", { text: "Once your progress shows up in the new icon, delete the old icon from your home screen." }))) : null));
-  const restoreIn = h("textarea", { id: "restoreIn", rows: "3", placeholder: "Paste a backup code here", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": "Backup code to restore", class: "codebox" });
+  const restoreIn = h("textarea", { id: "restoreIn", rows: "3", placeholder: "Paste a backup code here", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": "Backup code to restore", class: "codebox",
+    oninput: e => { restoreDraft = e.target.value; if (restoreArmed) { restoreArmed = false; clearTimeout(restoreTimer); renderSettings(); document.getElementById("restoreIn").focus(); } } });
+  restoreIn.value = restoreDraft;
   root.append(h("div", { class: "card" },
     h("span", { class: "eyebrow", text: "Backup & restore" }),
     h("p", { class: "note", text: "Save everything on this phone (all players, items, coins and streaks) as a code. Use it before deleting the app, or to move to a new phone." }),
