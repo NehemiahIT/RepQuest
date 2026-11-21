@@ -127,7 +127,7 @@ h2 { font-family: var(--display); font-size: 22px; font-weight: 400; margin: 0; 
 /* bought color themes (html[data-theme]); their colors are set from THEMES in the script */
 html[data-theme] .nav .badge { color: var(--ink); }
 /* Christmas: the one light theme. Red logo and accents, green buttons, snow falling. */
-html[data-theme="xmas"] { color-scheme: light; }
+html[data-theme="xmas"], html[data-light] { color-scheme: light; }
 html[data-theme="xmas"] .brand { color: #1f8a46; }
 html[data-theme="xmas"] section > .card, html[data-theme="xmas"] section > form.card { box-shadow: inset 0 4px 0 #d42a2f, 0 2px 8px #6d9dc21f; }
 html[data-theme="xmas"] section > .card:nth-of-type(even), html[data-theme="xmas"] section > form.card:nth-of-type(even) { box-shadow: inset 0 4px 0 #1f8a46, 0 2px 8px #6d9dc21f; }
@@ -154,6 +154,35 @@ html[data-theme="xmas"] .ex { border-left: 4px solid #d42a2f; border-radius: 0 1
 html[data-theme="xmas"] .ex:nth-child(even) { border-left-color: #1f8a46; }
 html[data-theme="xmas"] .chip { border-color: #1f8a46; color: #18723a; }
 html[data-theme="xmas"] .toast { background: #18723a; color: #fff; }
+/* theme backgrounds and effects. #bgfx sits behind the app (cards stay readable); #snow falls over it. */
+.app { position: relative; z-index: 1; }
+#bgfx { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+#bgfx .rain { position: absolute; top: 0; font: 15px/1.05 ui-monospace, Menlo, monospace; color: #22ff66; text-shadow: 0 0 6px #22ff66; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px; opacity: .32; animation: rain linear infinite; }
+@keyframes rain { from { transform: translateY(-100%); } to { transform: translateY(110vh); } }
+#bgfx .aur { position: absolute; width: 90vw; height: 55vh; border-radius: 50%; filter: blur(50px); opacity: .6; animation: aur 14s ease-in-out infinite alternate; }
+@keyframes aur { 0% { transform: translate(-10vw, -6vh) scale(1); } 50% { transform: translate(8vw, 2vh) scale(1.15); } 100% { transform: translate(18vw, -4vh) scale(.95); } }
+/* with a moving background, the header and cards turn slightly see-through so it glows behind them */
+html[data-fx] .top { background: color-mix(in srgb, var(--floor) 72%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+html[data-fx] .card, html[data-fx] .stat { background: color-mix(in srgb, var(--panel) 84%, transparent); }
+#bgfx .spark { position: absolute; width: 5px; height: 5px; background: #8fd3ff; border-radius: 50%; box-shadow: 0 0 10px 3px #5cb8f0; animation: twinkle 2.6s ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: .15; transform: scale(.5); } 50% { opacity: 1; transform: scale(1.3); } }
+#bgfx .grid { position: absolute; left: -50%; right: -50%; bottom: 0; height: 45vh; transform-origin: bottom; transform: perspective(300px) rotateX(62deg);
+  background: repeating-linear-gradient(90deg, #ff4fd8aa 0 2px, transparent 2px 60px), repeating-linear-gradient(0deg, #2ef2e0aa 0 2px, transparent 2px 46px); background-size: auto, 100% 46px; animation: gridmove 2.4s linear infinite; opacity: .6; }
+@keyframes gridmove { to { background-position: 0 0, 0 46px; } }
+#bgfx .sun { position: absolute; left: 50%; bottom: 30vh; width: 46vw; max-width: 260px; aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; opacity: .35;
+  background: repeating-linear-gradient(0deg, transparent 0 8px, #160a2c 8px 12px) bottom / 100% 45% no-repeat, linear-gradient(180deg, #ffd56b, #ff4fd8 70%); }
+#bgfx .glow { position: absolute; width: 90vw; height: 90vw; max-width: 700px; max-height: 700px; border-radius: 50%; filter: blur(60px); opacity: .35; animation: glow 6s ease-in-out infinite alternate; }
+@keyframes glow { to { opacity: .55; transform: scale(1.08); } }
+html[data-theme="camo"] body { background:
+  radial-gradient(ellipse 60px 34px at 20% 30%, #3e4a2c 98%, transparent) 0 0 / 220px 180px,
+  radial-gradient(ellipse 70px 40px at 70% 70%, #1a2014 98%, transparent) 0 0 / 220px 180px,
+  radial-gradient(ellipse 50px 30px at 80% 20%, #5a5236 98%, transparent) 0 0 / 220px 180px,
+  radial-gradient(ellipse 40px 46px at 35% 80%, #313b22 98%, transparent) 0 0 / 220px 180px, #232a1c; }
+html[data-theme="mintchip"] body { background:
+  radial-gradient(circle at 20% 30%, #120a06 0 4px, transparent 5px) 0 0 / 90px 80px,
+  radial-gradient(circle at 70% 65%, #120a06 0 3px, transparent 4px) 0 0 / 90px 80px,
+  radial-gradient(circle at 45% 85%, #6fe3b455 0 3px, transparent 4px) 0 0 / 90px 80px, #2a1a12; }
+@media (prefers-reduced-motion: reduce) { #bgfx * { animation: none !important; } }
 #snow { position: fixed; inset: 0; pointer-events: none; z-index: 30; overflow: hidden; }
 #snow i { position: absolute; top: -12px; border-radius: 50%; background: #ffffff; box-shadow: 0 0 3px #9cc7ea; opacity: .9; animation: snowfall linear infinite; }
 @keyframes snowfall { 0% { transform: translate(0, -12px); } 25% { transform: translate(12px, 25vh); } 50% { transform: translate(-8px, 50vh); } 75% { transform: translate(10px, 75vh); } 100% { transform: translate(0, 105vh); } }
@@ -2678,6 +2707,15 @@ const THEMES = [
   { id: "blossom", name: "Cherry Blossom", v: { floor: "#140a10", panel: "#22111b", "panel-2": "#301827", line: "#4a253b", chalk: "#ffeef6", dim: "#c9a3b6", ink: "#1a0a12", accent: "#ff8fc7", btn: "#ffc2df" } },
   { id: "steel",   name: "Steel",          v: { floor: "#101418", panel: "#1a2027", "panel-2": "#242c35", line: "#36414d", chalk: "#eef3f8", dim: "#94a3b3", ink: "#0f1418", accent: "#7cc4ff", btn: "#cfd8e3" } },
   { id: "royalblue", name: "Royal Blue & White", v: { floor: "#0c2266", panel: "#14318a", "panel-2": "#1d3fa6", line: "#3558c4", chalk: "#ffffff", dim: "#c9d6ff", ink: "#0c2266", accent: "#ffffff", btn: "#ffffff", knob: "#0c2266" } },
+  { id: "matrix",    name: "Matrix",              v: { floor: "#020a04", panel: "#071a0c", "panel-2": "#0b2613", line: "#14532a", chalk: "#c8ffd6", dim: "#5fae78", ink: "#021006", accent: "#22ff66", btn: "#22ff66" } },
+  { id: "aurora",    name: "Aurora",              v: { floor: "#070d1f", panel: "#0e1730", "panel-2": "#142140", line: "#22355e", chalk: "#e8f3ff", dim: "#8ea5c8", ink: "#06101f", accent: "#4dffc3", btn: "#9b7bff" } },
+  { id: "arctic",    name: "Arctic", light: true, v: { floor: "#e6f4ff", panel: "#ffffff", "panel-2": "#eef7ff", line: "#bcdcf2", chalk: "#0e2a40", dim: "#557891", ink: "#ffffff", accent: "#1aa3e8", btn: "#1f7fc4", knob: "#ffffff" } },
+  { id: "desert",    name: "Desert", light: true, v: { floor: "#f2e3c9", panel: "#fff8ec", "panel-2": "#f7ead5", line: "#e0c79f", chalk: "#3b2412", dim: "#8a6b4c", ink: "#ffffff", accent: "#d2622f", btn: "#b8532a", knob: "#ffffff" } },
+  { id: "bubblegum", name: "Bubblegum", light: true, v: { floor: "#ffe1f0", panel: "#ffffff", "panel-2": "#fff0f7", line: "#f6bcd9", chalk: "#3d1a33", dim: "#8f5f7d", ink: "#ffffff", accent: "#ff4f9a", btn: "#3d9bf0", knob: "#ffffff" } },
+  { id: "vaporwave", name: "Vaporwave",           v: { floor: "#160a2c", panel: "#22103f", "panel-2": "#2d1652", line: "#4a2580", chalk: "#ffe9ff", dim: "#b39ad6", ink: "#160a2c", accent: "#ff4fd8", btn: "#2ef2e0" } },
+  { id: "camo",      name: "Camo",                v: { floor: "#232a1c", panel: "#2f3826", "panel-2": "#3a4530", line: "#4d5a3d", chalk: "#eef0dc", dim: "#a8ad8a", ink: "#1c2216", accent: "#c2a25a", btn: "#9bbb55" } },
+  { id: "mintchip",  name: "Mint Chocolate Chip", v: { floor: "#2a1a12", panel: "#36231a", "panel-2": "#452e22", line: "#5e4030", chalk: "#f2fff8", dim: "#b9a596", ink: "#2a1a12", accent: "#6fe3b4", btn: "#8ff0c8" } },
+  { id: "fireice",   name: "Fire & Ice",          v: { floor: "#0d1016", panel: "#171b24", "panel-2": "#202634", line: "#303a4e", chalk: "#f3f6ff", dim: "#9aa3b8", ink: "#0d1016", accent: "#ff5a2a", btn: "#5cc8ff" } },
   { id: "xmas",    name: "Christmas", codeOnly: true, v: { floor: "#cfe7f8", panel: "#f4faff", "panel-2": "#e2f0fb", line: "#a9cbe6", chalk: "#10283b", dim: "#4c6a80", ink: "#ffffff", accent: "#d42a2f", btn: "#1f8a46", knob: "#ffffff" } },
   { id: "cocoa",   name: "Light Blue & Brown", v: { floor: "#1c120b", panel: "#2a1b11", "panel-2": "#3a2618", line: "#553925", chalk: "#eef8ff", dim: "#bfa892", ink: "#1c120b", accent: "#8fd3ff", btn: "#a9ddff" } },
 ];
@@ -2702,9 +2740,39 @@ function setSnow(on) {
   }
   document.body.append(el);
 }
+// moving backgrounds for some themes (behind the app, so cards stay readable)
+const rnd01 = () => Math.random();
+function setBgFx(t) {
+  const old = document.getElementById("bgfx");
+  if (old && old.dataset.t === t) return;
+  if (old) old.remove();
+  delete document.documentElement.dataset.fx;
+  const bits = [];
+  if (t === "matrix") {
+    const chars = "01アイウエオカキクケコ0110サシスセソ01";
+    for (let i = 0; i < 16; i++) {
+      let txt = ""; for (let k = 0; k < 18; k++) txt += chars[Math.floor(rnd01() * chars.length)];
+      bits.push(h("span", { class: "rain", text: txt, style: `left:${(i * 6.4 + rnd01() * 3).toFixed(1)}%;animation-duration:${(6 + rnd01() * 7).toFixed(1)}s;animation-delay:-${(rnd01() * 12).toFixed(1)}s;opacity:${(.18 + rnd01() * .25).toFixed(2)}` }));
+    }
+  } else if (t === "aurora") {
+    [["#4dffc3", "-10%", "-8%", 0], ["#9b7bff", "30%", "-12%", -4], ["#2fb8ff", "55%", "-6%", -8]].forEach(([c, x, y, d]) =>
+      bits.push(h("i", { class: "aur", style: `background:${c};left:${x};top:${y};animation-delay:${d}s` })));
+  } else if (t === "arctic") {
+    for (let i = 0; i < 22; i++) bits.push(h("i", { class: "spark", style: `left:${(rnd01() * 100).toFixed(1)}%;top:${(rnd01() * 100).toFixed(1)}%;animation-delay:-${(rnd01() * 2.6).toFixed(1)}s` }));
+  } else if (t === "vaporwave") {
+    bits.push(h("i", { class: "sun" }), h("i", { class: "grid" }));
+  } else if (t === "fireice") {
+    bits.push(h("i", { class: "glow", style: "background:#ff5a2a;left:-35vw;top:-25vw" }), h("i", { class: "glow", style: "background:#5cc8ff;right:-35vw;bottom:-25vw;animation-delay:-3s" }));
+  }
+  if (!bits.length) { delete document.documentElement.dataset.fx; return; }
+  document.documentElement.dataset.fx = t;
+  document.body.prepend(h("div", { id: "bgfx", "data-t": t, "aria-hidden": "true" }, bits));
+}
 function applyTheme() {
   const t = activeTheme(), root = document.documentElement;
   setSnow(t === "xmas");
+  setBgFx(t);
+  if (THEME_BY_ID[t] && THEME_BY_ID[t].light) root.dataset.light = ""; else delete root.dataset.light;
   root.classList.toggle("gold", t === "gold");
   if (THEME_BY_ID[t]) root.dataset.theme = t; else delete root.dataset.theme;
   const m = document.querySelector('meta[name="theme-color"]');
