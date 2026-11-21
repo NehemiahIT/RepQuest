@@ -120,6 +120,8 @@ html[data-theme] .card { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ac
 .themeprev .tp-card { flex: 1; border-radius: 6px; background: var(--tp); display: flex; align-items: flex-end; padding: 5px; gap: 4px; }
 .themeprev .tp-btn { height: 10px; flex: 1; border-radius: 3px; background: var(--tb); }
 .themeprev .tp-dot { height: 10px; width: 10px; border-radius: 50%; background: var(--ta); }
+.codebox { width: 100%; font: 13px/1.35 ui-monospace, Menlo, monospace; color: var(--chalk); background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px; resize: vertical; word-break: break-all; }
+.infotip summary { cursor: pointer; font-weight: 600; }
 .themepick { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
 .themepick button { background: var(--panel-2); border: 2px solid transparent; border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 6px; align-items: stretch; font-family: var(--label); font-weight: 700; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
 .themepick button[aria-pressed="true"] { border-color: var(--accent); }
@@ -2352,6 +2354,15 @@ function applyTheme() {
   if (THEME_BY_ID[t]) root.dataset.theme = t; else delete root.dataset.theme;
   const m = document.querySelector('meta[name="theme-color"]');
   if (m) m.content = t === "gold" ? "#0b0a08" : THEME_BY_ID[t] ? THEME_BY_ID[t].v.floor : "#14161b";
+  // installable app: the tab icon, the home-screen icon and the install info switch to this theme's colors.
+  // Phones only read the home-screen icon when you add the app, so it changes the next time you add it.
+  if (window.LOOTLIFT_PWA) {
+    const dir = t === "default" ? "icons/" : `icons/t-${t}/`;
+    const set = (rel, href) => { const l = document.querySelector(`link[rel="${rel}"]`); if (l && l.getAttribute("href") !== href) l.setAttribute("href", href); };
+    set("icon", dir + "icon-192.png");
+    set("apple-touch-icon", dir + "apple-touch-icon.png");
+    set("manifest", t === "default" ? "manifest.webmanifest" : `manifest-${t}.webmanifest`);
+  }
 }
 function themePreview(t) {
   const v = t.id === "gold" ? { floor: "#0b0a08", panel: "#221d12", accent: "#f2c94c", btn: "#f7dc85" }
@@ -2584,6 +2595,45 @@ function buyDeal(id) {
   save(); renderAll();
   toast(`Bought ${it.name}! It's in your storage.`);
 }
+// Backup: everything on this phone (all players) as one code you can paste somewhere safe.
+const BACKUP_PREFIX = "REPQUEST1:";
+function backupCode() {
+  saveLocalOnly();
+  const bytes = new TextEncoder().encode(JSON.stringify(store));
+  let bin = ""; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return BACKUP_PREFIX + btoa(bin);
+}
+function readBackup(code) {
+  code = (code || "").replace(/\s+/g, "");
+  if (!code.startsWith(BACKUP_PREFIX)) return null;
+  try {
+    const bin = atob(code.slice(BACKUP_PREFIX.length));
+    const data = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, ch => ch.charCodeAt(0))));
+    return data && data.players && typeof data.players === "object" && Object.keys(data.players).length ? data : null;
+  } catch { return null; }
+}
+let restoreArmed = false;
+async function copyBackup() {
+  const code = backupCode();
+  try { await navigator.clipboard.writeText(code); toast("Backup code copied. Paste it in Notes to keep it safe."); return; } catch {}
+  // no clipboard: show it so it can be copied by hand
+  const box = document.getElementById("backupOut");
+  if (box) { box.hidden = false; box.value = code; box.focus(); box.select(); toast("Select the code and copy it"); }
+}
+async function shareBackup() {
+  try { await navigator.share({ title: "Rep Quest backup", text: backupCode() }); } catch (e) { if (!e || e.name !== "AbortError") copyBackup(); }
+}
+function restoreBackup(code) {
+  const data = readBackup(code);
+  if (!data) { toast("That isn't a Rep Quest backup code"); restoreArmed = false; return; }
+  if (!restoreArmed) { restoreArmed = true; renderSettings(); toast("Tap Restore again to replace everything on this phone"); setTimeout(() => { restoreArmed = false; if (tab === "settings") renderSettings(); }, 6000); return; }
+  if (!data.settings) data.settings = { dumbbells: false };
+  if (!data.players[data.active]) data.active = Object.keys(data.players)[0];
+  lsSet(data);
+  toast("Backup restored!");
+  setTimeout(() => location.reload(), 600);
+}
+
 // Secret codes typed in Settings. Only a fingerprint of each code is kept here, not the code itself.
 const codeHash = str => { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h; };
 const CODES = { 2973782296: { what: "every color theme", use: () => { S.themes = THEMES.map(t => t.id); } } };
@@ -2721,7 +2771,27 @@ function renderSettings() {
     h("div", { class: "row" }, h("h2", { text: "Theme" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: `${mine.length - 1} unlocked` })),
     h("div", { class: "themepick", role: "group", "aria-label": "App theme" }, mine.map(t =>
       h("button", { "aria-pressed": String(cur === t.id), onclick: () => { setTheme(t.id); renderSettings(); toast(t.name.replace("👑 ", "") + " theme on"); } }, themePreview(t), t.name))),
-    mine.length < THEMES.length + 1 ? h("p", { class: "note" }, "Buy more color themes in the ", h("b", { text: "Shop" }), ".") : null));
+    mine.length < THEMES.length + 1 ? h("p", { class: "note" }, "Buy more color themes in the ", h("b", { text: "Shop" }), ".") : null,
+    window.LOOTLIFT_PWA ? h("details", { class: "infotip" },
+      h("summary", { text: "Make the home-screen icon match your theme" }),
+      h("p", { class: "note", style: "margin:8px 0 6px", text: "Phones only pick up the icon when you add the app, so you'll add it again. Your progress comes with you through a backup:" }),
+      h("ol", { class: "steps", style: "margin:0" },
+        h("li", { text: "Pick your theme here, then tap Copy backup code below and paste it in Notes." }),
+        h("li", { text: "Open Rep Quest's website in Safari (or Chrome), go to Settings, paste the code under Restore and tap Restore twice." }),
+        h("li", { text: "In the browser, tap Share, then Add to Home Screen. The new icon uses your theme's colors." }),
+        h("li", { text: "Open the new icon, go to Settings and restore the same code again." }),
+        h("li", { text: "Once your progress shows up in the new icon, delete the old icon from your home screen." }))) : null));
+  const restoreIn = h("textarea", { id: "restoreIn", rows: "3", placeholder: "Paste a backup code here", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": "Backup code to restore", class: "codebox" });
+  root.append(h("div", { class: "card" },
+    h("span", { class: "eyebrow", text: "Backup & restore" }),
+    h("p", { class: "note", text: "Save everything on this phone (all players, items, coins and streaks) as a code. Use it before deleting the app, or to move to a new phone." }),
+    h("div", { class: "row" },
+      h("button", { class: "btn primary", type: "button", style: "flex:1", onclick: copyBackup }, "Copy backup code"),
+      navigator.share ? h("button", { class: "btn ghost", type: "button", onclick: shareBackup }, "Share") : null),
+    h("textarea", { id: "backupOut", rows: "3", readonly: true, hidden: true, class: "codebox", "aria-label": "Your backup code" }),
+    restoreIn,
+    h("button", { class: "btn " + (restoreArmed ? "go" : "ghost"), type: "button", style: restoreArmed ? "--tc:var(--p25)" : null, onclick: () => restoreBackup(restoreIn.value) },
+      restoreArmed ? "Tap again to replace everything" : "Restore")));
   const codeIn = h("input", { id: "secretCode", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", enterkeyhint: "done", placeholder: "Enter code", "aria-label": "Secret code" });
   root.append(h("form", { class: "card", onsubmit: e => { e.preventDefault(); if (redeemCode(codeIn.value)) codeIn.value = ""; codeIn.blur(); } },
     h("span", { class: "eyebrow", text: "Secret code" }),

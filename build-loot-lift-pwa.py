@@ -9,6 +9,7 @@ Run it again after changing loot-lift.html:  python3 build-loot-lift-pwa.py
 import hashlib
 import json
 import math
+import re
 import struct
 import zlib
 from pathlib import Path
@@ -39,25 +40,27 @@ def write_png(path, size, pixel):
     path.write_bytes(png)
 
 
-def plate_icon(size, plate_scale):
-    """A red 25 kg bumper plate on the gym-floor background, 2x2 supersampled."""
+def plate_icon(size, plate_scale, pal=None):
+    """A 25 kg bumper plate on the gym-floor background, 2x2 supersampled.
+    pal = (background, plate, plate ring, hub, hole); defaults to the red plate."""
+    BG_, PLATE, PLATE_DARK, HUB_, HOLE_ = pal or (BG, RED, RED_DARK, HUB, HOLE)
     c = size / 2
     R = size * plate_scale
     layers = [  # (outer radius as fraction of plate radius, color), drawn outside-in
-        (1.00, RED), (0.80, RED_DARK), (0.77, RED), (0.30, HUB), (0.20, HOLE),
+        (1.00, PLATE), (0.80, PLATE_DARK), (0.77, PLATE), (0.30, HUB_), (0.20, HOLE_),
     ]
 
     def color_at(px, py):
         d = math.hypot(px - c, py - c) / R
-        col = BG
+        col = BG_
         for r, k in layers:
             if d <= r:
                 col = k
         # soft drop shadow under the plate
-        if d > 1.0 and col == BG:
+        if d > 1.0 and col == BG_:
             sd = math.hypot(px - c, py - c - size * 0.025) / R
             if sd <= 1.0:
-                col = tuple(int(v * 0.55) for v in BG)
+                col = tuple(int(v * 0.55) for v in BG_)
         return col
 
     offs = (0.25, 0.75)
@@ -72,6 +75,61 @@ def plate_icon(size, plate_scale):
         return bytes(v // 4 for v in acc)
 
     return pixel
+
+
+def hex_rgb(h):
+    h = h.lstrip("#")
+    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def shade(rgb, f):
+    return tuple(max(0, min(255, int(v * f))) for v in rgb)
+
+
+def theme_palettes(src):
+    """Icon colors for each app theme, read from the THEMES list in the page plus Gold."""
+    pals = {"gold": ((0x0B, 0x0A, 0x08), (0xF2, 0xC9, 0x4C), (0xB8, 0x86, 0x2B), (0x3D, 0x32, 0x20), (0x05, 0x04, 0x03))}
+    for m in re.finditer(r'\{ id: "(\w+)",\s*name: "[^"]*",\s*v: \{([^}]*)\} \}', src):
+        v = dict(re.findall(r'"?([\w-]+)"?: "(#[0-9a-fA-F]{6})"', m.group(2)))
+        bg, acc = hex_rgb(v["floor"]), hex_rgb(v["accent"])
+        pals[m.group(1)] = (bg, acc, shade(acc, 0.78), hex_rgb(v["panel-2"]), shade(bg, 0.6))
+    return pals
+
+
+ICON_SET = [("icon-192.png", 192, 0.44), ("icon-512.png", 512, 0.44), ("maskable-512.png", 512, 0.34), ("apple-touch-icon.png", 180, 0.38)]
+
+
+def write_icon_set(folder, pal):
+    """Draws the 4 icons into folder, skipping it when this palette was already drawn (drawing is slow)."""
+    folder.mkdir(parents=True, exist_ok=True)
+    sig = hashlib.sha1(repr(pal).encode()).hexdigest()[:12]
+    stamp = folder / ".palette"
+    if stamp.exists() and stamp.read_text() == sig and all((folder / n).exists() for n, _, _ in ICON_SET):
+        return
+    for name, size, scale in ICON_SET:
+        write_png(folder / name, size, plate_icon(size, scale, pal))
+    stamp.write_text(sig)
+
+
+def manifest_for(theme_id, theme_color, icon_dir):
+    return {
+        "name": "Rep Quest",
+        "short_name": "Rep Quest",
+        "description": "Random workouts that earn loot crates to decorate your own gym.",
+        "id": "./",
+        "start_url": "./",
+        "scope": "./",
+        "display": "standalone",
+        "orientation": "portrait",
+        "background_color": theme_color,
+        "theme_color": theme_color,
+        "categories": ["health", "fitness", "games"],
+        "icons": [
+            {"src": f"{icon_dir}icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+            {"src": f"{icon_dir}icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+            {"src": f"{icon_dir}maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        ],
+    }
 
 
 def build():
@@ -122,6 +180,12 @@ def build():
         ],
     }
     (OUT / "manifest.webmanifest").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    # one icon set + manifest per app theme; the page switches to them when you pick a theme
+    for tid, pal in theme_palettes(src).items():
+        write_icon_set(OUT / "icons" / f"t-{tid}", pal)
+        color = "#%02x%02x%02x" % pal[0]
+        (OUT / f"manifest-{tid}.webmanifest").write_text(json.dumps(manifest_for(tid, color, f"icons/t-{tid}/"), indent=2), encoding="utf-8")
 
     shell = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png",
              "./icons/icon-512.png", "./icons/maskable-512.png", "./icons/apple-touch-icon.png"]

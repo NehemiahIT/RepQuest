@@ -1,0 +1,37 @@
+{
+  "name": "Rep Quest",
+  "short_name": "Rep Quest",
+  "description": "Random workouts that earn loot crates to decorate your own gym.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b130d",
+  "theme_color": "#0b130d",
+  "categories": [
+    "health",
+    "fitness",
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "icons/t-forest/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/t-forest/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/t-forest/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
