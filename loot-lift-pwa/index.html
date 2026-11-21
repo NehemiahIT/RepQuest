@@ -39,6 +39,8 @@
   --r3: #ffb627;
   --r4: #ff4fa3;
   --r5: #ff7a1a;
+  --r6: #f2c94c;
+  --olympian: linear-gradient(110deg, #fff6c9 0%, #e7b53c 16%, #9c6b12 28%, #f4f7fb 42%, #9aa6b8 54%, #ffffff 62%, #d9a53a 76%, #fff1b0 88%, #b9c3d1 100%);
   --rainbow: linear-gradient(90deg, #ff3b3b, #ffb627, #f2ff3b, #3bff8a, #3bb5ff, #b46cff, #ff4fa3);
   --ink: #101216;
   --display: "Saira Stencil One", "Impact", "Arial Narrow Bold", sans-serif;
@@ -46,6 +48,21 @@
   --label: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --nav-h: 64px;
 }
+/* Gold theme: the Grand Champion prize (black and gold). Turned on with <html class="gold">. */
+html.gold {
+  --floor: #0b0a08; --panel: #17140d; --panel-2: #221d12; --line: #3d3220;
+  --chalk: #fbefc8; --dim: #b9a77c; --ink: #140f05;
+  --p10: #a8781f; --p15: #c9962e; --p20: #e2b546; --p25: #f5cf62;
+  --gold: linear-gradient(135deg, #fff1b8 0%, #f2c94c 35%, #b8862b 70%, #f7dc85 100%);
+}
+html.gold .brand, html.gold .brand span { background: var(--gold); -webkit-background-clip: text; background-clip: text; color: transparent; }
+html.gold .btn.primary, html.gold .lvl-badge, html.gold .seg button[aria-pressed="true"], html.gold .chip[aria-pressed="true"],
+html.gold .toast, html.gold .banner, html.gold .haul li .new { background: var(--gold); color: var(--ink); border-color: transparent; }
+html.gold .xpbar i, html.gold .achbar i, html.gold .ach .pbar i { background: var(--gold); opacity: 1; }
+html.gold .card { box-shadow: inset 0 0 0 1px #f2c94c26; }
+html.gold .nav button[aria-selected="true"] { color: #f7dc85; }
+html.gold .nav { border-top-color: #f2c94c40; }
+html.gold .top { border-bottom-color: #f2c94c40; }
 html, body { background: var(--floor); color: var(--chalk); }
 [hidden] { display: none !important; }
 body {
@@ -90,7 +107,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--chalk); out
   padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
 }
-.nav-inner { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); height: var(--nav-h); }
+.nav-inner { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); height: var(--nav-h); }
 .nav button { background: none; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--dim); font-family: var(--label); font-weight: 600; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; position: relative; }
 .nav button svg { width: 24px; height: 24px; }
 .nav button[aria-selected="true"] { color: var(--chalk); }
@@ -137,6 +154,11 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 /* ---------- workout ---------- */
 .wo-head { display: flex; align-items: flex-start; gap: 12px; }
 .wo-head .tchip { font-family: var(--label); font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: var(--tc); color: var(--ink); padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--panel-2); color: var(--chalk); border-radius: 999px; padding: 8px 14px; min-height: 40px; font-family: var(--label); font-weight: 700; font-size: 15px; letter-spacing: .05em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; }
+.chip[aria-pressed="true"] { background: var(--chalk); color: var(--ink); border-color: var(--chalk); }
+.chip[aria-pressed="true"]::before { content: "✓"; font-size: 13px; }
+.chip:disabled { opacity: .45; }
 .wo-meta { display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--label); font-size: 15px; color: var(--dim); }
 .wo-meta b { color: var(--chalk); font-variant-numeric: tabular-nums; }
 .exlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -176,12 +198,59 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 }
 @keyframes shimmer { to { background-position: 0 0, 0 0, 200% 0; } }
 .rainbow-text { background: var(--rainbow); -webkit-background-clip: text; background-clip: text; color: transparent !important; }
+/* Olympian: gold and silver */
+.crate.oly {
+  background:
+    linear-gradient(90deg, #00000030 0 9%, transparent 9% 91%, #00000030 91%),
+    linear-gradient(0deg, #00000026 0 10%, transparent 10% 74%, #ffffff80 74% 77%, #00000026 77%),
+    var(--olympian);
+  background-size: 100% 100%, 100% 100%, 250% 100%;
+  box-shadow: inset 0 0 0 3px #7a5a1a66, 0 6px 0 #00000066, 0 0 calc(var(--cw) * .25) #f2c94caa, 0 0 calc(var(--cw) * .5) #e8edf255;
+  animation: shimmer 4s linear infinite;
+}
+.crate.oly::after { color: #3a2a06; opacity: .85; text-shadow: 0 1px 0 #ffffff99; }
+.crate.locked { filter: grayscale(.85) brightness(.55); animation: none; box-shadow: inset 0 0 0 3px #00000040, 0 6px 0 #00000066; }
+.oly-text { background: var(--olympian); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent !important; animation: shimmer 4s linear infinite; }
+.reveal.oly .rays { background: repeating-conic-gradient(#f2c94c 0 6deg, transparent 6deg 12deg, #e8edf2 12deg 18deg, transparent 18deg 24deg); opacity: .8; }
+.slot.oly::before { background: conic-gradient(#f2c94c, #ffffff, #b9c3d1, #e7b53c, #f2c94c); opacity: .8; filter: blur(4px); }
+/* the OLYMPIAN AURA sign: white-hot letters with a gold and silver neon glow that breathes and flickers */
+.neon.aura {
+  color: #fffdf3; letter-spacing: .04em;
+  text-shadow: 0 0 2px #fff, 0 0 6px #fff6c9, 0 0 12px #f2c94c, 0 0 22px #e7b53c, 0 0 34px #d9a53a, 0 0 48px #e8edf2, 0 0 70px #b9c3d1;
+  animation: aura 3.2s ease-in-out infinite;
+}
+@keyframes aura {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 6px #f2c94c88); }
+  45% { filter: brightness(1.25) drop-shadow(0 0 14px #ffffffaa); }
+  47% { filter: brightness(.7); } 48% { filter: brightness(1.3); } 50% { filter: brightness(.85); } 52% { filter: brightness(1.2) drop-shadow(0 0 12px #f2c94caa); }
+}
+.slot .neon.aura { font-size: clamp(7px, 2.05vw, 10px); letter-spacing: 0; }
+@media (prefers-reduced-motion: reduce) { .neon.aura, .crate.oly, .oly-text { animation: none; } }
+.olyprog { height: 8px; border-radius: 4px; background: var(--panel); overflow: hidden; }
+.olyprog i { display: block; height: 100%; background: var(--olympian); background-size: 200% 100%; }
 .crate::before { content: ""; position: absolute; left: 42%; right: 42%; top: 18%; height: 14%; background: #0000004d; border-radius: 3px; }
 .crategrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
 .cratecard { background: var(--panel-2); border-radius: 12px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .cratecard .nm { font-family: var(--label); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: 14px; }
 .odds { display: flex; height: 8px; border-radius: 4px; overflow: hidden; width: 100%; }
 .odds i { display: block; height: 100%; }
+/* open all */
+.openall { display: flex; gap: 10px; align-items: stretch; background: var(--panel-2); border-radius: 12px; padding: 10px; }
+.openall .sel { position: relative; flex: 1; min-width: 0; display: flex; }
+.openall select { appearance: none; -webkit-appearance: none; width: 100%; min-height: 46px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--chalk); font: 600 16px/1.2 inherit; font-family: inherit; padding: 10px 38px 10px 12px; }
+.openall .sel::after { content: ""; position: absolute; right: 14px; top: 50%; width: 8px; height: 8px; border-right: 2px solid var(--dim); border-bottom: 2px solid var(--dim); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+.openall .btn { min-height: 46px; padding: 8px 16px; flex: none; }
+.haul { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+.haul .best { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.haul .best .big { font-size: 72px; line-height: 1; }
+.haul ul { list-style: none; margin: 0; padding: 4px; display: flex; flex-direction: column; gap: 6px; max-height: max(120px, calc(100vh - 440px)); max-height: max(120px, calc(100dvh - 440px)); overflow-y: auto; text-align: left; }
+.haul li { display: flex; align-items: center; gap: 10px; background: var(--panel); border-radius: 10px; padding: 8px 10px; border-left: 4px solid var(--rc); }
+.haul li .em { font-size: 24px; width: 30px; text-align: center; flex: none; }
+.haul li .swatch { width: 30px; height: 22px; border-radius: 5px; flex: none; }
+.haul li .nm { flex: 1; min-width: 0; display: flex; flex-direction: column; font-weight: 600; }
+.haul li .nm small { font-family: var(--label); font-weight: 700; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.haul li .new { font-family: var(--label); font-weight: 700; font-size: 11px; letter-spacing: .06em; background: var(--chalk); color: var(--ink); border-radius: 5px; padding: 2px 5px; flex: none; }
+.haul li .ct { font-family: var(--label); font-weight: 700; font-size: 18px; flex: none; }
 .loglist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .loglist li { display: flex; align-items: center; gap: 10px; font-size: 15px; }
 .loglist .em { font-size: 22px; width: 28px; text-align: center; }
@@ -288,6 +357,20 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 .item.missing > :not(.nm):not(.kind) { opacity: .35; filter: grayscale(1); }
 .item.missing .nm { color: var(--dim); }
 .kind { font-size: 12px; color: var(--dim); }
+/* settings */
+.setrow { display: flex; align-items: center; gap: 14px; }
+.setrow .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.setrow .txt b { font-size: 17px; }
+.setrow .txt small { color: var(--dim); font-size: 14px; line-height: 1.4; }
+.switch { position: relative; flex: none; width: 56px; height: 32px; }
+.switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.switch .track { position: absolute; inset: 0; border-radius: 16px; background: var(--panel-2); border: 2px solid var(--line, rgba(255,255,255,.18)); transition: background .2s, border-color .2s; }
+.switch .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--dim); transition: transform .2s, background .2s; }
+.switch input:checked + .track { background: var(--p25); border-color: var(--p25); }
+.switch input:checked + .track::after { transform: translateX(24px); background: #fff; }
+.switch input:focus-visible + .track { outline: 3px solid var(--chalk); outline-offset: 2px; }
+.dbtag { display: inline-block; font-family: var(--label); font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; background: var(--panel-2); color: var(--chalk); border-radius: 6px; padding: 2px 6px; margin-right: 6px; vertical-align: 1px; }
+.ex .dbtag { background: var(--panel); }
 .fold { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: 0; padding: 4px 0; min-height: 44px; text-align: left; }
 .fold .chev { width: 22px; height: 22px; flex: none; display: grid; place-items: center; color: var(--dim); transition: transform .2s; }
 .fold[aria-expanded="true"] .chev { transform: rotate(180deg); }
@@ -304,6 +387,22 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 .seg button { border: 0; background: none; padding: 8px 12px; border-radius: 8px; font-family: var(--label); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; font-size: 14px; color: var(--dim); }
 .seg button[aria-pressed="true"] { background: var(--chalk); color: var(--ink); }
 .board { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+/* achievements */
+.achhead { display: flex; flex-direction: column; gap: 8px; }
+.achbar { height: 8px; border-radius: 4px; background: var(--panel-2); overflow: hidden; }
+.achbar i { display: block; height: 100%; background: linear-gradient(90deg, #d08a54, #d6dbe4, var(--r3)); }
+.achgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.ach { position: relative; display: flex; flex-direction: column; gap: 6px; background: var(--panel-2); border-radius: 12px; padding: 12px; border: 1px solid transparent; }
+.ach .ic { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; background: var(--panel); filter: grayscale(1); opacity: .55; }
+.ach b { font-size: 15px; line-height: 1.2; }
+.ach small { color: var(--dim); font-size: 13px; line-height: 1.3; }
+.ach .pbar { height: 5px; border-radius: 3px; background: var(--panel); overflow: hidden; margin-top: auto; }
+.ach .pbar i { display: block; height: 100%; background: var(--chalk); opacity: .7; }
+.ach .pnum { font-family: var(--label); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--dim); }
+.ach.done { border-color: color-mix(in srgb, var(--r3) 55%, transparent); background: linear-gradient(160deg, color-mix(in srgb, var(--r3) 14%, var(--panel-2)), var(--panel-2) 60%); }
+.ach.done .ic { filter: none; opacity: 1; background: color-mix(in srgb, var(--r3) 22%, var(--panel)); box-shadow: 0 0 14px color-mix(in srgb, var(--r3) 45%, transparent); }
+.ach.done .pnum { color: var(--r3); }
+.ach.done::after { content: "✓"; position: absolute; top: 10px; right: 12px; font-weight: 800; color: var(--r3); }
 .lb { display: grid; grid-template-columns: 34px 38px 1fr auto; align-items: center; gap: 10px; background: var(--panel-2); border-radius: 12px; padding: 10px 12px; width: 100%; border: 1px solid transparent; text-align: left; }
 .lb.me { border-color: var(--chalk); }
 .lb .rk { font-family: var(--display); font-size: 20px; text-align: center; color: var(--dim); }
@@ -432,6 +531,7 @@ input[type="text"]::placeholder { color: var(--dim); }
     <section role="tabpanel" id="tab-crates" hidden></section>
     <section role="tabpanel" id="tab-gym" hidden></section>
     <section role="tabpanel" id="tab-board" hidden></section>
+    <section role="tabpanel" id="tab-settings" hidden></section>
   </main>
 </div>
 
@@ -445,6 +545,8 @@ input[type="text"]::placeholder { color: var(--dim); }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 10l9-6 9 6v10H3z"/><path d="M9 20v-6h6v6"/></svg>My Gym</button>
     <button role="tab" data-tab="board" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg>Ranks</button>
+    <button role="tab" data-tab="settings" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Settings</button>
   </div>
 </nav>
 
@@ -488,6 +590,7 @@ const CRATE_DROPS = [
   [0, 0, 25, 60, 15, 0],
   [0, 0, 0, 25, 60, 15],
   [0, 0, 0, 30, 0, 70],
+  [0, 0, 0, 0, 0, 0, 100], // Olympian: only the OLYMPIAN AURA sign
 ];
 // worst to rarest
 const RAR = [
@@ -497,8 +600,14 @@ const RAR = [
   { label: "Legendary",   color: "var(--r3)", val: 100 },
   { label: "Mythic",      color: "var(--r4)", val: 250 },
   { label: "Powerlifter", color: "var(--r5)", val: 600 },
+  // not in any workout's odds: earned once by collecting every other item
+  { label: "Olympian",    color: "var(--r6)", val: 1500 },
 ];
-const TOP = RAR.length - 1;
+const TOP = 5;   // Powerlifter, the rarest crate you can roll (rainbow)
+const OLY = 6;   // Olympian (gold and silver)
+const rarColor = r => r === TOP ? "var(--rainbow)" : r === OLY ? "var(--olympian)" : RAR[r].color; // for backgrounds
+const rarClass = r => r === TOP ? "rainbow-text" : r === OLY ? "oly-text" : null;                  // for text
+const neonClass = it => "neon" + (it.r === OLY ? " aura" : "");
 const an = word => (/^[AEIOU]/i.test(word) ? "an " : "a ") + word;
 function rollFrom(odds) {
   let x = Math.random() * odds.reduce((a, b) => a + b, 0);
@@ -506,9 +615,9 @@ function rollFrom(odds) {
   return odds.findLastIndex(o => o > 0);
 }
 function crateEl(c, cw, tag = "div", attrs = {}) {
-  return h(tag, { ...attrs, class: "crate" + (c >= 4 ? " glow" : "") + (c === TOP ? " top" : "") + (attrs.class ? " " + attrs.class : ""), "data-label": RAR[c].label.toUpperCase(), style: `--tc:${RAR[c].color};--cw:${cw}px` });
+  return h(tag, { ...attrs, class: "crate" + (c >= 4 && c !== OLY ? " glow" : "") + (c === TOP ? " top" : "") + (c === OLY ? " oly" : "") + (attrs.class ? " " + attrs.class : ""), "data-label": RAR[c].label.toUpperCase(), style: `--tc:${RAR[c].color};--cw:${cw}px` });
 }
-const rarText = (r, txt) => h("b", { class: r === TOP ? "rainbow-text" : null, style: r === TOP ? null : `color:${RAR[r].color}`, text: txt });
+const rarText = (r, txt) => h("b", { class: rarClass(r), style: rarClass(r) ? null : `color:${RAR[r].color}`, text: txt });
 // slot: floor | wall | wallSkin | floorSkin
 const ITEMS = [
   { id: "shake",    name: "Protein Shake",   e: "🥤", r: 0, slot: "floor", d: "Vanilla. Probably." },
@@ -611,6 +720,7 @@ const ITEMS = [
   { id: "sunstone", name: "Sun Stone",         e: "🌞", r: 5, slot: "floor", d: "Lift the sun. Don't touch it." },
   { id: "star",     name: "Hall of Strength Star", e: "🌟", r: 5, slot: "wall", d: "Only for the strongest of all." },
   { id: "goat",     name: "GOAT Sign",         txt: "GOAT", r: 5, slot: "wall", d: "Greatest of all time. That's you." },
+  { id: "aura",     name: "OLYMPIAN AURA Sign", txt: "OLYMPIAN AURA", r: 6, slot: "wall", d: "Only for those who have collected everything. It never stops glowing." },
 ];
 const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 const SKIN_CSS = { brick: "#7a3a2c", rubber: "#222429", neon: "linear-gradient(135deg,#3d1460,#ff3cf0)", court: "#b9824a", galaxy: "linear-gradient(135deg,#0a0b1e,#5b2ca0)", gold: "linear-gradient(135deg,#8a6417,#ffe08a)", concrete: "#3b404b", plain: "#23262d", lava: "linear-gradient(135deg,#1c0b06,#ff5a1a,#2a0f08)", clouds: "linear-gradient(135deg,#bfe3ff,#ffffff)", arena: "radial-gradient(circle at 50% 0,#fff8d6,#1b2340 70%)", platform: "linear-gradient(90deg,#111 0 20%,#c99358 20% 80%,#111 80%)", lockers: "repeating-linear-gradient(90deg,#4a5b73 0 10px,#2a3445 10px 12px)", track: "repeating-linear-gradient(0deg,#b5452f 0 8px,#f2e9e4 8px 9px)", turf: "repeating-linear-gradient(90deg,#2f8f3a 0 10px,#2a8034 10px 20px)" };
@@ -652,6 +762,43 @@ const EXERCISES = [
   { name: "Side Plank",         kind: "secs", base: 20, min: 1, per: 2, hint: "Each side", cam: { t: "hold", pose: "flat", tip: "Phone on the floor, facing you" } },
   { name: "Pike Push-ups",      kind: "reps", base: 6,  spr: 3, min: 2, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "pike", tip: "Side view" } },
   { name: "Tuck Jumps",         kind: "reps", base: 6,  spr: 2.5, min: 2, cam: { t: "range", f: "tuck", lo: 0.45, hi: 0.8, start: "upright", pose: "torsoUp", tip: "Face the camera" } },
+  // more bodyweight moves, so every muscle focus has enough moves that mainly work it
+  { name: "Wide Push-ups",      kind: "reps", base: 10, spr: 2.5, hint: "Knees down is fine", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "horizontal", tip: "Phone on the floor, side view" } },
+  { name: "Push-up Hold",       kind: "secs", base: 20,           hint: "Hover low", cam: { t: "hold", pose: "lowPlank", tip: "Phone on the floor, side view" } },
+  { name: "Plank Up-Downs",     kind: "reps", base: 8,  spr: 3,   cam: { t: "angle", limb: "elbow", lo: 110, hi: 150, pose: "horizontal", minRep: 1, tip: "Phone on the floor, side view" } },
+  { name: "Doorframe Rows",     kind: "reps", base: 10, spr: 2.5, hint: "Hold a sturdy door frame", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "doorRow", minRep: 0.8, tip: "Stand sideways to the camera" } },
+  { name: "Backpack Curls",     kind: "reps", base: 12, spr: 2.5, hint: "Fill a backpack with books", cam: { t: "angle", limb: "elbow", lo: 70, hi: 145, pose: "curl", minRep: 0.8, tip: "Stand sideways to the camera" } },
+  { name: "Reverse Snow Angels", kind: "reps", base: 10, spr: 3,  cam: { t: "angle", limb: "shoulder", lo: 50, hi: 140, pose: "flat", minRep: 1, tip: "Phone on the floor, side view" } },
+  { name: "Bird Dogs",          kind: "reps", base: 6,  spr: 4, per: 2, hint: "Each side", cam: { t: "range", f: "reach", lo: -0.6, hi: -0.2, pose: "allFours", minRep: 1, tip: "Phone on the floor, side view" } },
+  { name: "Swimmers",           kind: "secs", base: 25,           cam: { t: "active", pts: [15, 16, 27, 28], dir: "y", pose: "flat", tip: "Phone on the floor, side view" } },
+  { name: "Back Extensions",    kind: "reps", base: 10, spr: 2.5, cam: { t: "range", f: "situp", lo: 0.1, hi: 0.28, pose: "flat", minRep: 1, tip: "Phone on the floor, side view" } },
+  { name: "Arm Circles",        kind: "secs", base: 30,           cam: { t: "active", pts: [15, 16], rel: "shoulders", pose: "armsOut", start: "upright", tip: "Face the camera" } },
+  { name: "Donkey Kicks",       kind: "reps", base: 8,  spr: 2, per: 2, hint: "Each leg", cam: { t: "range", f: "kick", lo: -0.5, hi: 0, pose: "allFours", minRep: 0.8, tip: "Phone on the floor, side view" } },
+  { name: "Diamond Push-ups",   kind: "reps", base: 8,  spr: 2.5, min: 1, hint: "Knees down is fine", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "horizontal", tip: "Phone on the floor, side view" } },
+  { name: "Decline Push-ups",   kind: "reps", base: 8,  spr: 2.5, min: 1, hint: "Feet up on a chair", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "horizontal", tip: "Phone on the floor, side view" } },
+  { name: "Incline Push-ups",   kind: "reps", base: 10, spr: 2.5, hint: "Hands on a couch or chair", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "incline", tip: "Side view" } },
+  { name: "Clap Push-ups",      kind: "reps", base: 5,  spr: 3, min: 2, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "horizontal", minRep: 0.8, tip: "Phone on the floor, side view" } },
+  { name: "Floor Dips",         kind: "reps", base: 10, spr: 2.5, hint: "Hands behind you on the floor", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "dips", tip: "Side view" } },
+  { name: "Backpack Triceps Extensions", kind: "reps", base: 10, spr: 2.5, hint: "Backpack full of books", cam: { t: "angle", limb: "elbow", lo: 80, hi: 145, pose: "overhead", minRep: 0.8, tip: "Stand sideways to the camera" } },
+  { name: "Backpack Shoulder Press", kind: "reps", base: 10, spr: 2.5, hint: "Backpack full of books", cam: { t: "angle", limb: "elbow", lo: 100, hi: 155, pose: "press", minRep: 0.8, tip: "Face the camera" } },
+  { name: "Backpack Front Raises", kind: "reps", base: 10, spr: 2.5, hint: "Backpack full of books", cam: { t: "angle", limb: "shoulder", lo: 35, hi: 75, pose: "raise", minRep: 0.8, tip: "Stand sideways to the camera" } },
+  { name: "Plank Shoulder Taps", kind: "reps", base: 12, spr: 1.5, hint: "Count each tap", cam: { t: "range", f: "reach", lo: -0.6, hi: -0.2, pose: "horizontal", minRep: 0.5, tip: "Phone on the floor, side view" } },
+  { name: "Leg Raises",         kind: "reps", base: 10, spr: 3,   cam: { t: "angle", limb: "hip", lo: 115, hi: 160, pose: "backFlat", minRep: 1, tip: "Phone on the floor, side view" } },
+  { name: "Fire Hydrants",      kind: "reps", base: 10, spr: 2, per: 2, hint: "Each leg", cam: { t: "range", f: "kneeUp", lo: -0.6, hi: -0.25, pose: "allFours", minRep: 0.8, tip: "Phone on the floor, side view" } },
+  { name: "Sumo Squats",        kind: "reps", base: 12, spr: 2.5, hint: "Feet wide, toes out", cam: { t: "angle", limb: "knee", lo: 115, hi: 155, pose: "standing", start: "upright", minRep: 0.8, tip: "Face the camera" } },
+  { name: "Glute Bridge Hold",  kind: "secs", base: 25,           cam: { t: "hold", pose: "bridgeTop", tip: "Phone on the floor, side view" } },
+  { name: "Single-leg Glute Bridges", kind: "reps", base: 8, spr: 2.5, min: 1, per: 2, hint: "Each leg", cam: { t: "range", f: "hipLift", lo: 0.08, hi: 0.22, pose: "bridge", minRep: 0.8, tip: "Phone on the floor, side view" } },
+  // dumbbell moves (only in workouts when Dumbbell mode is on in Settings)
+  { name: "Dumbbell Curls",     db: true, kind: "reps", base: 10, spr: 2.5, cam: { t: "angle", limb: "elbow", lo: 70, hi: 145, pose: "curl", minRep: 0.8, tip: "Stand sideways to the camera" } },
+  { name: "Shoulder Press",     db: true, kind: "reps", base: 8,  spr: 2.5, cam: { t: "angle", limb: "elbow", lo: 100, hi: 155, pose: "press", minRep: 0.8, tip: "Face the camera" } },
+  { name: "Goblet Squats",      db: true, kind: "reps", base: 10, spr: 3,   cam: { t: "angle", limb: "knee", lo: 115, hi: 155, pose: "goblet", minRep: 0.8, tip: "Stand sideways to the camera" } },
+  { name: "Bent-over Rows",     db: true, kind: "reps", base: 10, spr: 2.5, hint: "Both arms together", cam: { t: "angle", limb: "elbow", lo: 105, hi: 150, pose: "hinge", minRep: 0.8, tip: "Stand sideways to the camera" } },
+  { name: "Romanian Deadlifts", db: true, kind: "reps", base: 10, spr: 3,   cam: { t: "angle", limb: "hip", lo: 125, hi: 160, pose: "onFeet", start: "upright", minRep: 1.2, tip: "Stand sideways to the camera" } },
+  { name: "Lateral Raises",     db: true, kind: "reps", base: 10, spr: 2.5, cam: { t: "angle", limb: "shoulder", lo: 35, hi: 75, pose: "raise", minRep: 0.8, tip: "Face the camera" } },
+  { name: "Triceps Extensions", db: true, kind: "reps", base: 10, spr: 2.5, hint: "Overhead", cam: { t: "angle", limb: "elbow", lo: 80, hi: 145, pose: "overhead", minRep: 0.8, tip: "Stand sideways to the camera" } },
+  { name: "Floor Press",        db: true, kind: "reps", base: 10, spr: 2.5, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "floorPress", minRep: 0.8, tip: "Phone on the floor, side view" } },
+  { name: "Russian Twists",     db: true, kind: "secs", base: 30,           cam: { t: "active", pts: [15, 16], rel: "shoulders", dir: "x", pose: "twist", tip: "Face the camera" } },
+  { name: "Thrusters",          db: true, kind: "reps", base: 6,  spr: 3.5, min: 1, cam: { t: "angle", limb: "knee", lo: 115, hi: 155, pose: "standing", start: "upright", via: "armsUp", minRep: 1.2, tip: "Face the camera" } },
 ];
 const EXERCISE = Object.fromEntries(EXERCISES.map(e => [e.name, e]));
 
@@ -662,19 +809,19 @@ const MUSCLES = {
   calves: "Calves", hipFlexors: "Hip flexors",
 };
 const HOWTO = {
-  "Jumping Jacks": { main: ["calves", "shoulders"], also: ["glutes", "quads"],
+  "Jumping Jacks": { main: ["calves"], also: ["shoulders", "glutes", "quads"],
     steps: ["Stand tall with your feet together and arms at your sides.", "Jump your feet out wide while swinging your arms up over your head.", "Jump back to the start. That's one."],
     tip: "Land softly on the balls of your feet." },
-  "Push-ups": { main: ["chest", "triceps"], also: ["shoulders", "abs"],
+  "Push-ups": { main: ["chest"], also: ["triceps", "shoulders", "abs"],
     steps: ["Put your hands on the floor a little wider than your shoulders.", "Step your feet back so your body is a straight line from head to heels.", "Bend your elbows and lower your chest until it's close to the floor.", "Push back up until your arms are straight."],
     tip: "Don't let your hips sag. Knees on the floor makes it easier." },
-  "Bodyweight Squats": { main: ["quads", "glutes"], also: ["hamstrings", "abs"],
+  "Bodyweight Squats": { main: ["quads"], also: ["glutes", "hamstrings", "abs"],
     steps: ["Stand with your feet shoulder-width apart, toes pointing slightly out.", "Push your hips back and bend your knees like you're sitting in a chair.", "Go down until your thighs are about level with the floor.", "Push through your heels to stand back up."],
     tip: "Keep your chest up and your knees in line with your toes." },
   "Plank": { main: ["abs"], also: ["shoulders", "glutes", "lowerBack"],
     steps: ["Put your forearms on the floor with your elbows under your shoulders.", "Step your feet back so your body is a straight line.", "Squeeze your belly and glutes and hold."],
     tip: "Don't let your hips droop or stick up in the air." },
-  "Lunges": { main: ["quads", "glutes"], also: ["hamstrings", "calves"],
+  "Lunges": { main: ["quads"], also: ["glutes", "hamstrings", "calves"],
     steps: ["Stand tall with your feet together.", "Take a big step forward with one foot.", "Lower down until both knees are bent at about a right angle.", "Push off your front foot to step back. Switch legs."],
     tip: "Your back knee should hover just above the floor." },
   "Mountain Climbers": { main: ["abs", "hipFlexors"], also: ["shoulders", "quads"],
@@ -683,7 +830,7 @@ const HOWTO = {
   "Sit-ups": { main: ["abs"], also: ["hipFlexors", "obliques"],
     steps: ["Lie on your back with your knees bent and feet flat.", "Cross your arms over your chest.", "Curl up until you're sitting, then lower back down slowly."],
     tip: "Lead with your chest, not your neck." },
-  "High Knees": { main: ["hipFlexors", "quads"], also: ["calves", "abs"],
+  "High Knees": { main: ["quads"], also: ["hipFlexors", "calves", "abs"],
     steps: ["Stand tall.", "Run in place, driving each knee up to hip height.", "Pump your arms as you go."],
     tip: "Stay light on the balls of your feet." },
   "Glute Bridges": { main: ["glutes"], also: ["hamstrings", "lowerBack"],
@@ -707,19 +854,19 @@ const HOWTO = {
   "Shadow Boxing": { main: ["shoulders"], also: ["abs", "obliques", "calves"],
     steps: ["Stand with one foot forward and your fists up by your chin.", "Throw quick punches straight out, twisting your hips.", "Bring each fist back to your chin after you punch."],
     tip: "Keep your feet moving." },
-  "Inchworms": { main: ["hamstrings", "abs"], also: ["shoulders", "chest"],
+  "Inchworms": { main: ["hamstrings"], also: ["abs", "shoulders", "chest"],
     steps: ["Stand tall, bend over and put your hands on the floor.", "Walk your hands out until you're in a plank.", "Walk your hands back to your feet and stand up."],
     tip: "Bend your knees a little if your legs feel tight." },
-  "Burpees": { main: ["quads", "chest"], also: ["shoulders", "abs", "glutes"],
+  "Burpees": { main: ["quads"], also: ["chest", "shoulders", "abs", "glutes"],
     steps: ["Squat down and put your hands on the floor.", "Jump your feet back into a plank.", "Jump your feet back up to your hands.", "Stand up and jump with your arms overhead."],
     tip: "Add a push-up at the bottom for an extra challenge." },
-  "Jump Squats": { main: ["quads", "glutes"], also: ["calves", "hamstrings"],
+  "Jump Squats": { main: ["quads"], also: ["glutes", "calves", "hamstrings"],
     steps: ["Stand with your feet shoulder-width apart.", "Squat down.", "Explode up into a jump.", "Land softly and go right into the next squat."],
     tip: "Land with bent knees to protect your joints." },
-  "Skater Hops": { main: ["glutes", "quads"], also: ["calves"],
+  "Skater Hops": { main: ["glutes"], also: ["quads", "calves"],
     steps: ["Stand on your right leg.", "Jump sideways to the left and land on your left foot, sweeping your right leg behind you.", "Jump back to the right. Keep going side to side."],
     tip: "Swing your arms like a speed skater." },
-  "Bear Crawl": { main: ["shoulders", "abs"], also: ["quads"],
+  "Bear Crawl": { main: ["shoulders"], also: ["abs", "quads"],
     steps: ["Get on your hands and feet with your knees bent, hovering just off the floor.", "Crawl forward, moving your opposite hand and foot together.", "Keep your back flat like a table."],
     tip: "Keep your knees low the whole time." },
   "Side Plank": { main: ["obliques"], also: ["shoulders", "glutes"],
@@ -731,7 +878,123 @@ const HOWTO = {
   "Tuck Jumps": { main: ["quads", "calves"], also: ["abs", "hipFlexors", "glutes"],
     steps: ["Stand with your feet hip-width apart.", "Jump up and pull your knees toward your chest.", "Land softly with bent knees."],
     tip: "Use your arms to swing yourself up." },
+  "Wide Push-ups": { main: ["chest"], also: ["shoulders", "triceps", "abs"],
+    steps: ["Get in a push-up position with your hands much wider than your shoulders.", "Keep your body in a straight line from head to heels.", "Lower your chest toward the floor.", "Push back up until your arms are straight."],
+    tip: "The wider your hands, the more your chest does the work." },
+  "Push-up Hold": { main: ["chest"], also: ["triceps", "abs", "shoulders"],
+    steps: ["Start at the top of a push-up.", "Lower halfway down, so your elbows are bent and your chest hovers above the floor.", "Hold right there with your body straight."],
+    tip: "Keep breathing. Drop your knees if your form starts to slip." },
+  "Plank Up-Downs": { main: ["triceps"], also: ["shoulders", "abs", "chest"],
+    steps: ["Start in a forearm plank.", "Put one hand down, then the other, and push up into a high plank.", "Lower back down to your forearms one arm at a time.", "Switch which arm leads each time."],
+    tip: "Keep your hips still. Don't rock side to side." },
+  "Doorframe Rows": { main: ["back"], also: ["biceps", "shoulders"],
+    steps: ["Stand in a doorway and grab both sides of the frame at chest height.", "Walk your feet forward and lean back until your arms are straight.", "Pull your chest toward the door frame, squeezing your shoulder blades.", "Lower yourself back slowly."],
+    tip: "Make sure the door frame is solid. Walk your feet further in to make it harder." },
+  "Backpack Curls": { main: ["biceps"], also: [],
+    steps: ["Fill a backpack with books and hold it by the top handle or straps, arms down.", "Keep your elbows pinned to your sides.", "Curl the backpack up to your chest.", "Lower it slowly."],
+    tip: "Add or remove books to make it heavier or lighter." },
+  "Reverse Snow Angels": { main: ["back"], also: ["shoulders", "lowerBack"],
+    steps: ["Lie face down with your arms by your sides, palms down.", "Lift your arms and chest a little off the floor.", "Sweep your arms out and up until they're over your head.", "Sweep them back down to your sides."],
+    tip: "Move slowly and keep your arms off the floor the whole time." },
+  "Bird Dogs": { main: ["lowerBack"], also: ["abs", "glutes", "shoulders"],
+    steps: ["Get on your hands and knees, hands under your shoulders and knees under your hips.", "Reach one arm straight forward and the opposite leg straight back.", "Hold for a second, then bring them back down.", "Switch sides."],
+    tip: "Keep your back flat, like a table. Move slowly." },
+  "Swimmers": { main: ["lowerBack", "back"], also: ["glutes", "shoulders"],
+    steps: ["Lie face down with your arms stretched out in front.", "Lift your arms, chest and legs off the floor.", "Flutter your opposite arm and leg up and down, like you're swimming."],
+    tip: "Keep your neck long and look at the floor." },
+  "Back Extensions": { main: ["lowerBack"], also: ["glutes", "hamstrings"],
+    steps: ["Lie face down with your hands lightly behind your ears.", "Lift your chest off the floor as high as is comfortable.", "Lower back down slowly."],
+    tip: "Keep your feet on the floor and lift with your back, not your arms." },
+  "Arm Circles": { main: ["shoulders"], also: ["back"],
+    steps: ["Stand tall with your arms straight out to the sides at shoulder height.", "Make small circles with your arms.", "Switch direction halfway through."],
+    tip: "Keep your arms level. Make the circles bigger to make it harder." },
+  "Donkey Kicks": { main: ["glutes"], also: ["hamstrings", "abs"],
+    steps: ["Get on your hands and knees.", "Keeping your knee bent, kick one foot up toward the ceiling.", "Lower it back down without touching the floor.", "Do all your reps, then switch legs."],
+    tip: "Squeeze your glute at the top. Don't arch your back." },
+  "Diamond Push-ups": { main: ["triceps"], also: ["chest", "shoulders", "abs"],
+    steps: ["Get in a push-up position with your hands close together under your chest.", "Touch your thumbs and pointer fingers to make a diamond shape.", "Lower your chest to your hands, keeping your elbows close to your sides.", "Push back up."],
+    tip: "This one is hard. Drop to your knees if you need to." },
+  "Decline Push-ups": { main: ["chest"], also: ["shoulders", "triceps", "abs"],
+    steps: ["Put your feet up on a sturdy chair and your hands on the floor.", "Keep your body in a straight line.", "Lower your chest toward the floor.", "Push back up."],
+    tip: "Make sure the chair can't slide out from under your feet." },
+  "Incline Push-ups": { main: ["chest"], also: ["triceps", "shoulders"],
+    steps: ["Put your hands on the edge of a sturdy couch, bench or chair, a little wider than your shoulders.", "Walk your feet back until your body is a straight line.", "Lower your chest to the edge.", "Push back up."],
+    tip: "The higher your hands, the easier it is." },
+  "Clap Push-ups": { main: ["chest"], also: ["triceps", "shoulders"],
+    steps: ["Start in a push-up position.", "Lower your chest toward the floor.", "Push up hard enough that your hands leave the floor, and clap.", "Catch yourself with soft elbows and go right into the next one."],
+    tip: "Only try this once regular push-ups feel easy. Do it on a soft floor." },
+  "Floor Dips": { main: ["triceps"], also: ["shoulders"],
+    steps: ["Sit on the floor with your knees bent and your hands behind you, fingers pointing at your feet.", "Lift your hips off the floor.", "Bend your elbows to lower your body, then straighten them to push back up."],
+    tip: "Keep your elbows pointing back, not out to the sides." },
+  "Backpack Triceps Extensions": { main: ["triceps"], also: ["shoulders"],
+    steps: ["Fill a backpack with books and hold it by the handle with both hands over your head.", "Keep your elbows pointing up and bend them to lower the backpack behind your head.", "Straighten your arms to lift it back up."],
+    tip: "Keep your elbows close to your head." },
+  "Backpack Shoulder Press": { main: ["shoulders"], also: ["triceps"],
+    steps: ["Fill a backpack with books and hold it at chest height with both hands.", "Press it straight up over your head until your arms are straight.", "Lower it back to your chest."],
+    tip: "Squeeze your belly so your back doesn't arch." },
+  "Backpack Front Raises": { main: ["shoulders"], also: [],
+    steps: ["Hold a backpack full of books in front of your thighs with both hands.", "Keeping your arms straight, raise it in front of you to shoulder height.", "Lower it slowly."],
+    tip: "Don't swing. If you have to lean back, take some books out." },
+  "Plank Shoulder Taps": { main: ["shoulders"], also: ["abs", "chest"],
+    steps: ["Start in a high plank, hands under your shoulders.", "Lift one hand and tap the opposite shoulder.", "Put it down and tap with the other hand. Each tap counts."],
+    tip: "Spread your feet wider to keep your hips from rocking." },
+  "Leg Raises": { main: ["abs"], also: ["hipFlexors"],
+    steps: ["Lie on your back with your legs straight and hands under your hips.", "Keep your legs together and raise them until they point at the ceiling.", "Lower them slowly until they hover just above the floor."],
+    tip: "Keep your lower back pressed into the floor. Bend your knees a little to make it easier." },
+  "Fire Hydrants": { main: ["glutes"], also: ["abs"],
+    steps: ["Get on your hands and knees.", "Keeping your knee bent, lift one leg out to the side until your thigh is level with the floor.", "Lower it back down. Do all your reps, then switch legs."],
+    tip: "Keep your hips level. Don't lean away from the lifting leg." },
+  "Sumo Squats": { main: ["glutes"], also: ["quads", "hamstrings"],
+    steps: ["Stand with your feet much wider than your shoulders, toes pointing out.", "Push your hips back and squat down, knees pushing out over your toes.", "Squeeze your glutes to stand back up."],
+    tip: "Keep your chest up and your knees in line with your toes." },
+  "Glute Bridge Hold": { main: ["glutes"], also: ["hamstrings"],
+    steps: ["Lie on your back with your knees bent and feet flat.", "Push through your heels and lift your hips until your body is straight from shoulders to knees.", "Squeeze your glutes and hold."],
+    tip: "If you feel it in your hamstrings, move your feet a little closer to your butt." },
+  "Single-leg Glute Bridges": { main: ["glutes"], also: ["hamstrings"],
+    steps: ["Lie on your back with your knees bent and feet flat.", "Lift one foot off the floor and straighten that leg.", "Push through your other heel to lift your hips.", "Lower slowly. Do all your reps, then switch legs."],
+    tip: "Keep your hips level as you lift." },
+  "Dumbbell Curls": { main: ["biceps"], also: [],
+    steps: ["Stand tall with a dumbbell in each hand, arms down and palms facing forward.", "Keep your elbows pinned to your sides.", "Curl the weights up to your shoulders.", "Lower them slowly until your arms are straight."],
+    tip: "Don't swing your body to lift the weight. If you have to, go lighter." },
+  "Shoulder Press": { main: ["shoulders"], also: ["triceps", "back"],
+    steps: ["Stand with a dumbbell in each hand, held at shoulder height, palms forward.", "Press both weights straight up until your arms are straight.", "Lower them back to your shoulders."],
+    tip: "Squeeze your belly so your lower back doesn't arch." },
+  "Goblet Squats": { main: ["quads"], also: ["glutes", "hamstrings", "abs"],
+    steps: ["Hold one dumbbell upright against your chest with both hands.", "Stand with your feet a little wider than your shoulders.", "Squat down until your thighs are about level with the floor.", "Push through your heels to stand back up."],
+    tip: "Keep the dumbbell touching your chest the whole time." },
+  "Bent-over Rows": { main: ["back"], also: ["biceps", "shoulders", "lowerBack"],
+    steps: ["Hold a dumbbell in each hand and bend your knees a little.", "Hinge at your hips until your back is at about 45 degrees, flat, arms hanging down.", "Pull the weights up to your ribs, squeezing your shoulder blades together.", "Lower them slowly."],
+    tip: "Keep your back flat, not rounded." },
+  "Romanian Deadlifts": { main: ["hamstrings"], also: ["glutes", "lowerBack"],
+    steps: ["Stand holding a dumbbell in each hand in front of your thighs.", "With a slight bend in your knees, push your hips back and slide the weights down your legs.", "Stop when you feel a stretch in the back of your legs, around your shins.", "Squeeze your glutes to stand back up."],
+    tip: "Keep your back flat and the weights close to your legs." },
+  "Lateral Raises": { main: ["shoulders"], also: ["back"],
+    steps: ["Stand with a dumbbell in each hand at your sides.", "With a slight bend in your elbows, raise your arms out to the sides.", "Stop when your arms are level with your shoulders.", "Lower them slowly."],
+    tip: "Use light weights. This one gets hard fast." },
+  "Triceps Extensions": { main: ["triceps"], also: ["shoulders"],
+    steps: ["Hold one dumbbell with both hands over your head.", "Keep your elbows pointing up and bend them to lower the weight behind your head.", "Straighten your arms to lift it back up."],
+    tip: "Keep your elbows close to your head, not flared out." },
+  "Floor Press": { main: ["chest"], also: ["triceps", "shoulders"],
+    steps: ["Lie on your back with your knees bent, a dumbbell in each hand.", "Rest your upper arms on the floor with the weights above your chest.", "Press the weights straight up until your arms are straight.", "Lower until your elbows touch the floor."],
+    tip: "Touch the floor gently with your elbows. Don't bounce." },
+  "Russian Twists": { main: ["obliques", "abs"], also: ["hipFlexors"],
+    steps: ["Sit on the floor with your knees bent, holding one dumbbell at your chest with both hands.", "Lean back a little with a straight back.", "Twist your upper body to move the dumbbell to one side, then the other."],
+    tip: "Lift your feet off the floor to make it harder." },
+  "Thrusters": { main: ["quads", "shoulders"], also: ["glutes", "triceps", "abs"],
+    steps: ["Stand holding a dumbbell in each hand at your shoulders.", "Squat down until your thighs are about level with the floor.", "Drive up hard and use that push to press the weights straight overhead.", "Lower the weights to your shoulders and go right into the next squat."],
+    tip: "It's one smooth move: squat, stand, press." },
 };
+// Muscle groups you can focus a workout on (Train tab). Each covers some of the MUSCLES above.
+const FOCUS = [
+  { id: "chest",     label: "Chest",     m: ["chest"] },
+  { id: "back",      label: "Back",      m: ["back", "lowerBack"] },
+  { id: "shoulders", label: "Shoulders", m: ["shoulders"] },
+  { id: "arms",      label: "Arms",      m: ["biceps", "triceps"] },
+  { id: "core",      label: "Core",      m: ["abs", "obliques", "hipFlexors"] },
+  { id: "legs",      label: "Legs",      m: ["quads", "hamstrings", "calves"] },
+  { id: "glutes",    label: "Glutes",    m: ["glutes"] },
+];
+const FOCUS_BY_ID = Object.fromEntries(FOCUS.map(f => [f.id, f]));
 const WORDS_A = ["Iron", "Chalk", "Thunder", "Rocket", "Titan", "Sweat", "Steel", "Turbo", "Plate", "Savage"];
 const WORDS_B = ["Circuit", "Gauntlet", "Ladder", "Blitz", "Grinder", "Session", "Storm", "Rumble", "Crusher"];
 
@@ -749,6 +1012,7 @@ function lsSet(v) { try { localStorage.setItem(LS_KEY, JSON.stringify(v)); } cat
 let store = lsGet();
 if (!store || !store.players) store = { active: "p1", players: { p1: { name: "Player 1", state: null, current: null } } };
 if (!store.players[store.active]) store.active = Object.keys(store.players)[0];
+if (!store.settings) store.settings = { dumbbells: false };
 let me = store.players[store.active];
 let S = me.state ? normalize(me.state) : fresh();
 let current = me.current || null;
@@ -808,16 +1072,34 @@ function toast(msg) {
 }
 
 /* ================= workouts ================= */
+function myFocus() { return (me.focus || []).filter(id => FOCUS_BY_ID[id]); }
 function makeWorkout(t) {
-  const T = TIERS[t];
-  const pool = EXERCISES.filter(e => (e.min || 0) <= t);
-  const ex = shuffle(pool).slice(0, T.count).map(e => {
+  const T = TIERS[t], focus = myFocus();
+  // with a focus, a move only fits if every muscle it mainly works is one you picked
+  // (score 2). Partial matches (1) are only a backup if a level ever runs out of moves.
+  const muscles = focus.flatMap(id => FOCUS_BY_ID[id].m);
+  const score = e => { const x = HOWTO[e.name]; return !muscles.length || !x ? 0 : x.main.every(m => muscles.includes(m)) ? 2 : x.main.some(m => muscles.includes(m)) ? 1 : 0; };
+  const rank = list => shuffle(list).sort((a, b) => score(b) - score(a)); // ties stay in random order
+  const ok = e => (e.min || 0) <= t;
+  const bw = rank(EXERCISES.filter(e => ok(e) && !e.db));
+  const dbs = store.settings.dumbbells ? rank(EXERCISES.filter(e => ok(e) && e.db)) : [];
+  // dumbbell mode: about half the moves use dumbbells, unless the other kind fits your focus better
+  const wantDb = dbs.length ? Math.ceil(T.count / 2) : 0;
+  let moves = [], nDb = 0;
+  while (moves.length < T.count && (bw.length || dbs.length)) {
+    const d = dbs[0], b = bw[0];
+    const takeDb = !b || (d && (score(d) !== score(b) ? score(d) > score(b) : nDb < wantDb));
+    moves.push(takeDb ? dbs.shift() : bw.shift());
+    if (takeDb) nDb++;
+  }
+  moves = shuffle(moves);
+  const ex = moves.map(e => {
     const amt = e.kind === "reps" ? Math.max(1, Math.round(e.base * T.mult)) : Math.max(10, Math.round(e.base * T.mult / 5) * 5);
     const secs = e.kind === "reps" ? amt * e.spr : amt;
-    return { name: e.name, kind: e.kind, amt, secs, hint: e.hint || "" };
+    return { name: e.name, kind: e.kind, amt, secs, hint: e.hint || "", db: !!e.db };
   });
   const est = Math.round(T.rounds * ex.reduce((a, b) => a + b.secs + 10, 0) + (T.rounds - 1) * 45);
-  return { tier: t, title: pick(WORDS_A) + " " + pick(WORDS_B), ex, rounds: T.rounds, est, minSecs: Math.round(est * 0.5), startedAt: null, checks: ex.map(() => false), progress: ex.map(() => 0) };
+  return { tier: t, focus, title: pick(WORDS_A) + " " + pick(WORDS_B), ex, rounds: T.rounds, est, minSecs: Math.round(est * 0.5), startedAt: null, checks: ex.map(() => false), progress: ex.map(() => 0) };
 }
 function elapsed() { return current && current.startedAt ? (Date.now() - current.startedAt) / 1000 : 0; }
 
@@ -849,6 +1131,7 @@ const LIMB = {
   knee:  [[J.lh, J.lk, J.la], [J.rh, J.rk, J.ra]],
   elbow: [[J.ls, J.le, J.lw], [J.rs, J.re, J.rw]],
   hip:   [[J.ls, J.lh, J.lk], [J.rs, J.rh, J.rk]],
+  shoulder: [[J.lh, J.ls, J.le], [J.rh, J.rs, J.re]],
 };
 const seen = p => !!p && (p.visibility ?? 1) > 0.65;
 const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
@@ -883,6 +1166,14 @@ const SIGNAL = {
   tuck:  lm => knees(lm).y - hips(lm).y,
   knees: lm => gap(lm[J.lk], shoulders(lm)) - gap(lm[J.rk], shoulders(lm)),
   sway:  lm => hips(lm).x,
+  // how high your highest hand is above your shoulders (bird dogs reach one arm forward)
+  reach: lm => { const ws = [lm[J.lw], lm[J.rw]].filter(seen); return ws.length ? shoulders(lm).y - Math.min(...ws.map(w => w.y)) : -9; },
+  // how high your highest foot is above your hips (donkey kicks)
+  kick:  lm => hips(lm).y - Math.min(lm[J.la].y, lm[J.ra].y),
+  // how high your highest knee is compared to your hips (fire hydrants)
+  kneeUp: lm => hips(lm).y - Math.min(lm[J.lk].y, lm[J.rk].y),
+  // how far your hips are lifted above your shoulders (glute bridges)
+  hipLift: lm => shoulders(lm).y - hips(lm).y,
 };
 // Body positions. A move only counts while you're in its position, so waving, walking
 // or adjusting the phone doesn't add reps. T = torso length.
@@ -903,12 +1194,66 @@ const POSTURE = {
   torsoUp:    lm => tilt(lm) < 45 && shoulders(lm).y < hips(lm).y,
   bear:       (lm, T) => tilt(lm) > 50 && feet(lm).y - hips(lm).y < 1.1 * T && lm[J.lw].y > shoulders(lm).y && lm[J.rw].y > shoulders(lm).y,
   wallsit:    (lm, T) => { const a = angleOf(lm, "knee"); return tilt(lm) < 35 && Math.abs(hips(lm).y - knees(lm).y) < 0.4 * T && a != null && a > 60 && a < 125; },
+  // ---- dumbbell moves: the camera can't see the weight, so each one needs its own arm position ----
+  // elbows pinned at your sides, so waving or reaching doesn't count as a curl
+  curl:       (lm, T) => POSTURE.upright(lm, T) && armsOK(lm, (s, e) => e.y > s.y + 0.35 * T && Math.abs(e.x - s.x) < 0.35 * T),
+  // hands up at shoulder height or higher
+  press:      (lm, T) => POSTURE.upright(lm, T) && handsOK(lm, w => w.y < shoulders(lm).y + 0.15 * T),
+  // elbows pointing up beside your head
+  overhead:   (lm, T) => POSTURE.upright(lm, T) && armsOK(lm, (s, e) => e.y < s.y - 0.2 * T),
+  // bent over with a flat back, on your feet, hands hanging below your shoulders
+  hinge:      (lm, T) => { const t = tilt(lm); return t > 30 && t < 80 && feet(lm).y - hips(lm).y > 0.8 * T && handsOK(lm, w => w.y > shoulders(lm).y); },
+  // on your feet with legs nearly straight, so squatting down isn't a deadlift
+  onFeet:     (lm, T) => feet(lm).y - hips(lm).y > 0.9 * T && shoulders(lm).y < hips(lm).y + 0.2 * T && (angleOf(lm, "knee") ?? 0) > 135,
+  // both hands together at your chest, holding the dumbbell
+  goblet:     (lm, T) => { if (!POSTURE.standing(lm, T) || !bothHands(lm)) return false;
+                         const w = mid(lm[J.lw], lm[J.rw]), s = shoulders(lm);
+                         return gap(lm[J.lw], lm[J.rw]) < 0.45 * T && w.y > s.y - 0.15 * T && w.y < hips(lm).y && Math.abs(w.x - s.x) < 0.45 * T; },
+  // arms nearly straight out to the sides
+  raise:      (lm, T) => POSTURE.upright(lm, T) && LIMB.elbow.every(([s, e, w]) => !(seen(lm[s]) && seen(lm[e]) && seen(lm[w])) || jointAngle(lm[s], lm[e], lm[w]) > 130) && angleOf(lm, "elbow") != null,
+  // on your back pushing up, hands above your chest
+  floorPress: (lm, T) => POSTURE.lying(lm, T) && handsOK(lm, w => w.y < shoulders(lm).y),
+  armsUp:     lm => bothHands(lm) && lm[J.lw].y < lm[J.nose].y && lm[J.rw].y < lm[J.nose].y,
+  // sitting on the floor, leaning back a bit, both hands on the dumbbell
+  // bottom of a push-up, held
+  lowPlank:   (lm, T) => POSTURE.horizontal(lm, T) && (angleOf(lm, "elbow") ?? 180) < 120,
+  // leaning back on your feet, hands out in front at chest height (holding the door frame)
+  doorRow:    (lm, T) => { const t = tilt(lm); return t > 12 && t < 55 && shoulders(lm).y < hips(lm).y && feet(lm).y - hips(lm).y > 0.8 * T && handsOK(lm, w => Math.abs(w.y - shoulders(lm).y) < 0.5 * T); },
+  // hands and knees: a knee down below the hips and a hand down on the floor
+  allFours:   (lm, T) => tilt(lm) > 55 && [lm[J.lk], lm[J.rk]].some(k => k.y > hips(lm).y + 0.5 * T) && [lm[J.lw], lm[J.rw]].some(w => seen(w) && w.y > shoulders(lm).y + 0.5 * T),
+  // standing with both arms straight out to the sides
+  armsOut:    (lm, T) => POSTURE.upright(lm, T) && bothHands(lm) && Math.abs(lm[J.lw].x - lm[J.rw].x) > 2.2 * T && handsOK(lm, w => Math.abs(w.y - shoulders(lm).y) < 0.5 * T),
+  // straight body slanting up to your hands on a couch or chair
+  incline:    (lm, T) => { const t = tilt(lm); return t > 40 && t < 78 && shoulders(lm).y < hips(lm).y && feet(lm).y - hips(lm).y < 1.2 * T && (angleOf(lm, "knee") ?? 0) > 150 && handsOK(lm, w => w.y > shoulders(lm).y); },
+  // lying on your back, shoulders and hips both down
+  backFlat:   (lm, T) => tilt(lm) > 60 && Math.abs(shoulders(lm).y - hips(lm).y) < 0.3 * T,
+  // on your back with your knees bent (glute bridges)
+  bridge:     (lm, T) => tilt(lm) > 45 && Math.abs(shoulders(lm).y - hips(lm).y) < 0.6 * T && LIMB.knee.some(([a, b, c]) => seen(lm[a]) && seen(lm[b]) && seen(lm[c]) && jointAngle(lm[a], lm[b], lm[c]) < 130),
+  bridgeTop:  (lm, T) => POSTURE.bridge(lm, T) && hips(lm).y < shoulders(lm).y - 0.2 * T,
+  twist:      (lm, T) => POSTURE.floor(lm, T) && shoulders(lm).y < hips(lm).y - 0.4 * T && bothHands(lm) && gap(lm[J.lw], lm[J.rw]) < 0.5 * T,
 };
+// every arm the camera can see passes test(shoulder, elbow); at least one has to be seen
+function armsOK(lm, test) {
+  const arms = [[J.ls, J.le], [J.rs, J.re]].filter(([s, e]) => seen(lm[s]) && seen(lm[e]));
+  return arms.length > 0 && arms.every(([s, e]) => test(lm[s], lm[e]));
+}
+function handsOK(lm, test) {
+  const ws = [lm[J.lw], lm[J.rw]].filter(seen);
+  return ws.length > 0 && ws.every(test);
+}
+function bothHands(lm) { return seen(lm[J.lw]) && seen(lm[J.rw]); }
 const SETUP = {
   any: "Get in the picture", upright: "Stand up straight", standing: "Stand up", straight: "Stand up straight",
   horizontal: "Get into plank position", flat: "Get into position", floor: "Sit on the floor, knees bent",
   lying: "Lie on your back", pike: "Hands and feet down, hips up high", dips: "Hands on the chair behind you",
   bear: "Hands and feet on the floor", wallsit: "Slide down into your wall sit",
+  curl: "Stand tall, elbows at your sides", press: "Dumbbells up at your shoulders", overhead: "Dumbbell up behind your head",
+  hinge: "Bend over with a flat back", goblet: "Hold the dumbbell at your chest", raise: "Stand tall, arms at your sides",
+  floorPress: "Lie on your back, dumbbells up", twist: "Sit and lean back, holding the dumbbell",
+  lowPlank: "Lower to the bottom of a push-up", doorRow: "Hold the door frame and lean back",
+  allFours: "Get on your hands and knees", armsOut: "Arms straight out to the sides",
+  incline: "Hands on the couch, body straight", backFlat: "Lie on your back, legs straight",
+  bridge: "Lie on your back, knees bent", bridgeTop: "Lift your hips up",
 };
 // Things that must keep happening during timed moves
 const EVENT = {
@@ -950,14 +1295,16 @@ function makeTracker(spec) {
     }
     if (!gate(lm, T)) { if (st.phase === "go") resetRep(); st.phase = "off"; return; }
     st.phase = "go";
-    if (spec.via && POSTURE[spec.via](lm, T)) st.via = true;
+    if (spec.via && spec.t !== "angle" && POSTURE[spec.via](lm, T)) st.via = true;
     switch (spec.t) {
       case "angle": {
         const a = angleOf(lm, spec.limb, spec.either);
         if (a == null) return;
         const low = twice("lowN", a <= spec.lo), high = twice("highN", a >= spec.hi);
+        // via: the rep only finishes once you're also in that position (thrusters end with the dumbbells overhead)
+        const viaOK = !spec.via || twice("viaN", POSTURE[spec.via](lm, T));
         if (low) st.down = true;
-        else if (st.down && high) { st.down = false; rep(); }
+        else if (st.down && high && viaOK) { st.down = false; rep(); }
         return;
       }
       case "range": {
@@ -1184,7 +1531,26 @@ const allDone = W => W.ex.every((_, i) => doneMove(W, i));
 
 /* ================= persistence ================= */
 let db = null, userCap = null, uid = null, myRef = null, readOnly = false, writing = false, dirty = false, syncState = "connecting";
+// The Olympian crate: given once, the moment you own every other item (in storage or in your gym).
+function ownedIds() {
+  return new Set([...Object.keys(S.inv).filter(id => S.inv[id] > 0), ...S.room.wall, ...S.room.floor, S.room.wallSkin, S.room.floorSkin].filter(id => id && ITEM[id]));
+}
+function olympianProgress() {
+  const have = ownedIds(), all = ITEMS.filter(i => i.r !== OLY);
+  return { have: all.filter(i => have.has(i.id)).length, total: all.length };
+}
+function checkOlympian() {
+  if (S.olympian) return false;
+  const p = olympianProgress();
+  if (p.have < p.total) return false;
+  S.olympian = Date.now();
+  S.crates.push(OLY);
+  setTimeout(() => { toast("You collected every item! The Olympian crate is yours."); renderHeader(); }, 1300);
+  return true;
+}
 function save() {
+  checkOlympian();
+  checkAchievements();
   S.updatedAt = Date.now();
   saveLocalOnly();
   pushRemote();
@@ -1199,7 +1565,7 @@ function switchPlayer(pid) {
   if (current && !current.progress) current.progress = current.ex.map((_, k) => current.checks[k] ? current.rounds : 0);
   pickedTier = current ? current.tier : 0;
   justEarned = null; placing = null;
-  saveLocalOnly(); renderAll();
+  saveLocalOnly(); applyTheme(); renderAll();
   toast("Now playing as " + me.name);
 }
 function addPlayer(name) {
@@ -1268,6 +1634,17 @@ function renderWorkout() {
       h("span", {}, "Best crate chance: ", rarText(T.odds.findLastIndex(o => o > 0), RAR[T.odds.findLastIndex(o => o > 0)].label + " " + T.odds[T.odds.findLastIndex(o => o > 0)] + "%")))
   ));
 
+  // muscle focus picker
+  const focus = myFocus(), locked = !!active || justEarned != null;
+  const setFocus = ids => { me.focus = ids; current = makeWorkout(pickedTier); saveLocalOnly(); renderWorkout(); };
+  root.append(h("div", { class: "card" },
+    h("div", { class: "row" }, h("h2", { text: "Focus on" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: "Pick one or more" })),
+    h("div", { class: "chips", role: "group", "aria-label": "Muscle focus" },
+      h("button", { class: "chip", "aria-pressed": String(!focus.length), disabled: locked, onclick: () => setFocus([]) }, "Full body"),
+      FOCUS.map(f => h("button", { class: "chip", "aria-pressed": String(focus.includes(f.id)), disabled: locked,
+        onclick: () => setFocus(focus.includes(f.id) ? focus.filter(x => x !== f.id) : [...focus, f.id]) }, f.label))),
+    locked && active ? h("p", { class: "note", text: "Finish or quit this workout to change your focus." }) : null));
+
   if (justEarned != null) {
     const EC = justEarned.crate, ER = RAR[EC];
     root.append(h("div", { class: "card earned", style: `--tc:${ER.color}` },
@@ -1297,13 +1674,13 @@ function renderWorkout() {
       list.append(h("li", { class: "ex" + (done ? " done" : "") },
         done ? h("span", { class: "scanned", "aria-label": "Scanned" }, "✓") :
           h("button", { class: "scanbtn", disabled: !active, "aria-label": "Scan " + e.name, onclick: () => startScan(i) }, camIcon(), "Scan"),
-        h("div", { class: "exlabel" }, h("span", { class: "nm", text: e.name }), sub ? h("span", { class: "hint", text: sub }) : null),
+        h("div", { class: "exlabel" }, h("span", { class: "nm" }, e.db ? dbTag() : null, e.name), sub ? h("span", { class: "hint", text: sub }) : null),
         amt, info));
       return;
     }
     list.append(h("li", { class: "ex" + (W.checks[i] ? " done" : "") },
       h("input", { type: "checkbox", id, checked: W.checks[i], disabled: !active, onchange: ev => { W.checks[i] = ev.target.checked; ev.target.closest(".ex").classList.toggle("done", ev.target.checked); saveLocalOnly(); tickWorkout(); } }),
-      h("label", { for: id }, h("span", { class: "nm", text: e.name }), e.hint ? h("span", { class: "hint", text: e.hint }) : null),
+      h("label", { for: id }, h("span", { class: "nm" }, e.db ? dbTag() : null, e.name), e.hint ? h("span", { class: "hint", text: e.hint }) : null),
       amt, info
     ));
   });
@@ -1317,7 +1694,8 @@ function renderWorkout() {
     h("div", { class: "wo-meta" },
       h("span", {}, h("b", { text: W.rounds }), W.rounds === 1 ? " round" : " rounds"),
       h("span", {}, "about ", h("b", { text: Math.max(1, Math.round(W.est / 60)) + " min" })),
-      W.rounds > 1 ? h("span", {}, "rest ", h("b", { text: "45s" }), " between rounds") : null),
+      W.rounds > 1 ? h("span", {}, "rest ", h("b", { text: "45s" }), " between rounds") : null,
+      W.focus && W.focus.length ? h("span", {}, "focus ", h("b", { text: W.focus.map(id => FOCUS_BY_ID[id] ? FOCUS_BY_ID[id].label : id).join(", ") })) : null),
     list
   );
 
@@ -1411,6 +1789,9 @@ function claim() {
   const T = TIERS[W.tier];
   const c = rollFrom(T.odds);
   S.xp += T.xp; S.workouts += 1; S.perTier[W.tier] += 1; S.crates.push(c);
+  if (CAM) S.camWorkouts = (S.camWorkouts || 0) + 1;
+  if (W.ex.some(e => e.db)) S.dbWorkouts = (S.dbWorkouts || 0) + 1;
+  if (W.focus && W.focus.length) S.focusWorkouts = (S.focusWorkouts || 0) + 1;
   justEarned = { crate: c, xp: T.xp }; current = null;
   const before = levelOf(S.xp - T.xp);
   save(); renderAll();
@@ -1428,9 +1809,122 @@ function tickWorkout() {
 /* ================= tab: crates ================= */
 function oddsBar(odds) {
   return h("div", { class: "odds", title: odds.map((o, i) => `${RAR[i].label} ${o}%`).join(" · ") },
-    odds.map((o, i) => o ? h("i", { style: `width:${o}%;background:${i === TOP ? "var(--rainbow)" : RAR[i].color}` }) : null));
+    odds.map((o, i) => o ? h("i", { style: `width:${o}%;background:${rarColor(i)}` }) : null));
 }
 const oddsText = odds => odds.map((o, i) => o ? `${RAR[i].label[0]} ${o}%` : null).filter(Boolean).join(" · ");
+/* ---- share for a free Legendary crate (up to 2 a day per player) ---- */
+const SHARE_CRATE = 3, SHARE_GIFTS_PER_DAY = 2;
+const todayKey = () => new Date().toDateString();
+// S.shareGift = { day, n }: how many share crates were given out on that day
+const shareGiftsToday = () => { const g = S.shareGift; return g && g.day === todayKey() ? g.n || 0 : g === todayKey() ? 1 : 0; };
+const shareGiftsLeft = () => Math.max(0, SHARE_GIFTS_PER_DAY - shareGiftsToday());
+const shareGiftReady = () => shareGiftsLeft() > 0;
+function shareCard() {
+  const ready = shareGiftReady(), left = shareGiftsLeft();
+  return h("div", { class: "card share", style: `--tc:${RAR[SHARE_CRATE].color}` },
+    h("div", { class: "row", style: "flex-wrap:nowrap;gap:14px" },
+      crateEl(SHARE_CRATE, 64),
+      h("div", { style: "flex:1;min-width:0;display:flex;flex-direction:column;gap:4px" },
+        h("h2", { text: "Share Rep Quest" }),
+        h("p", { class: "note", style: "margin:0" }, ready
+          ? ["Send it to a friend and get a free ", rarText(SHARE_CRATE, "Legendary crate"), `. ${left} of ${SHARE_GIFTS_PER_DAY} left today.`]
+          : `Thanks for sharing! You got both free Legendary crates today. More unlock tomorrow.`))),
+    h("button", { class: "btn primary wide", onclick: shareApp }, ready ? "Share and get a Legendary crate" : "Share again"));
+}
+async function shareApp() {
+  const url = location.origin + location.pathname.replace(/index\.html$/, "");
+  const text = "Do random workouts, open crates and build your own gym. Try Rep Quest:";
+  let how = null;
+  if (navigator.share) {
+    try { await navigator.share({ title: "Rep Quest", text, url }); how = "shared"; }
+    catch (e) { if (e && e.name === "AbortError") return; } // closed the share sheet without sending
+  }
+  if (!how) {
+    try { await navigator.clipboard.writeText(text + " " + url); how = "copied"; }
+    catch { toast("Couldn't share right now. Try again."); return; }
+  }
+  const lead = how === "copied" ? "Link copied. Send it to a friend!" : "Thanks for sharing!";
+  S.shares = (S.shares || 0) + 1;
+  if (!shareGiftReady()) save();
+  if (!shareGiftReady()) { toast(lead); return; }
+  S.shareGift = { day: todayKey(), n: shareGiftsToday() + 1 };
+  S.crates.push(SHARE_CRATE);
+  save(); renderAll();
+  toast(lead + (shareGiftsLeft() ? " Free Legendary crate added. 1 more today." : " Free Legendary crate added. That's both for today."));
+}
+/* ---- open all ---- */
+let openPick = "all"; // "all" or a rarity number as text
+function openAllBar() {
+  const counts = RAR.map((_, r) => S.crates.filter(c => c === r).length);
+  if (openPick !== "all" && !counts[+openPick]) openPick = "all";
+  const sel = h("select", { id: "openPick", "aria-label": "Which crates to open", onchange: ev => { openPick = ev.target.value; } },
+    h("option", { value: "all", text: `All crates (${S.crates.length})` }),
+    RAR.map((R, r) => h("option", { value: String(r), disabled: !counts[r], text: `${R.label} crates (${counts[r]})` })));
+  sel.value = openPick;
+  return h("div", { class: "openall" },
+    h("span", { class: "sel" }, sel),
+    h("button", { class: "btn primary", onclick: () => openMany(openPick) }, "Open all"));
+}
+function openMany(pickVal) {
+  const want = c => pickVal === "all" || c === +pickVal;
+  const picked = S.crates.filter(want);
+  if (!picked.length) return;
+  const owned = id => (S.inv[id] || 0) > 0 || [...S.room.wall, ...S.room.floor, S.room.wallSkin, S.room.floorSkin].includes(id);
+  const got = new Map(); // item id -> { item, n, isNew }
+  for (const c of picked) {
+    const item = rollItem(c);
+    const row = got.get(item.id) || { item, n: 0, isNew: !owned(item.id) };
+    row.n++; got.set(item.id, row);
+    S.inv[item.id] = (S.inv[item.id] || 0) + 1;
+    S.log.unshift({ item: item.id, crate: c, at: Date.now() });
+  }
+  S.log = S.log.slice(0, 20);
+  S.crates = S.crates.filter(c => !want(c));
+  S.cratesOpened += picked.length;
+  justEarned = null;
+  save(); renderAll();
+  showHaul(picked.length, [...got.values()].sort((a, b) => b.item.r - a.item.r || b.n - a.n || a.item.name.localeCompare(b.item.name)), pickVal);
+}
+function showHaul(total, rows, pickVal) {
+  const best = rows[0].item, BR = RAR[best.r];
+  const icon = (it, big) => it.txt ? h("span", { class: (big ? "big " : "em ") + neonClass(it), style: big ? "font-size:28px;padding:14px 0" : "font-size:11px", text: it.txt })
+    : it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` + (big ? ";width:110px;height:72px;border-radius:12px;display:block" : "") })
+    : h("span", { class: big ? "big" : "em", text: it.e });
+  const newCount = rows.filter(r => r.isNew).length;
+  const what = pickVal === "all" ? "crate" : RAR[+pickVal].label + " crate";
+  const close = () => { $("#crateOv").hidden = true; renderAll(); };
+  $("#crateOvInner").replaceChildren(
+    h("div", { class: "haul" },
+      h("div", { class: "eyebrow", text: `Opened ${total} ${what}${total > 1 ? "s" : ""}` }),
+      h("div", { class: "best reveal" + (best.r === TOP ? " top" : best.r === OLY ? " oly" : ""), style: `--rc:${BR.color}` },
+        h("div", { class: "rays" }),
+        icon(best, true),
+        h("div", { class: "rtag " + (rarClass(best.r) || ""), text: "Best pull · " + BR.label }),
+        h("div", { class: "rname", text: best.name })),
+      h("p", { class: "note", style: "text-align:center", text: `${rows.length} different item${rows.length > 1 ? "s" : ""}` + (newCount ? ` · ${newCount} new to your collection` : "") }),
+      h("ul", { "aria-label": "Everything you got" }, rows.map(({ item, n, isNew }) => h("li", { style: `--rc:${item.r === TOP ? "var(--r5)" : RAR[item.r].color}` },
+        icon(item, false),
+        h("span", { class: "nm" }, item.name, h("small", {}, rarText(item.r, RAR[item.r].label))),
+        isNew ? h("span", { class: "new", text: "NEW" }) : null,
+        h("span", { class: "ct", text: "×" + n }))))),
+    h("div", { class: "ov-actions" },
+      h("button", { class: "btn primary wide", onclick: () => { $("#crateOv").hidden = true; setTab("gym"); } }, "Go to my gym"),
+      h("button", { class: "btn ghost wide", onclick: close }, "Done")));
+  $("#crateOv").hidden = false;
+  confetti(best.r);
+}
+function olympianCard() {
+  const p = olympianProgress();
+  return h("div", { class: "card" },
+    h("div", { class: "row", style: "flex-wrap:nowrap;gap:14px" },
+      crateEl(OLY, 64, "div", { class: "locked" }),
+      h("div", { style: "flex:1;min-width:0;display:flex;flex-direction:column;gap:4px" },
+        h("h2", {}, rarText(OLY, "Olympian crate")),
+        h("p", { class: "note", style: "margin:0", text: "Collect every item in the game to unlock it. Inside is one thing you can't get anywhere else." }))),
+    h("div", { class: "olyprog", role: "progressbar", "aria-label": "Items collected", "aria-valuemin": "0", "aria-valuemax": String(p.total), "aria-valuenow": String(p.have) },
+      h("i", { style: `width:${Math.round(100 * p.have / p.total)}%` })),
+    h("div", { class: "tierinfo" }, h("span", { text: "Items collected" }), h("span", {}, h("b", { text: `${p.have} / ${p.total}` }))));
+}
 function renderCrates() {
   const root = $("#tab-crates"); root.replaceChildren();
   const card = h("div", { class: "card" }, h("h2", { text: S.crates.length ? `${S.crates.length} crate${S.crates.length > 1 ? "s" : ""} waiting` : "No crates waiting" }));
@@ -1438,6 +1932,7 @@ function renderCrates() {
     card.append(h("p", { class: "note", text: "Finish a workout to earn a crate. Heavier plates roll rarer crates." }),
       h("button", { class: "btn primary wide", onclick: () => setTab("workout") }, "Go train"));
   } else {
+    card.append(openAllBar());
     const grid = h("div", { class: "crategrid" });
     S.crates.map((c, i) => [c, i]).sort((a, b) => b[0] - a[0]).forEach(([c, i]) => {
       grid.append(h("div", { class: "cratecard", style: `--tc:${RAR[c].color}` },
@@ -1448,10 +1943,13 @@ function renderCrates() {
     });
     card.append(grid);
   }
-  root.append(card);
+  // the share card sits on top while today's free crate is waiting, then moves below your crates
+  if (window.LOOTLIFT_PWA && shareGiftReady()) root.append(shareCard(), card);
+  else root.append(...[card, window.LOOTLIFT_PWA ? shareCard() : null].filter(Boolean));
+  if (!S.olympian) root.append(olympianCard());
 
   // odds: what each crate drops
-  const legend = h("div", { class: "legend" }, RAR.map((r, i) => h("span", { style: `--rc:${i === TOP ? "var(--rainbow)" : r.color}` }, h("i", { style: "background:var(--rc)" }), r.label)));
+  const legend = h("div", { class: "legend" }, RAR.map((r, i) => h("span", { style: `--rc:${rarColor(i)}` }, h("i", { style: "background:var(--rc)" }), r.label)));
   const dropOdds = h("div", { class: "card" }, h("h2", { text: "What's inside each crate" }), legend);
   CRATE_DROPS.forEach((odds, c) => dropOdds.append(h("div", { class: "row", style: "flex-wrap:nowrap;gap:12px" },
     crateEl(c, 44),
@@ -1466,7 +1964,7 @@ function renderCrates() {
     root.append(h("div", { class: "card" }, h("h2", { text: "Recent loot" }),
       h("ul", { class: "loglist" }, S.log.slice(0, 8).map(l => {
         const it = ITEM[l.item]; if (!it) return null;
-        return h("li", { style: `--rc:${RAR[it.r].color}` }, h("span", { class: "em", text: it.e || (it.txt ? "✨" : "🎨") }), h("span", { style: "flex:1", text: it.name }), h("span", { class: "rtag" + (it.r === TOP ? " rainbow-text" : ""), text: RAR[it.r].label }));
+        return h("li", { style: `--rc:${RAR[it.r].color}` }, h("span", { class: "em", text: it.e || (it.txt ? "✨" : "🎨") }), h("span", { style: "flex:1", text: it.name }), h("span", { class: "rtag " + (rarClass(it.r) || ""), text: RAR[it.r].label }));
       }))));
   }
 }
@@ -1506,12 +2004,12 @@ function openCrate(idx) {
 function showReveal(item) {
   const inner = $("#crateOvInner"), R = RAR[item.r];
   inner.replaceChildren(
-    h("div", { class: "reveal" + (item.r === TOP ? " top" : ""), style: `--rc:${R.color}` },
+    h("div", { class: "reveal" + (item.r === TOP ? " top" : item.r === OLY ? " oly" : ""), style: `--rc:${R.color}` },
       h("div", { class: "rays" }),
-      item.txt ? h("div", { class: "big neon", text: item.txt }) :
+      item.txt ? h("div", { class: "big " + neonClass(item), text: item.txt }) :
       item.sw ? h("div", { class: "big" }, h("div", { class: "swatch", style: `width:120px;height:80px;border-radius:12px;background:${SKIN_CSS[item.sw]}` })) :
       h("div", { class: "big", text: item.e }),
-      h("div", { class: "rtag" + (item.r === TOP ? " rainbow-text" : ""), text: R.label + (item.slot === "wall" ? " · wall decor" : item.slot === "floor" ? " · gym gear" : " · room style") }),
+      h("div", { class: "rtag " + (rarClass(item.r) || ""), text: R.label + (item.slot === "wall" ? " · wall decor" : item.slot === "floor" ? " · gym gear" : " · room style") }),
       h("div", { class: "rname", text: item.name }),
       h("p", { class: "rdesc", text: item.d })),
     h("div", { class: "ov-actions" },
@@ -1528,7 +2026,8 @@ function confetti(r) {
   const dpr = devicePixelRatio || 1, W = c.width = innerWidth * dpr, H = c.height = innerHeight * dpr;
   const ctx = c.getContext("2d");
   const cs = getComputedStyle(document.documentElement);
-  const cols = [cs.getPropertyValue("--r" + r), cs.getPropertyValue("--p10"), cs.getPropertyValue("--p15"), cs.getPropertyValue("--p20"), cs.getPropertyValue("--p25"), "#ffffff"].map(s => s.trim());
+  const cols = r === OLY ? ["#f2c94c", "#fff1b0", "#d9a53a", "#e8edf2", "#b9c3d1", "#ffffff"]
+    : [cs.getPropertyValue("--r" + r), cs.getPropertyValue("--p10"), cs.getPropertyValue("--p15"), cs.getPropertyValue("--p20"), cs.getPropertyValue("--p25"), "#ffffff"].map(s => s.trim());
   const n = 40 + r * 40;
   const ps = Array.from({ length: n }, () => ({ x: W / 2, y: H * 0.42, vx: (Math.random() - .5) * 22 * dpr, vy: (-Math.random() * 18 - 4) * dpr, s: (4 + Math.random() * 6) * dpr, a: Math.random() * 6, va: (Math.random() - .5) * .4, c: pick(cols) }));
   let f = 0;
@@ -1543,13 +2042,13 @@ function confetti(r) {
 function slotView(id, extraClass, onClick, isTarget) {
   const it = id ? ITEM[id] : null;
   const btn = h(onClick ? "button" : "div", {
-    class: "slot " + extraClass + (it ? " filled" : "") + (it && it.r === TOP ? " top" : "") + (isTarget ? " target" : ""),
+    class: "slot " + extraClass + (it ? " filled" : "") + (it && it.r === TOP ? " top" : "") + (it && it.r === OLY ? " oly" : "") + (isTarget ? " target" : ""),
     style: it ? `--rc:${RAR[it.r].color}` : null,
     title: it ? it.name : null,
     "aria-label": onClick ? (it ? it.name + " (tap to move to storage)" : isTarget ? "Empty spot, tap to place" : "Empty spot") : null,
     onclick: onClick
   });
-  if (it) btn.append(it.txt ? h("span", { class: "neon", text: it.txt }) : h("span", { class: "sprite", text: it.e }));
+  if (it) btn.append(it.txt ? h("span", { class: neonClass(it), text: it.txt }) : h("span", { class: "sprite", text: it.e }));
   return btn;
 }
 function roomView(room, interactive) {
@@ -1633,7 +2132,7 @@ function renderGym() {
       const grid = h("div", { class: "invgrid" });
       items.forEach(it => grid.append(h("button", { class: "item", style: `--rc:${RAR[it.r].color}`, "aria-pressed": String(placing === it.id), onclick: () => useItem(it.id) },
         S.inv[it.id] > 1 ? h("span", { class: "ct", text: "×" + S.inv[it.id] }) : null,
-        it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` }) : h("span", { class: "em", text: it.e || "✨" }),
+        it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` }) : it.txt ? h("span", { class: neonClass(it), style: "padding:9px 0", text: it.txt }) : h("span", { class: "em", text: it.e || "✨" }),
         h("span", { class: "nm", text: it.name }),
         h("span", { class: "rtag", text: RAR[it.r].label }))));
       card.append(h("div", { class: "invgroup" }, h("div", { class: "eyebrow", text: label }), grid));
@@ -1657,23 +2156,147 @@ function renderGym() {
     const items = ITEMS.filter(i => i.r === r);
     const have = items.filter(i => found.has(i.id)).length;
     const from = CRATE_DROPS.map((o, c) => o[r] ? RAR[c].label : null).filter(Boolean);
+    const where = r === OLY ? "Earned by collecting every other item" : "Found in " + from.join(", ") + " crates";
     const grid = h("div", { class: "invgrid" });
-    items.forEach(it => grid.append(h("div", { class: "item" + (found.has(it.id) ? "" : " missing"), style: `--rc:${r === TOP ? "var(--r5)" : R.color}`, title: it.d },
+    items.forEach(it => grid.append(h("div", { class: "item" + (found.has(it.id) ? "" : " missing"), style: `--rc:${R.color}`, title: it.d },
       found.has(it.id) ? h("span", { class: "ct got", "aria-label": "Found", text: "✓" }) : null,
-      it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` }) : it.txt ? h("span", { class: "neon", style: "padding:9px 0", text: it.txt }) : h("span", { class: "em", text: it.e }),
+      it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` }) : it.txt ? h("span", { class: neonClass(it), style: "padding:9px 0", text: it.txt }) : h("span", { class: "em", text: it.e }),
       h("span", { class: "nm", text: it.name }),
       h("span", { class: "kind", text: it.slot === "wall" ? "Wall decor" : it.slot === "floor" ? "Gym gear" : it.slot === "wallSkin" ? "Wall style" : "Floor style" }))));
     all.append(h("div", { class: "invgroup" },
       h("div", { class: "row", style: "justify-content:space-between" },
         h("span", { class: "eyebrow", style: "font-size:14px" }, rarText(r, R.label)),
         h("span", { class: "eyebrow", text: `${have} / ${items.length}` })),
-      h("div", { class: "kind", text: "Found in " + from.join(", ") + " crates" }),
+      h("div", { class: "kind", text: where }),
       grid));
   });
 }
 
 /* ================= tab: leaderboard ================= */
 let boardDocs = null, boardErr = null, boardSlow = false;
+/* ================= achievements ================= */
+// Each one reads a number from your progress (v) and unlocks when it reaches goal.
+const ACH = [
+  { id: "first",    cat: "Training",   e: "👟", name: "First Rep",        d: "Finish your first workout",            v: s => s.workouts, goal: 1 },
+  { id: "w10",      cat: "Training",   e: "🔥", name: "Warming Up",       d: "Finish 10 workouts",                   v: s => s.workouts, goal: 10 },
+  { id: "w25",      cat: "Training",   e: "⚡", name: "On a Roll",        d: "Finish 25 workouts",                   v: s => s.workouts, goal: 25 },
+  { id: "w50",      cat: "Training",   e: "🛠️", name: "Iron Habit",       d: "Finish 50 workouts",                   v: s => s.workouts, goal: 50 },
+  { id: "w100",     cat: "Training",   e: "💯", name: "Century Club",     d: "Finish 100 workouts",                  v: s => s.workouts, goal: 100 },
+  { id: "lvl5",     cat: "Training",   e: "⭐", name: "Level 5",          d: "Reach level 5",                        v: s => s.level, goal: 5 },
+  { id: "lvl10",    cat: "Training",   e: "🌟", name: "Double Digits",    d: "Reach level 10",                       v: s => s.level, goal: 10 },
+  { id: "lvl20",    cat: "Training",   e: "👑", name: "Veteran",          d: "Reach level 20",                       v: s => s.level, goal: 20 },
+  { id: "rack",     cat: "Training",   e: "🏋️", name: "Full Rack",        d: "Finish a workout at every plate",      v: s => s.perTier.filter(n => n > 0).length, goal: 4 },
+  // 1, 5, 10 and 20 workouts at each plate (ids kept from the first version so nothing unlocks twice)
+  ...[
+    { t: 0, cat: "Warm-up", e: "🟢", ids: ["wu1", "wu5", "wu10", "wu20"],         names: ["Warmed Up", "Loosened Up", "Warm-up Regular", "Warm-up Master"] },
+    { t: 1, cat: "Grinder", e: "🟡", ids: ["grinder", "gr5", "gr10", "gr20"],     names: ["Grinder", "Daily Grind", "Grind Never Stops", "Grinder Master"] },
+    { t: 2, cat: "Beast",   e: "🔵", ids: ["beast", "be5", "be10", "be20"],       names: ["Beast Unleashed", "Beast Mode", "Apex Beast", "Beast Master"] },
+    { t: 3, cat: "Legend",  e: "🔴", ids: ["legend", "le5", "legend10", "le20"],  names: ["Legend Status", "Legend in the Making", "Living Legend", "Legend Master"] },
+  ].flatMap(P => [1, 5, 10, 20].map((n, k) => ({
+    id: P.ids[k], cat: P.cat, e: P.e, name: P.names[k],
+    d: n === 1 ? `Finish your first ${P.cat} workout` : `Finish ${n} ${P.cat} workouts`,
+    v: s => s.perTier[P.t], goal: n,
+  }))),
+  { id: "cam",      cat: "Style",      e: "📷", name: "Caught on Camera", d: "Finish a workout using camera checks", v: s => s.camWorkouts, goal: 1 },
+  { id: "dumbbell", cat: "Style",      e: "💪", name: "Iron Grip",        d: "Finish 5 workouts in Dumbbell mode",   v: s => s.dbWorkouts, goal: 5 },
+  { id: "focus",    cat: "Style",      e: "🎯", name: "Specialist",       d: "Finish 5 workouts with a muscle focus", v: s => s.focusWorkouts, goal: 5 },
+  { id: "open1",    cat: "Crates",     e: "📦", name: "Unboxed",          d: "Open your first crate",                v: s => s.opened, goal: 1 },
+  { id: "open50",   cat: "Crates",     e: "🧰", name: "Crate Cracker",    d: "Open 50 crates",                       v: s => s.opened, goal: 50 },
+  { id: "open200",  cat: "Crates",     e: "🐉", name: "Loot Goblin",      d: "Open 200 crates",                      v: s => s.opened, goal: 200 },
+  { id: "rar3",     cat: "Crates",     e: "✨", name: "Legendary Find",   d: "Get a Legendary item",                 v: s => s.rarities[3], goal: 1 },
+  { id: "rar4",     cat: "Crates",     e: "🦄", name: "Myth Made Real",   d: "Get a Mythic item",                    v: s => s.rarities[4], goal: 1 },
+  { id: "rar5",     cat: "Crates",     e: "🌈", name: "Powerlifter Pull", d: "Get a Powerlifter item",               v: s => s.rarities[5], goal: 1 },
+  { id: "c25",      cat: "Collection", e: "🗂️", name: "Collector",        d: "Collect 25 different items",           v: s => s.collected, goal: 25 },
+  { id: "c50",      cat: "Collection", e: "🖼️", name: "Curator",          d: "Collect 50 different items",           v: s => s.collected, goal: 50 },
+  { id: "call",     cat: "Collection", e: "📚", name: "Completionist",    d: "Collect every item",                   v: s => s.collected, goal: () => ITEMS.filter(i => i.r !== OLY).length },
+  { id: "oly",      cat: "Collection", e: "🏛️", name: "Olympian",         d: "Unlock the Olympian crate",            v: s => s.olympian, goal: 1 },
+  { id: "first3",   cat: "Gym",        e: "🪑", name: "Moving In",        d: "Place 3 things in your gym",           v: s => s.placed, goal: 3 },
+  { id: "full",     cat: "Gym",        e: "🏠", name: "Full House",       d: "Fill every spot in your gym",          v: s => s.placed, goal: 24 },
+  { id: "g1k",      cat: "Gym",        e: "🧽", name: "Looking Sharp",    d: "Get a gym score of 1,000",             v: s => s.rating, goal: 1000 },
+  { id: "g5k",      cat: "Gym",        e: "💎", name: "Showroom",         d: "Get a gym score of 5,000",             v: s => s.rating, goal: 5000 },
+  { id: "g10k",     cat: "Gym",        e: "🏟️", name: "Hall of Fame",     d: "Get a gym score of 10,000",            v: s => s.rating, goal: 10000 },
+  { id: "share",    cat: "Friends",    e: "📣", name: "Spread the Word",  d: "Share Rep Quest with a friend",        v: s => s.shares, goal: 1 },
+  { id: "share10",  cat: "Friends",    e: "📢", name: "Hype Squad",       d: "Share Rep Quest 10 times",             v: s => s.shares, goal: 10 },
+  { id: "crew",     cat: "Friends",    e: "👥", name: "Training Crew",    d: "Have 2 or more players on this phone", v: s => s.players, goal: 2 },
+  // hidden until earned: unlock every other achievement. Prize: the gold theme.
+  { id: "champion", cat: "Secret",     e: "👑", name: "Grand Champion",   d: "Unlock every other achievement",       v: s => s.achDone, goal: () => ACH.length - 1, hidden: true, reward: "Gold theme" },
+];
+const ACH_CATS = ["Training", "Warm-up", "Grinder", "Beast", "Legend", "Style", "Crates", "Collection", "Gym", "Friends", "Secret"];
+const achGoal = a => typeof a.goal === "function" ? a.goal() : a.goal;
+function achStats() {
+  const owned = ownedIds(), rarities = RAR.map(() => 0);
+  owned.forEach(id => rarities[ITEM[id].r]++);
+  return {
+    workouts: S.workouts, level: levelOf(S.xp), perTier: S.perTier, opened: S.cratesOpened, rarities,
+    collected: olympianProgress().have, olympian: S.olympian ? 1 : 0, rating: ratingOf(S.room),
+    placed: [...S.room.wall, ...S.room.floor].filter(Boolean).length,
+    camWorkouts: S.camWorkouts || 0, dbWorkouts: S.dbWorkouts || 0, focusWorkouts: S.focusWorkouts || 0,
+    shares: S.shares || 0, players: Object.keys(store.players).length,
+  };
+}
+// The hidden one counts the others, so it's worked out last.
+function achUnlocked(st) {
+  const normal = ACH.filter(a => !a.hidden);
+  const got = normal.filter(a => a.v(st) >= achGoal(a)).map(a => a.id);
+  st.achDone = got.length;
+  if (got.length >= normal.length) got.push("champion");
+  return got;
+}
+const isChampion = () => Array.isArray(S.achSeen) && S.achSeen.includes("champion");
+function applyTheme() {
+  const gold = isChampion() && me.gold !== false;
+  document.documentElement.classList.toggle("gold", gold);
+  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = gold ? "#0b0a08" : "#14161b";
+}
+// Called on every save: pops a message for anything you just unlocked. The first time a player
+// is seen (no achSeen yet), what they've already done is marked quietly.
+function checkAchievements() {
+  const now = achUnlocked(achStats());
+  if (!Array.isArray(S.achSeen)) { S.achSeen = now; return; }
+  const fresh = now.filter(id => !S.achSeen.includes(id));
+  if (!fresh.length) return;
+  S.achSeen = [...S.achSeen, ...fresh];
+  if (fresh.includes("champion")) {
+    me.gold = true; applyTheme();
+    setTimeout(() => toast("👑 Grand Champion! You unlocked the Gold theme. You can turn it off in Settings."), 1700);
+    return;
+  }
+  const names = fresh.map(id => ACH.find(a => a.id === id).name);
+  setTimeout(() => toast(fresh.length === 1 ? `🏆 Achievement unlocked: ${names[0]}`
+    : fresh.length <= 3 ? `🏆 ${fresh.length} achievements unlocked: ${names.join(", ")}` : `🏆 ${fresh.length} achievements unlocked! See them in Ranks.`), 1700);
+}
+function achievementsCard() {
+  const st = achStats(), done = new Set(achUnlocked(st));
+  const card = h("div", { class: "card", id: "achievements" },
+    h("div", { class: "achhead" },
+      h("div", { class: "row" }, h("h2", { text: "Achievements" }), h("span", { class: "spacer" }),
+        h("span", { class: "eyebrow", text: `${done.size} of ${ACH.length} unlocked` })),
+      h("div", { class: "achbar", role: "progressbar", "aria-label": "Achievements unlocked", "aria-valuemin": "0", "aria-valuemax": String(ACH.length), "aria-valuenow": String(done.size) },
+        h("i", { style: `width:${Math.round(100 * done.size / ACH.length)}%` }))));
+  for (const cat of ACH_CATS) {
+    const list = ACH.filter(a => a.cat === cat);
+    const n = list.filter(a => done.has(a.id)).length;
+    card.append(h("div", { class: "invgroup" },
+      h("div", { class: "row", style: "justify-content:space-between" }, h("span", { class: "eyebrow", style: "font-size:14px", text: cat }), h("span", { class: "eyebrow", text: `${n} / ${list.length}` })),
+      h("div", { class: "achgrid" }, list.map(a => {
+        const goal = achGoal(a), got = Math.min(a.v(st), goal), ok = done.has(a.id);
+        if (a.hidden && !ok) return h("div", { class: "ach", "aria-label": "Hidden achievement" },
+          h("span", { class: "ic", "aria-hidden": "true", text: "❔" }), h("b", { text: "???" }),
+          h("small", { text: "Hidden achievement. Keep going…" }), h("span", { class: "pnum", text: "Locked" }));
+        if (a.hidden) return h("div", { class: "ach done", "aria-label": `${a.name}: ${a.d}. Unlocked. Reward: ${a.reward}` },
+          h("span", { class: "ic", "aria-hidden": "true", text: a.e }), h("b", { text: a.name }), h("small", { text: a.d }),
+          h("span", { class: "pnum", text: "Reward: " + a.reward }));
+        return h("div", { class: "ach" + (ok ? " done" : ""), "aria-label": `${a.name}: ${a.d}. ${ok ? "Unlocked" : got + " of " + goal}` },
+          h("span", { class: "ic", "aria-hidden": "true", text: a.e }),
+          h("b", { text: a.name }),
+          h("small", { text: a.d }),
+          goal > 1 && !ok ? h("div", { class: "pbar" }, h("i", { style: `width:${Math.round(100 * got / goal)}%` })) : null,
+          h("span", { class: "pnum", text: ok ? "Unlocked" : goal > 1 ? `${got.toLocaleString()} / ${goal.toLocaleString()}` : "Locked" }));
+      }))));
+  }
+  return card;
+}
+
 async function renderBoard() {
   const root = $("#tab-board");
   root.replaceChildren();
@@ -1691,7 +2314,7 @@ async function renderBoard() {
   root.append(note);
 
   const list = h("ol", { class: "board" });
-  root.append(list);
+  root.append(list, achievementsCard());
 
   if (!db) {
     if (syncState !== "connecting") renderLocalBoard(root, list);
@@ -1758,6 +2381,51 @@ function showGym(r, name, onSwitch) {
   $("#gymOv").hidden = false;
 }
 
+/* ================= tab: settings ================= */
+const dbTag = () => h("span", { class: "dbtag", text: "Dumbbell" });
+function setDumbbells(on) {
+  store.settings.dumbbells = on;
+  // a workout you haven't started yet gets re-rolled so the change shows up right away
+  const swap = !(current && current.startedAt) && justEarned == null;
+  if (swap) current = makeWorkout(pickedTier);
+  saveLocalOnly();
+  renderSettings();
+  toast(on ? (swap ? "Dumbbell mode on. New workout ready." : "Dumbbell mode on. It starts with your next workout.")
+           : (swap ? "Dumbbell mode off. New workout ready." : "Dumbbell mode off. It starts with your next workout."));
+}
+function renderSettings() {
+  const root = $("#tab-settings"); root.replaceChildren();
+  const on = !!store.settings.dumbbells;
+  root.append(h("div", { class: "row" }, h("h2", { text: "Settings" })));
+  root.append(h("div", { class: "card" },
+    h("span", { class: "eyebrow", text: "Equipment" }),
+    h("div", { class: "setrow" },
+      h("label", { class: "txt", for: "dbSwitch" },
+        h("b", { id: "dbName", text: "Dumbbell mode" }),
+        h("small", { id: "dbDesc", text: "Adds dumbbell moves like curls, presses and rows to your workouts. About half of each workout will use dumbbells." })),
+      h("span", { class: "switch" },
+        h("input", { type: "checkbox", role: "switch", id: "dbSwitch", "aria-labelledby": "dbName", "aria-describedby": "dbDesc", checked: on, onchange: ev => setDumbbells(ev.target.checked) }),
+        h("span", { class: "track", "aria-hidden": "true" }))),
+    on ? h("p", { class: "infotip" }, h("b", { text: "Tip: " }), "Pick a weight you can lift with good form for every rep. If the last few reps get sloppy, go lighter.") : null));
+  if (isChampion()) root.append(h("div", { class: "card" },
+    h("span", { class: "eyebrow", text: "Grand Champion prize" }),
+    h("div", { class: "setrow" },
+      h("label", { class: "txt", for: "goldSwitch" },
+        h("b", { id: "goldName", text: "👑 Gold theme" }),
+        h("small", { id: "goldDesc", text: "Black and gold everything. You earned it by unlocking every achievement." })),
+      h("span", { class: "switch" },
+        h("input", { type: "checkbox", role: "switch", id: "goldSwitch", "aria-labelledby": "goldName", "aria-describedby": "goldDesc", checked: me.gold !== false,
+          onchange: ev => { me.gold = ev.target.checked; saveLocalOnly(); applyTheme(); toast(ev.target.checked ? "Gold theme on" : "Gold theme off"); } }),
+        h("span", { class: "track", "aria-hidden": "true" })))));
+  const moves = EXERCISES.filter(e => e.db);
+  root.append(h("div", { class: "card" },
+    h("span", { class: "eyebrow", text: on ? "Dumbbell moves in your workouts" : "Dumbbell moves you'll unlock" }),
+    h("ul", { class: "exlist" }, moves.map(e => h("li", { class: "ex" },
+      h("div", { class: "exlabel" }, h("span", { class: "nm", text: e.name }),
+        h("span", { class: "hint", text: [HOWTO[e.name].main.map(m => MUSCLES[m]).join(", "), e.min ? "Grinder and up" : null].filter(Boolean).join(" · ") })),
+      h("button", { class: "infobtn", "aria-label": "How to do " + e.name, onclick: () => showInfo(e.name) }, "i"))))));
+}
+
 /* ================= tabs ================= */
 function setTab(t) {
   tab = t;
@@ -1771,6 +2439,7 @@ function renderTab() {
   if (tab === "workout") renderWorkout();
   else if (tab === "crates") renderCrates();
   else if (tab === "gym") renderGym();
+  else if (tab === "settings") renderSettings();
   else renderBoard();
 }
 function renderAll() { renderHeader(); renderTab(); }
@@ -1781,6 +2450,9 @@ $("#infoOv").addEventListener("click", e => { if (e.target.id === "infoOv") $("#
 $("#camStop").addEventListener("click", () => stopScan());
 document.addEventListener("visibilitychange", () => { if (document.hidden && scan) stopScan(); });
 
+if (checkOlympian()) saveLocalOnly();
+if (!Array.isArray(S.achSeen)) { checkAchievements(); saveLocalOnly(); }
+applyTheme();
 renderAll();
 
 /* ================= installable app (PWA build only) ================= */
@@ -1830,7 +2502,7 @@ if (window.LOOTLIFT_PWA) {
       if ((remote.xp || 0) > S.xp || ((remote.xp || 0) === S.xp && (remote.updatedAt || 0) >= (S.updatedAt || 0))) {
         const { rating, level, ...rest } = remote;
         S = normalize(JSON.parse(JSON.stringify(rest)));
-        saveLocalOnly(); renderAll();
+        saveLocalOnly(); applyTheme(); renderAll();
       } else pushRemote();
     } else pushRemote();
   } catch {}
