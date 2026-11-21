@@ -399,7 +399,7 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 .switch .track { position: absolute; inset: 0; border-radius: 16px; background: var(--panel-2); border: 2px solid var(--line, rgba(255,255,255,.18)); transition: background .2s, border-color .2s; }
 .switch .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--dim); transition: transform .2s, background .2s; }
 .switch input:checked + .track { background: var(--accent); border-color: var(--accent); }
-.switch input:checked + .track::after { transform: translateX(24px); background: #fff; }
+.switch input:checked + .track::after { transform: translateX(24px); background: var(--knob, #fff); }
 .switch input:focus-visible + .track { outline: 3px solid var(--chalk); outline-offset: 2px; }
 .dbtag { display: inline-block; font-family: var(--label); font-weight: 700; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; background: var(--panel-2); color: var(--chalk); border-radius: 6px; padding: 2px 6px; margin-right: 6px; vertical-align: 1px; }
 .ex .dbtag { background: var(--panel); }
@@ -2336,7 +2336,7 @@ const THEMES = [
   { id: "royal",   name: "Royal",          v: { floor: "#0d0a18", panel: "#181230", "panel-2": "#221a42", line: "#352a63", chalk: "#f3eeff", dim: "#a89cc9", ink: "#0d0a18", accent: "#f2c94c", btn: "#b794ff" } },
   { id: "blossom", name: "Cherry Blossom", v: { floor: "#140a10", panel: "#22111b", "panel-2": "#301827", line: "#4a253b", chalk: "#ffeef6", dim: "#c9a3b6", ink: "#1a0a12", accent: "#ff8fc7", btn: "#ffc2df" } },
   { id: "steel",   name: "Steel",          v: { floor: "#101418", panel: "#1a2027", "panel-2": "#242c35", line: "#36414d", chalk: "#eef3f8", dim: "#94a3b3", ink: "#0f1418", accent: "#7cc4ff", btn: "#cfd8e3" } },
-  { id: "royalblue", name: "Royal Blue & White", v: { floor: "#0c2266", panel: "#14318a", "panel-2": "#1d3fa6", line: "#3558c4", chalk: "#ffffff", dim: "#c9d6ff", ink: "#0c2266", accent: "#ffffff", btn: "#ffffff" } },
+  { id: "royalblue", name: "Royal Blue & White", v: { floor: "#0c2266", panel: "#14318a", "panel-2": "#1d3fa6", line: "#3558c4", chalk: "#ffffff", dim: "#c9d6ff", ink: "#0c2266", accent: "#ffffff", btn: "#ffffff", knob: "#0c2266" } },
   { id: "cocoa",   name: "Light Blue & Brown", v: { floor: "#1c120b", panel: "#2a1b11", "panel-2": "#3a2618", line: "#553925", chalk: "#eef8ff", dim: "#bfa892", ink: "#1c120b", accent: "#8fd3ff", btn: "#a9ddff" } },
 ];
 const THEME_BY_ID = Object.fromEntries(THEMES.map(t => [t.id, t]));
@@ -2797,6 +2797,14 @@ function renderSettings() {
         h("input", { type: "checkbox", role: "switch", id: "dbSwitch", "aria-labelledby": "dbName", "aria-describedby": "dbDesc", checked: on, onchange: ev => setDumbbells(ev.target.checked) }),
         h("span", { class: "track", "aria-hidden": "true" }))),
     on ? h("p", { class: "infotip" }, h("b", { text: "Tip: " }), "Pick a weight you can lift with good form for every rep. If the last few reps get sloppy, go lighter.") : null));
+  // the dumbbell moves sit right under the Dumbbell mode switch
+  const moves = EXERCISES.filter(e => e.db);
+  root.append(h("div", { class: "card" },
+    h("span", { class: "eyebrow", text: on ? "Dumbbell moves in your workouts" : "Dumbbell moves you'll unlock" }),
+    h("ul", { class: "exlist" }, moves.map(e => h("li", { class: "ex" },
+      h("div", { class: "exlabel" }, h("span", { class: "nm", text: e.name }),
+        h("span", { class: "hint", text: [HOWTO[e.name].main.map(m => MUSCLES[m]).join(", "), e.min ? "Grinder and up" : null].filter(Boolean).join(" · ") })),
+      h("button", { class: "infobtn", "aria-label": "How to do " + e.name, onclick: () => showInfo(e.name) }, "i"))))));
   // themes you own: Default, any bought in the Shop, and Gold if you're a Grand Champion
   const mine = [{ id: "default", name: "Default" }, ...(isChampion() ? [{ id: "gold", name: "👑 Gold" }] : []), ...THEMES.filter(t => ownsTheme(t.id))];
   const cur = activeTheme();
@@ -2832,13 +2840,6 @@ function renderSettings() {
     h("span", { class: "eyebrow", text: "Secret code" }),
     h("p", { class: "note", text: "Got a code? Type it exactly, capitals and all." }),
     h("div", { class: "row", style: "flex-wrap:nowrap" }, codeIn, h("button", { class: "btn primary", type: "submit" }, "Redeem"))));
-  const moves = EXERCISES.filter(e => e.db);
-  root.append(h("div", { class: "card" },
-    h("span", { class: "eyebrow", text: on ? "Dumbbell moves in your workouts" : "Dumbbell moves you'll unlock" }),
-    h("ul", { class: "exlist" }, moves.map(e => h("li", { class: "ex" },
-      h("div", { class: "exlabel" }, h("span", { class: "nm", text: e.name }),
-        h("span", { class: "hint", text: [HOWTO[e.name].main.map(m => MUSCLES[m]).join(", "), e.min ? "Grinder and up" : null].filter(Boolean).join(" · ") })),
-      h("button", { class: "infobtn", "aria-label": "How to do " + e.name, onclick: () => showInfo(e.name) }, "i"))))));
 }
 
 /* ================= tabs ================= */
