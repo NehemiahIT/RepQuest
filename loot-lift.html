@@ -214,6 +214,12 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 }
 .slot .neon.aura { font-size: clamp(7px, 2.05vw, 10px); letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce) { .neon.aura, .crate.oly, .oly-text { animation: none; } }
+.streak { gap: 10px; }
+.streak .flame { font-size: 30px; line-height: 1; filter: grayscale(1); opacity: .5; }
+.streak.lit .flame { filter: none; opacity: 1; animation: flick 1.6s ease-in-out infinite; }
+@keyframes flick { 50% { transform: scale(1.08) rotate(-3deg); } }
+@media (prefers-reduced-motion: reduce) { .streak.lit .flame { animation: none; } }
+.streak .streakn { font-family: var(--display); font-size: 22px; line-height: 1.1; }
 .olyprog { height: 8px; border-radius: 4px; background: var(--panel); overflow: hidden; }
 .olyprog i { display: block; height: 100%; background: var(--olympian); background-size: 200% 100%; }
 .crate::before { content: ""; position: absolute; left: 42%; right: 42%; top: 18%; height: 14%; background: #0000004d; border-radius: 3px; }
@@ -1541,6 +1547,28 @@ function checkOlympian() {
   setTimeout(() => { toast("You collected every item! The Olympian crate is yours."); renderHeader(); }, 1300);
   return true;
 }
+// Daily streak: finish at least one workout every day. Every 50 days in a row earns an Olympian crate.
+const STREAK_GOAL = 50;
+const dayKey = d => d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+const todayStr = () => dayKey(new Date());
+const yesterdayStr = () => { const d = new Date(); d.setDate(d.getDate() - 1); return dayKey(d); };
+// your streak right now: it only counts if your last workout day was today or yesterday
+function currentStreak() {
+  const st = S.streak;
+  return st && (st.last === todayStr() || st.last === yesterdayStr()) ? st.n : 0;
+}
+// called when you finish a workout; returns true if this workout earned a streak crate
+function bumpStreak() {
+  const today = todayStr();
+  const st = S.streak || { n: 0, last: null };
+  if (st.last === today) return false;          // already counted today
+  st.n = st.last === yesterdayStr() ? st.n + 1 : 1;
+  st.last = today;
+  S.streak = st;
+  S.bestStreak = Math.max(S.bestStreak || 0, st.n);
+  if (st.n % STREAK_GOAL === 0) { S.crates.push(OLY); return true; }
+  return false;
+}
 function save() {
   checkOlympian();
   checkAchievements();
@@ -1604,9 +1632,28 @@ function renderHeader() {
 }
 
 /* ================= tab: workout ================= */
+function streakCard() {
+  const n = currentStreak(), doneToday = S.streak && S.streak.last === todayStr();
+  const toGo = STREAK_GOAL - (n % STREAK_GOAL);
+  const msg = doneToday ? `Done for today ✓ Come back tomorrow to keep it going.`
+    : n ? `Finish a workout today or your streak resets.` : `Finish a workout every day. ${STREAK_GOAL} days in a row earns an Olympian crate.`;
+  return h("div", { class: "card streak" + (doneToday ? " lit" : "") },
+    h("div", { class: "row", style: "flex-wrap:nowrap;gap:12px" },
+      h("span", { class: "flame", "aria-hidden": "true", text: "🔥" }),
+      h("div", { style: "flex:1;min-width:0;display:flex;flex-direction:column;gap:2px" },
+        h("div", { class: "row", style: "justify-content:space-between" },
+          h("b", { class: "streakn", text: `${n}-day streak` }),
+          h("span", { class: "eyebrow" }, `${toGo} to `, rarText(OLY, "Olympian"))),
+        h("small", { class: "note", text: msg }))),
+    h("div", { class: "olyprog", role: "progressbar", "aria-label": "Days toward an Olympian crate", "aria-valuemin": "0", "aria-valuemax": String(STREAK_GOAL), "aria-valuenow": String(n % STREAK_GOAL) },
+      h("i", { style: `width:${Math.round(100 * (n % STREAK_GOAL) / STREAK_GOAL)}%` })),
+    (S.bestStreak || 0) > n ? h("div", { class: "tierinfo" }, h("span", { text: "Best streak" }), h("span", {}, h("b", { text: `${S.bestStreak} days` }))) : null);
+}
 function renderWorkout() {
   const root = $("#tab-workout"); root.replaceChildren();
   const active = current && current.startedAt;
+
+  root.append(streakCard());
 
   // tier picker
   const plates = h("div", { class: "plates", role: "group", "aria-label": "Workout level" });
@@ -1782,6 +1829,7 @@ function claim() {
   const T = TIERS[W.tier];
   const c = rollFrom(T.odds);
   S.xp += T.xp; S.workouts += 1; S.perTier[W.tier] += 1; S.crates.push(c);
+  const streakCrate = bumpStreak();
   if (CAM) S.camWorkouts = (S.camWorkouts || 0) + 1;
   if (W.ex.some(e => e.db)) S.dbWorkouts = (S.dbWorkouts || 0) + 1;
   if (W.focus && W.focus.length) S.focusWorkouts = (S.focusWorkouts || 0) + 1;
@@ -1789,6 +1837,7 @@ function claim() {
   const before = levelOf(S.xp - T.xp);
   save(); renderAll();
   toast(levelOf(S.xp) > before ? `Level up! You're level ${levelOf(S.xp)}` : `+${T.xp} XP · ${RAR[c].label} crate earned`);
+  if (streakCrate) setTimeout(() => toast(`🔥 ${S.streak.n}-day streak! You earned an Olympian crate.`), 2400);
 }
 setInterval(tickWorkout, 1000);
 function tickWorkout() {
@@ -1913,7 +1962,7 @@ function olympianCard() {
       crateEl(OLY, 64, "div", { class: "locked" }),
       h("div", { style: "flex:1;min-width:0;display:flex;flex-direction:column;gap:4px" },
         h("h2", {}, rarText(OLY, "Olympian crate")),
-        h("p", { class: "note", style: "margin:0", text: "Collect every item in the game to unlock it. Inside is one thing you can't get anywhere else." }))),
+        h("p", { class: "note", style: "margin:0", text: `Collect every item in the game to unlock it, or keep a ${STREAK_GOAL}-day workout streak. Inside is one thing you can't get anywhere else.` }))),
     h("div", { class: "olyprog", role: "progressbar", "aria-label": "Items collected", "aria-valuemin": "0", "aria-valuemax": String(p.total), "aria-valuenow": String(p.have) },
       h("i", { style: `width:${Math.round(100 * p.have / p.total)}%` })),
     h("div", { class: "tierinfo" }, h("span", { text: "Items collected" }), h("span", {}, h("b", { text: `${p.have} / ${p.total}` }))));
