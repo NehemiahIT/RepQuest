@@ -852,6 +852,41 @@ const EXERCISES = [
   { name: "Floor Press",        db: true, kind: "reps", base: 10, spr: 2.5, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "floorPress", minRep: 0.8, tip: "Phone on the floor, side view" } },
   { name: "Russian Twists",     db: true, kind: "secs", base: 30,           cam: { t: "active", pts: [15, 16], rel: "shoulders", dir: "x", pose: "twist", tip: "Face the camera" } },
   { name: "Thrusters",          db: true, kind: "reps", base: 6,  spr: 3.5, min: 1, cam: { t: "angle", limb: "knee", lo: 115, hi: 155, pose: "standing", start: "upright", via: "armsUp", minRep: 1.2, tip: "Face the camera" } },
+  // ---- calisthenics skill drills (Calisthenics mode only). skills = which skill focus they train ----
+  // Ordered easiest to hardest for each skill; min = first plate they show up at (0 Warm-up … 3 Legend).
+  { name: "Planche Lean",            cali: true, skills: ["planche"], kind: "secs", base: 20, cam: { t: "hold", pose: "plancheLean", tip: "Side view, whole body in the picture" } },
+  { name: "Pseudo Planche Push-ups", cali: true, skills: ["planche", "ninety"], kind: "reps", base: 8, spr: 3, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "horizontal", minRep: 0.8, tip: "Side view, whole body in the picture" } },
+  { name: "Frog Stand",              cali: true, skills: ["planche", "ninety"], kind: "secs", base: 20, cam: { t: "hold", pose: "frog", tip: "Side view, whole body in the picture" } },
+  { name: "Tuck Planche",            cali: true, skills: ["planche"], kind: "secs", base: 10, min: 1, cam: { t: "hold", pose: "tuckPlanche", tip: "Side view, whole body in the picture" } },
+  { name: "Advanced Tuck Planche",   cali: true, skills: ["planche"], kind: "secs", base: 8, min: 2, cam: { t: "hold", pose: "tuckPlanche", tip: "Side view, whole body in the picture" } },
+  { name: "Straddle Planche",        cali: true, skills: ["planche"], kind: "secs", base: 5, min: 3, cam: { t: "hold", pose: "planche", tip: "Side view, whole body in the picture" } },
+  { name: "Wall Walks",              cali: true, skills: ["handstand", "hspu"], kind: "reps", base: 4, spr: 8, hint: "Feet against a wall", cam: { t: "range", f: "invert", lo: 0.3, hi: 1.6, start: "horizontal", minRep: 3, tip: "Side view, whole body in the picture" } },
+  { name: "Chest-to-Wall Handstand", cali: true, skills: ["handstand", "hspu"], kind: "secs", base: 30, hint: "Use a wall", cam: { t: "hold", pose: "inverted", tip: "Side view, whole body in the picture" } },
+  { name: "Pike Hold",               cali: true, skills: ["handstand", "hspu"], kind: "secs", base: 30, cam: { t: "hold", pose: "pike", tip: "Side view, whole body in the picture" } },
+  { name: "Hollow Body Hold",        cali: true, skills: ["handstand", "lsithandstand", "frontlever"], kind: "secs", base: 30, cam: { t: "hold", pose: "lying", tip: "Phone on the floor, side view" } },
+  { name: "Handstand Kick-ups",      cali: true, skills: ["handstand"], kind: "reps", base: 6, spr: 5, min: 1, hint: "Facing a wall", cam: { t: "range", f: "invert", lo: 0.3, hi: 1.6, start: "upright", minRep: 2, tip: "Side view, whole body in the picture" } },
+  { name: "Wall Handstand Shoulder Taps", cali: true, skills: ["handstand"], kind: "reps", base: 8, spr: 2, min: 2, hint: "Count each tap", cam: { t: "range", f: "reach", lo: -0.6, hi: -0.2, pose: "inverted", minRep: 0.6, tip: "Side view, whole body in the picture" } },
+  { name: "Freestanding Handstand",  cali: true, skills: ["handstand"], kind: "secs", base: 15, min: 3, cam: { t: "hold", pose: "inverted", tip: "Side view, whole body in the picture" } },
+  { name: "Floor Pike Push-ups",     cali: true, skills: ["hspu"], kind: "reps", base: 8, spr: 3, cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "pike", tip: "Side view, whole body in the picture" } },
+  { name: "Elevated Pike Push-ups",  cali: true, skills: ["hspu"], kind: "reps", base: 6, spr: 3, min: 1, hint: "Feet on a chair", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "pike", tip: "Side view, whole body in the picture" } },
+  { name: "Wall HSPU Negatives",     cali: true, skills: ["hspu"], kind: "reps", base: 4, spr: 7, min: 2, hint: "Lower slowly", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, neg: true, pose: "inverted", minRep: 2, tip: "Side view, whole body in the picture" } },
+  { name: "Wall Handstand Push-ups", cali: true, skills: ["hspu"], kind: "reps", base: 4, spr: 4, min: 3, hint: "Back to the wall", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "inverted", minRep: 1, tip: "Side view, whole body in the picture" } },
+  { name: "Compression Leg Lifts",   cali: true, skills: ["lsithandstand"], kind: "reps", base: 10, spr: 2.5, cam: { t: "range", f: "kick", lo: 0.03, hi: 0.15, pose: "seated", minRep: 0.8, tip: "Side view, whole body in the picture" } },
+  { name: "Tuck L-Sit",              cali: true, skills: ["lsithandstand"], kind: "secs", base: 15, hint: "Two chairs or parallettes", cam: { t: "hold", pose: "lsitTuck", tip: "Side view, whole body in the picture" } },
+  { name: "L-Sit",                   cali: true, skills: ["lsithandstand"], kind: "secs", base: 10, min: 1, hint: "Two chairs or parallettes", cam: { t: "hold", pose: "lsit", tip: "Side view, whole body in the picture" } },
+  { name: "Wall-Assisted Pike Press", cali: true, skills: ["lsithandstand"], kind: "reps", base: 4, spr: 6, min: 2, hint: "Back to a wall", cam: { t: "range", f: "invert", lo: 0.3, hi: 1.6, minRep: 2, tip: "Side view, whole body in the picture" } },
+  { name: "L-Sit to Handstand Negatives", cali: true, skills: ["lsithandstand"], kind: "reps", base: 3, spr: 8, min: 3, hint: "Lower slowly", cam: { t: "range", f: "invert", lo: 0.3, hi: 1.6, neg: true, minRep: 3, tip: "Side view, whole body in the picture" } },
+  { name: "Active Hang",             cali: true, skills: ["frontlever"], kind: "secs", base: 30, hint: "Pull-up bar", cam: { t: "hold", pose: "hang", tip: "Side view, bar and whole body in the picture" } },
+  { name: "Australian Pull-ups",     cali: true, skills: ["frontlever"], kind: "reps", base: 10, spr: 2.5, hint: "Low bar or sturdy table", cam: { t: "angle", limb: "elbow", lo: 100, hi: 150, pose: "rowPose", minRep: 0.8, tip: "Side view, whole body in the picture" } },
+  { name: "Tuck Front Lever",        cali: true, skills: ["frontlever"], kind: "secs", base: 10, min: 1, hint: "Pull-up bar", cam: { t: "hold", pose: "lever", tip: "Side view, bar and whole body in the picture" } },
+  { name: "Dragon Flag Negatives",   cali: true, skills: ["frontlever"], kind: "reps", base: 4, spr: 6, min: 1, hint: "On a bench", cam: { t: "range", f: "legsUp", lo: 0.8, hi: 3, neg: true, pose: "flagPose", minRep: 2, tip: "Side view, whole body in the picture" } },
+  { name: "Ice Cream Makers",        cali: true, skills: ["frontlever"], kind: "reps", base: 5, spr: 4, min: 2, hint: "Pull-up bar", cam: { t: "range", f: "lean", raw: true, lo: 0.35, hi: 0.72, pose: "hanging", minRep: 1.2, tip: "Side view, bar and whole body in the picture" } },
+  { name: "Advanced Tuck Front Lever", cali: true, skills: ["frontlever"], kind: "secs", base: 8, min: 2, hint: "Pull-up bar", cam: { t: "hold", pose: "lever", tip: "Side view, bar and whole body in the picture" } },
+  { name: "Straddle Front Lever",    cali: true, skills: ["frontlever"], kind: "secs", base: 5, min: 3, hint: "Pull-up bar", cam: { t: "hold", pose: "lever", tip: "Side view, bar and whole body in the picture" } },
+  { name: "Bent-Arm Planche Lean",   cali: true, skills: ["ninety"], kind: "secs", base: 15, cam: { t: "hold", pose: "lowPlank", tip: "Side view, whole body in the picture" } },
+  { name: "Tuck 90° Hold",           cali: true, skills: ["ninety"], kind: "secs", base: 8, min: 1, cam: { t: "hold", pose: "tuck90", tip: "Side view, whole body in the picture" } },
+  { name: "One-Leg 90° Hold",        cali: true, skills: ["ninety"], kind: "secs", base: 6, min: 2, cam: { t: "hold", pose: "tuck90", tip: "Side view, whole body in the picture" } },
+  { name: "90° Hold",                cali: true, skills: ["ninety"], kind: "secs", base: 5, min: 3, cam: { t: "hold", pose: "ninety", tip: "Side view, whole body in the picture" } },
 ];
 const EXERCISE = Object.fromEntries(EXERCISES.map(e => [e.name, e]));
 
@@ -1006,6 +1041,105 @@ const HOWTO = {
   "Single-leg Glute Bridges": { main: ["glutes"], also: ["hamstrings"],
     steps: ["Lie on your back with your knees bent and feet flat.", "Lift one foot off the floor and straighten that leg.", "Push through your other heel to lift your hips.", "Lower slowly. Do all your reps, then switch legs."],
     tip: "Keep your hips level as you lift." },
+  "Planche Lean": { main: ["shoulders"], also: ["chest", "abs", "triceps"],
+    steps: ["Start in a push-up position with straight arms and your fingers turned slightly out.", "Lean your shoulders forward past your hands.", "Keep your arms locked and your body straight, push the floor away, and hold."],
+    tip: "Only lean as far as you can keep your arms straight." },
+  "Pseudo Planche Push-ups": { main: ["shoulders"], also: ["chest", "triceps", "abs"],
+    steps: ["Get in a push-up position with your hands turned out and down by your waist.", "Lean your shoulders forward past your hands.", "Lower your chest while keeping the lean.", "Push back up without losing the lean."],
+    tip: "The further you lean, the harder it gets." },
+  "Frog Stand": { main: ["shoulders"], also: ["abs", "triceps", "chest"],
+    steps: ["Squat down and put your hands flat on the floor, shoulder-width apart.", "Bend your elbows and rest your knees on the backs of your arms.", "Lean forward until your feet lift off the floor, and hold."],
+    tip: "Look a little forward, not straight down, to keep your balance." },
+  "Tuck Planche": { main: ["shoulders"], also: ["chest", "abs", "triceps"],
+    steps: ["Put your hands on the floor or parallettes with straight arms.", "Lean forward and pull your knees tight to your chest.", "Lift your feet off the floor so you balance on your hands with your back rounded, and hold."],
+    tip: "Keep your arms locked straight the whole time." },
+  "Advanced Tuck Planche": { main: ["shoulders"], also: ["chest", "abs", "triceps", "lowerBack"],
+    steps: ["Start in a tuck planche.", "Flatten your back and push your hips back until they're level with your shoulders.", "Your thighs and torso should make a right angle. Hold."],
+    tip: "Lean further forward as your hips move back." },
+  "Straddle Planche": { main: ["shoulders"], also: ["chest", "abs", "triceps", "glutes"],
+    steps: ["Start in an advanced tuck planche.", "Spread your legs wide and straighten them out behind you.", "Keep your body level with the floor and hold."],
+    tip: "Squeeze your glutes and point your toes." },
+  "Wall Walks": { main: ["shoulders"], also: ["abs", "triceps", "chest"],
+    steps: ["Start in a push-up position with your feet against a wall.", "Walk your feet up the wall while walking your hands back toward it.", "Stop when your chest is close to the wall, then walk back down the same way."],
+    tip: "Only go as high as you can control." },
+  "Chest-to-Wall Handstand": { main: ["shoulders"], also: ["triceps", "abs", "back"],
+    steps: ["Put your hands on the floor a little in front of a wall, facing away from it.", "Walk your feet up the wall and your hands in until your chest is close to the wall.", "Push the floor away, squeeze your legs together and hold."],
+    tip: "Keep your ribs in so your back doesn't arch." },
+  "Pike Hold": { main: ["shoulders"], also: ["triceps", "abs", "hamstrings"],
+    steps: ["Put your hands on the floor and walk your feet in so your hips are high, like an upside-down V.", "Shift your weight onto your hands and push the floor away.", "Hold with your arms straight."],
+    tip: "Put your feet on a box to make it harder." },
+  "Hollow Body Hold": { main: ["abs"], also: ["hipFlexors", "quads"],
+    steps: ["Lie on your back with your arms over your head.", "Press your lower back into the floor.", "Lift your arms, shoulders and legs a few inches off the floor and hold."],
+    tip: "Bend your knees to make it easier." },
+  "Handstand Kick-ups": { main: ["shoulders"], also: ["abs", "triceps"],
+    steps: ["Stand facing a wall with your arms over your head.", "Step forward, put your hands on the floor a hand's length from the wall, and kick one leg up.", "Bring your other leg up to meet it, touching the wall lightly or not at all.", "Come back down and repeat."],
+    tip: "Kick gently. Practice cartwheeling out to the side so you can bail safely." },
+  "Wall Handstand Shoulder Taps": { main: ["shoulders"], also: ["abs", "triceps"],
+    steps: ["Get into a chest-to-wall handstand.", "Shift your weight onto one hand and tap your shoulder with the other.", "Put it back down and switch sides."],
+    tip: "Move slowly and keep your body straight." },
+  "Freestanding Handstand": { main: ["shoulders"], also: ["abs", "triceps", "back"],
+    steps: ["Kick up into a handstand away from the wall.", "Stack your hips over your shoulders and your shoulders over your hands.", "Balance by pressing with your fingertips, and hold."],
+    tip: "If you fall forward, cartwheel out to the side." },
+  "Floor Pike Push-ups": { main: ["shoulders"], also: ["triceps", "back"],
+    steps: ["Put your hands and feet on the floor with your hips high, like an upside-down V.", "Bend your elbows to lower the top of your head toward the floor.", "Push back up."],
+    tip: "Look back toward your feet." },
+  "Elevated Pike Push-ups": { main: ["shoulders"], also: ["triceps", "back"],
+    steps: ["Put your feet on a chair and your hands on the floor.", "Walk your hands in until your hips are high over your shoulders.", "Lower your head toward the floor, then push back up."],
+    tip: "The higher your feet, the harder it is." },
+  "Wall HSPU Negatives": { main: ["shoulders", "triceps"], also: ["back", "abs"],
+    steps: ["Kick up into a handstand with your back to the wall.", "Lower your head toward the floor as slowly as you can, about 3 to 5 seconds.", "Come down and kick up again for the next rep."],
+    tip: "Put a folded towel under your head." },
+  "Wall Handstand Push-ups": { main: ["shoulders", "triceps"], also: ["back", "abs"],
+    steps: ["Kick up into a handstand with your back to the wall.", "Lower your head until it lightly touches the floor.", "Press back up until your arms are straight."],
+    tip: "Keep your elbows pointing forward, not out to the sides." },
+  "Compression Leg Lifts": { main: ["hipFlexors", "abs"], also: ["quads"],
+    steps: ["Sit with your legs straight together and your hands on the floor beside your knees.", "Lean forward a little and lift both heels off the floor.", "Hold for a second, then lower."],
+    tip: "Keep your knees locked straight." },
+  "Tuck L-Sit": { main: ["abs", "hipFlexors"], also: ["triceps", "shoulders"],
+    steps: ["Sit between two chairs or parallettes and put your hands on them beside your hips.", "Straighten your arms to lift your butt off the floor.", "Pull your knees to your chest and hold."],
+    tip: "Push down hard and keep your shoulders away from your ears." },
+  "L-Sit": { main: ["abs", "hipFlexors"], also: ["triceps", "quads", "shoulders"],
+    steps: ["Start in a tuck L-sit.", "Straighten your legs out in front of you.", "Keep them level with the floor, toes pointed, and hold."],
+    tip: "Bend one knee if you can't hold both straight yet." },
+  "Wall-Assisted Pike Press": { main: ["shoulders", "abs"], also: ["hipFlexors", "triceps"],
+    steps: ["Stand in a pike with your hands on the floor a foot from a wall, back to the wall.", "Shift your shoulders forward over your hands until your feet get light.", "Lift your hips up the wall and float your legs up into a handstand.", "Lower back down with control."],
+    tip: "Use a small push from your toes at first." },
+  "L-Sit to Handstand Negatives": { main: ["shoulders", "abs"], also: ["hipFlexors", "triceps"],
+    steps: ["Kick up into a handstand. Use a wall if you need to.", "Pike your hips and slowly lower your straight legs toward the floor in front of your hands.", "Keep going until you're in an L-sit, or as low as you can control."],
+    tip: "The slower you go, the stronger you get." },
+  "Active Hang": { main: ["back"], also: ["biceps", "shoulders", "abs"],
+    steps: ["Hang from a pull-up bar with your hands shoulder-width apart.", "Pull your shoulders down away from your ears without bending your arms.", "Hold with your body still."],
+    tip: "Squeeze your legs together and point your toes." },
+  "Australian Pull-ups": { main: ["back"], also: ["biceps", "abs"],
+    steps: ["Lie under a low bar or sturdy table and grab it with both hands.", "Keep your body straight from your heels to your head.", "Pull your chest to the bar, then lower slowly."],
+    tip: "Put your feet on a chair to make it harder." },
+  "Tuck Front Lever": { main: ["back", "abs"], also: ["biceps", "shoulders"],
+    steps: ["Hang from a bar.", "Pull your knees to your chest and lean back until your back is level with the floor.", "Keep your arms straight and hold."],
+    tip: "Push the bar down toward your hips." },
+  "Dragon Flag Negatives": { main: ["abs"], also: ["back", "hipFlexors", "lowerBack"],
+    steps: ["Lie on a bench and hold it behind your head.", "Lift your whole body until it points at the ceiling, resting on your upper back.", "Lower your straight body as slowly as you can until it hovers above the bench."],
+    tip: "Bend your knees to make it easier." },
+  "Ice Cream Makers": { main: ["back", "abs"], also: ["biceps", "shoulders"],
+    steps: ["Hang from a bar with your arms straight.", "Pull the bar toward your hips and swing up into a tuck front lever.", "Lower back to a hang with control."],
+    tip: "Keep your arms straight the whole time." },
+  "Advanced Tuck Front Lever": { main: ["back", "abs"], also: ["biceps", "shoulders", "lowerBack"],
+    steps: ["Start in a tuck front lever.", "Flatten your back and push your knees away until your hips and thighs make a right angle.", "Keep your back level with the floor and hold."],
+    tip: "Hold for 10 seconds with a flat back before moving on." },
+  "Straddle Front Lever": { main: ["back", "abs"], also: ["biceps", "shoulders", "glutes"],
+    steps: ["Start in an advanced tuck front lever.", "Spread your legs wide and straighten them out.", "Keep your whole body level with the floor and hold."],
+    tip: "Squeeze your glutes to keep your hips up." },
+  "Bent-Arm Planche Lean": { main: ["shoulders"], also: ["chest", "triceps", "abs"],
+    steps: ["Lower to the bottom of a push-up, elbows bent and close to your sides.", "Lean your shoulders forward until your weight is over your hands.", "Hold the lean."],
+    tip: "Keep your elbows tucked into your sides." },
+  "Tuck 90° Hold": { main: ["shoulders", "triceps"], also: ["chest", "abs"],
+    steps: ["Start in a frog stand.", "Slide your knees off your arms and tuck them to your chest.", "Lean forward until your back is about level with the floor, elbows bent to 90 degrees, and hold."],
+    tip: "Keep your elbows pressed into your sides." },
+  "One-Leg 90° Hold": { main: ["shoulders", "triceps"], also: ["chest", "abs", "glutes"],
+    steps: ["Start in a tuck 90° hold.", "Straighten one leg out behind you, level with your body.", "Hold, then switch legs next time."],
+    tip: "Squeeze the straight leg's glute to keep it up." },
+  "90° Hold": { main: ["shoulders", "triceps"], also: ["chest", "abs", "glutes"],
+    steps: ["Start in a tuck 90° hold.", "Straighten both legs out behind you.", "Keep your whole body level with the floor, elbows bent to 90 degrees, and hold."],
+    tip: "Lean further forward as your legs straighten." },
   "Dumbbell Curls": { main: ["biceps"], also: [],
     steps: ["Stand tall with a dumbbell in each hand, arms down and palms facing forward.", "Keep your elbows pinned to your sides.", "Curl the weights up to your shoulders.", "Lower them slowly until your arms are straight."],
     tip: "Don't swing your body to lift the weight. If you have to, go lighter." },
@@ -1125,8 +1259,33 @@ function toast(msg) {
 }
 
 /* ================= workouts ================= */
-function myFocus() { return (me.focus || []).filter(id => FOCUS_BY_ID[id]); }
+// Calisthenics skill focus (Train tab, Calisthenics mode)
+const CALI_FOCUS = [
+  { id: "planche", label: "Planche" }, { id: "handstand", label: "Handstand" }, { id: "hspu", label: "Handstand Push-up" },
+  { id: "lsithandstand", label: "L-Sit → Handstand" }, { id: "frontlever", label: "Front Lever" }, { id: "ninety", label: "90° Hold" },
+];
+const CALI_BY_ID = Object.fromEntries(CALI_FOCUS.map(f => [f.id, f]));
+const focusLabel = id => (FOCUS_BY_ID[id] || CALI_BY_ID[id] || { label: id }).label;
+function myFocus() { return trainMode() === "calisthenics" ? (me.caliFocus || []).filter(id => CALI_BY_ID[id]) : (me.focus || []).filter(id => FOCUS_BY_ID[id]); }
+function makeCaliWorkout(t) {
+  const T = TIERS[t], focus = myFocus();
+  // a drill fits the focus if it trains one of the picked skills
+  const score = e => focus.length && e.skills.some(k => focus.includes(k)) ? 1 : 0;
+  const pool = shuffle(EXERCISES.filter(e => e.cali && (e.min || 0) <= t)).sort((a, b) => score(b) - score(a));
+  return finishWorkout(t, focus, shuffle(pool.slice(0, T.count)), "calisthenics");
+}
+function finishWorkout(t, focus, moves, mode) {
+  const T = TIERS[t];
+  const ex = moves.map(e => {
+    const amt = e.kind === "reps" ? Math.max(1, Math.round(e.base * T.mult)) : Math.max(10, Math.round(e.base * T.mult / 5) * 5);
+    const secs = e.kind === "reps" ? amt * e.spr : amt;
+    return { name: e.name, kind: e.kind, amt, secs, hint: e.hint || "", db: !!e.db };
+  });
+  const est = Math.round(T.rounds * ex.reduce((a, b) => a + b.secs + 10, 0) + (T.rounds - 1) * 45);
+  return { tier: t, mode, focus, title: pick(WORDS_A) + " " + pick(WORDS_B), ex, rounds: T.rounds, est, minSecs: Math.round(est * 0.5), startedAt: null, checks: ex.map(() => false), progress: ex.map(() => 0) };
+}
 function makeWorkout(t) {
+  if (trainMode() === "calisthenics") return makeCaliWorkout(t);
   const T = TIERS[t], focus = myFocus();
   // with a focus, a move only fits if every muscle it mainly works is one you picked
   // (score 2). Partial matches (1) are only a backup if a level ever runs out of moves.
@@ -1134,7 +1293,7 @@ function makeWorkout(t) {
   const score = e => { const x = HOWTO[e.name]; return !muscles.length || !x ? 0 : x.main.every(m => muscles.includes(m)) ? 2 : x.main.some(m => muscles.includes(m)) ? 1 : 0; };
   const rank = list => shuffle(list).sort((a, b) => score(b) - score(a)); // ties stay in random order
   const ok = e => (e.min || 0) <= t;
-  const bw = rank(EXERCISES.filter(e => ok(e) && !e.db));
+  const bw = rank(EXERCISES.filter(e => ok(e) && !e.db && !e.cali));
   const dbs = store.settings.dumbbells ? rank(EXERCISES.filter(e => ok(e) && e.db)) : [];
   // dumbbell mode: about half the moves use dumbbells, unless the other kind fits your focus better
   const wantDb = dbs.length ? Math.ceil(T.count / 2) : 0;
@@ -1145,14 +1304,7 @@ function makeWorkout(t) {
     moves.push(takeDb ? dbs.shift() : bw.shift());
     if (takeDb) nDb++;
   }
-  moves = shuffle(moves);
-  const ex = moves.map(e => {
-    const amt = e.kind === "reps" ? Math.max(1, Math.round(e.base * T.mult)) : Math.max(10, Math.round(e.base * T.mult / 5) * 5);
-    const secs = e.kind === "reps" ? amt * e.spr : amt;
-    return { name: e.name, kind: e.kind, amt, secs, hint: e.hint || "", db: !!e.db };
-  });
-  const est = Math.round(T.rounds * ex.reduce((a, b) => a + b.secs + 10, 0) + (T.rounds - 1) * 45);
-  return { tier: t, focus, title: pick(WORDS_A) + " " + pick(WORDS_B), ex, rounds: T.rounds, est, minSecs: Math.round(est * 0.5), startedAt: null, checks: ex.map(() => false), progress: ex.map(() => 0) };
+  return finishWorkout(t, focus, shuffle(moves), "lifting");
 }
 function elapsed() { return current && current.startedAt ? (Date.now() - current.startedAt) / 1000 : 0; }
 
@@ -1227,6 +1379,12 @@ const SIGNAL = {
   kneeUp: lm => hips(lm).y - Math.min(lm[J.lk].y, lm[J.rk].y),
   // how far your hips are lifted above your shoulders (glute bridges)
   hipLift: lm => shoulders(lm).y - hips(lm).y,
+  // how far upside down you are: about -2 standing, 0 in a plank, +2 in a handstand
+  invert: lm => lm[J.nose].y - feet(lm).y,
+  // how high your feet are over your shoulders (dragon flags)
+  legsUp: lm => shoulders(lm).y - feet(lm).y,
+  // how far your body leans from hanging straight down (0) to level (1); used raw, not per torso length
+  lean: lm => tilt(lm) / 90,
 };
 // Body positions. A move only counts while you're in its position, so waving, walking
 // or adjusting the phone doesn't add reps. T = torso length.
@@ -1283,6 +1441,31 @@ const POSTURE = {
   // on your back with your knees bent (glute bridges)
   bridge:     (lm, T) => tilt(lm) > 45 && Math.abs(shoulders(lm).y - hips(lm).y) < 0.6 * T && LIMB.knee.some(([a, b, c]) => seen(lm[a]) && seen(lm[b]) && seen(lm[c]) && jointAngle(lm[a], lm[b], lm[c]) < 130),
   bridgeTop:  (lm, T) => POSTURE.bridge(lm, T) && hips(lm).y < shoulders(lm).y - 0.2 * T,
+  // ---- calisthenics skills ----
+  // upside down: hips over shoulders, feet over hips, hands on the floor
+  inverted:   (lm, T) => hips(lm).y < shoulders(lm).y - 0.3 * T && feet(lm).y < hips(lm).y + 0.2 * T && handsOK(lm, w => w.y > shoulders(lm).y),
+  // straight arms, body level-ish, shoulders leaning out past the hands
+  plancheLean:(lm, T) => POSTURE.horizontal(lm, T) && (angleOf(lm, "elbow") ?? 0) > 150 && handsOK(lm, w => Math.abs(shoulders(lm).x - w.x) > 0.2 * T),
+  // balancing on straight arms with feet off the floor
+  tuckPlanche:(lm, T) => tilt(lm) > 45 && (angleOf(lm, "elbow") ?? 0) > 150 && bothFeetUp(lm, T) && hips(lm).y < shoulders(lm).y + 0.4 * T,
+  planche:    (lm, T) => POSTURE.tuckPlanche(lm, T) && Math.abs(feet(lm).y - shoulders(lm).y) < 0.5 * T,
+  // hands down, knees on elbows, feet off the floor
+  frog:       (lm, T) => tilt(lm) > 40 && bothFeetUp(lm, T) && handsOK(lm, w => w.y > shoulders(lm).y + 0.2 * T),
+  // balancing on bent arms with feet off the floor
+  tuck90:     (lm, T) => { const a = angleOf(lm, "elbow"); return tilt(lm) > 45 && a != null && a > 55 && a < 125 && bothFeetUp(lm, T); },
+  ninety:     (lm, T) => POSTURE.tuck90(lm, T) && Math.abs(feet(lm).y - shoulders(lm).y) < 0.5 * T,
+  // sitting up on your hands with your feet off the floor
+  lsitTuck:   (lm, T) => tilt(lm) < 40 && handsOK(lm, w => w.y > hips(lm).y - 0.1 * T) && bothFeetUp(lm, T),
+  lsit:       (lm, T) => POSTURE.lsitTuck(lm, T) && Math.abs(feet(lm).y - hips(lm).y) < 0.35 * T && (angleOf(lm, "knee") ?? 0) > 140,
+  seated:     (lm, T) => tilt(lm) < 45 && Math.abs(feet(lm).y - hips(lm).y) < 0.6 * T && (angleOf(lm, "knee") ?? 0) > 140,
+  // hanging from a bar: hands above your head
+  hanging:    (lm, T) => handsOK(lm, w => w.y < shoulders(lm).y - 0.2 * T),
+  hang:       (lm, T) => POSTURE.hanging(lm, T) && handsOK(lm, w => w.y < lm[J.nose].y) && tilt(lm) < 30 && feet(lm).y > hips(lm).y,
+  lever:      (lm, T) => POSTURE.hanging(lm, T) && tilt(lm) > 60,
+  // under a bar, body straight and slanted, feet on the floor
+  rowPose:    (lm, T) => { const t = tilt(lm); return t > 40 && t < 88 && handsOK(lm, w => w.y < shoulders(lm).y) && feet(lm).y > hips(lm).y; },
+  // on a bench on your upper back, shoulders lowest
+  flagPose:   (lm, T) => shoulders(lm).y > hips(lm).y - 0.2 * T,
   twist:      (lm, T) => POSTURE.floor(lm, T) && shoulders(lm).y < hips(lm).y - 0.4 * T && bothHands(lm) && gap(lm[J.lw], lm[J.rw]) < 0.5 * T,
 };
 // every arm the camera can see passes test(shoulder, elbow); at least one has to be seen
@@ -1295,6 +1478,8 @@ function handsOK(lm, test) {
   return ws.length > 0 && ws.every(test);
 }
 function bothHands(lm) { return seen(lm[J.lw]) && seen(lm[J.rw]); }
+// feet lifted clear of the floor your hands are on
+function bothFeetUp(lm, T) { const ws = [lm[J.lw], lm[J.rw]].filter(seen); return ws.length > 0 && feet(lm).y < Math.max(...ws.map(w => w.y)) - 0.1 * T; }
 const SETUP = {
   any: "Get in the picture", upright: "Stand up straight", standing: "Stand up", straight: "Stand up straight",
   horizontal: "Get into plank position", flat: "Get into position", floor: "Sit on the floor, knees bent",
@@ -1306,6 +1491,11 @@ const SETUP = {
   lowPlank: "Lower to the bottom of a push-up", doorRow: "Hold the door frame and lean back",
   allFours: "Get on your hands and knees", armsOut: "Arms straight out to the sides",
   incline: "Hands on the couch, body straight", backFlat: "Lie on your back, legs straight",
+  inverted: "Get into your handstand", plancheLean: "Lean forward, arms straight", tuckPlanche: "Balance on straight arms, feet up",
+  planche: "Balance on straight arms, body level", frog: "Knees on elbows, feet up", tuck90: "Balance on bent arms, feet up",
+  ninety: "Balance on bent arms, body level", lsitTuck: "Lift up on your hands, knees tucked", lsit: "Lift up on your hands, legs straight out",
+  seated: "Sit with your legs straight", hanging: "Hang from the bar", hang: "Hang from the bar, arms straight",
+  lever: "Lean back until you're level", rowPose: "Hang under the bar, body straight", flagPose: "Lie on the bench",
   bridge: "Lie on your back, knees bent", bridgeTop: "Lift your hips up",
 };
 // Things that must keep happening during timed moves
@@ -1356,13 +1546,16 @@ function makeTracker(spec) {
         const low = twice("lowN", a <= spec.lo), high = twice("highN", a >= spec.hi);
         // via: the rep only finishes once you're also in that position (thrusters end with the dumbbells overhead)
         const viaOK = !spec.via || twice("viaN", POSTURE[spec.via](lm, T));
+        // neg: negatives count on the way down (top first, then the bottom)
+        if (spec.neg) { if (high) st.top = true; else if (st.top && low) { st.top = false; rep(); } return; }
         if (low) st.down = true;
         else if (st.down && high && viaOK) { st.down = false; rep(); }
         return;
       }
       case "range": {
-        const v = SIGNAL[spec.f](lm) / T;
+        const v = SIGNAL[spec.f](lm) / (spec.raw ? 1 : T);
         const low = twice("lowN", v <= spec.lo), high = twice("highN", v >= spec.hi);
+        if (spec.neg) { if (high) st.top = true; else if (st.top && low) { st.top = false; rep(); } return; }
         if (low) st.down = true;
         else if (st.down && high) { st.down = false; rep(); }
         return;
@@ -1716,12 +1909,13 @@ function renderWorkout() {
   const active = current && current.startedAt;
 
   root.append(modeSwitch());
-  if (trainMode() === "calisthenics") {
-    root.append(h("div", { class: "card empty", style: "align-items:center;text-align:center;padding:32px 16px" },
-      h("span", { style: "font-size:44px;line-height:1", "aria-hidden": "true", text: "🤸" }),
-      h("h2", { text: "Calisthenics" }),
-      h("p", { class: "note", text: "Coming soon. Calisthenics workouts haven't been added yet." }),
-      active ? h("p", { class: "note", text: "Your lifting workout is still going. Switch back to Lifting to finish it." }) : null));
+  // a workout you already started in the other mode stays put until you finish or quit it
+  const curMode = current ? current.mode || "lifting" : null;
+  if (active && curMode !== trainMode()) {
+    const other = MODES.find(m => m.id === curMode).label;
+    root.append(h("div", { class: "card", style: "align-items:center;text-align:center" },
+      h("h2", { text: `Your ${other} workout is still going` }),
+      h("p", { class: "note", text: `Finish or quit it first. Switch back to ${other} to keep going.` })));
     return;
   }
 
@@ -1747,13 +1941,13 @@ function renderWorkout() {
   ));
 
   // muscle focus picker
-  const focus = myFocus(), locked = !!active || justEarned != null;
-  const setFocus = ids => { me.focus = ids; current = makeWorkout(pickedTier); saveLocalOnly(); renderWorkout(); };
+  const focus = myFocus(), locked = !!active || justEarned != null, cali = trainMode() === "calisthenics";
+  const setFocus = ids => { if (cali) me.caliFocus = ids; else me.focus = ids; current = makeWorkout(pickedTier); saveLocalOnly(); renderWorkout(); };
   root.append(h("div", { class: "card" },
-    h("div", { class: "row" }, h("h2", { text: "Focus on" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: "Pick one or more" })),
-    h("div", { class: "chips", role: "group", "aria-label": "Muscle focus" },
-      h("button", { class: "chip", "aria-pressed": String(!focus.length), disabled: locked, onclick: () => setFocus([]) }, "Full body"),
-      FOCUS.map(f => h("button", { class: "chip", "aria-pressed": String(focus.includes(f.id)), disabled: locked,
+    h("div", { class: "row" }, h("h2", { text: cali ? "Skill focus" : "Focus on" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: "Pick one or more" })),
+    h("div", { class: "chips", role: "group", "aria-label": cali ? "Skill focus" : "Muscle focus" },
+      h("button", { class: "chip", "aria-pressed": String(!focus.length), disabled: locked, onclick: () => setFocus([]) }, cali ? "All skills" : "Full body"),
+      (cali ? CALI_FOCUS : FOCUS).map(f => h("button", { class: "chip", "aria-pressed": String(focus.includes(f.id)), disabled: locked,
         onclick: () => setFocus(focus.includes(f.id) ? focus.filter(x => x !== f.id) : [...focus, f.id]) }, f.label))),
     locked && active ? h("p", { class: "note", text: "Finish or quit this workout to change your focus." }) : null));
 
@@ -1770,7 +1964,7 @@ function renderWorkout() {
     return;
   }
 
-  if (!current || current.tier !== pickedTier) { current = makeWorkout(pickedTier); saveLocalOnly(); }
+  if (!current || current.tier !== pickedTier || (!current.startedAt && (current.mode || "lifting") !== trainMode())) { current = makeWorkout(pickedTier); saveLocalOnly(); }
   const W = current, WT = TIERS[W.tier];
   const allChecked = allDone(W);
   const left = W.minSecs - elapsed();
@@ -1807,7 +2001,7 @@ function renderWorkout() {
       h("span", {}, h("b", { text: W.rounds }), W.rounds === 1 ? " round" : " rounds"),
       h("span", {}, "about ", h("b", { text: Math.max(1, Math.round(W.est / 60)) + " min" })),
       W.rounds > 1 ? h("span", {}, "rest ", h("b", { text: "45s" }), " between rounds") : null,
-      W.focus && W.focus.length ? h("span", {}, "focus ", h("b", { text: W.focus.map(id => FOCUS_BY_ID[id] ? FOCUS_BY_ID[id].label : id).join(", ") })) : null),
+      W.focus && W.focus.length ? h("span", {}, "focus ", h("b", { text: W.focus.map(focusLabel).join(", ") })) : null),
     list
   );
 
