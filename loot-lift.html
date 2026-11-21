@@ -78,7 +78,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--chalk); out
 .brand span { color: var(--p25); }
 .lvl { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .lvl-badge { font-family: var(--label); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; background: var(--chalk); color: var(--ink); padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
-.xpbar { flex: 1; height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; min-width: 70px; }
+.xpbar { flex: 1; height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; min-width: 32px; }
 .xpbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--p10), var(--p15), var(--p20), var(--p25)); border-radius: inherit; transition: width .5s; }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .stat { background: var(--panel); border-radius: 8px; padding: 6px 8px; display: flex; flex-direction: column; }
@@ -390,6 +390,9 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 .ach.done .ic { filter: none; opacity: 1; background: color-mix(in srgb, var(--r3) 22%, var(--panel)); box-shadow: 0 0 14px color-mix(in srgb, var(--r3) 45%, transparent); }
 .ach.done .pnum { color: var(--r3); }
 .ach.done::after { content: "✓"; position: absolute; top: 10px; right: 12px; font-weight: 800; color: var(--r3); }
+.namerow { flex-wrap: nowrap; }
+.namerow .nameview { flex: 1; min-width: 0; font-size: 19px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.namerow form .btn { padding-inline: 14px; }
 .lb { display: grid; grid-template-columns: 34px 38px 1fr auto; align-items: center; gap: 10px; background: var(--panel-2); border-radius: 12px; padding: 10px 12px; width: 100%; border: 1px solid transparent; text-align: left; }
 .lb.me { border-color: var(--chalk); }
 .lb .rk { font-family: var(--display); font-size: 20px; text-align: center; color: var(--dim); }
@@ -405,7 +408,7 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
 .avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--line); font-family: var(--display); font-size: 18px; }
 input[type="text"] { flex: 1; min-width: 0; font: inherit; font-size: 17px; color: var(--chalk); background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; min-height: 50px; }
 input[type="text"]::placeholder { color: var(--dim); }
-.player { font-family: var(--label); font-weight: 600; font-size: 14px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 9em; }
+.player { font-family: var(--label); font-weight: 600; font-size: 14px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 8.5em; flex-shrink: 0; }
 .install { display: flex; align-items: center; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 14px; }
 .install p { margin: 0; flex: 1; min-width: 0; }
 .install .x { background: none; border: 0; color: var(--dim); font-size: 20px; padding: 4px 8px; }
@@ -1589,7 +1592,7 @@ function renderHeader() {
   $("#sCr").textContent = S.crates.length;
   $("#sRt").textContent = ratingOf(S.room);
   const pn = $("#playerName");
-  pn.hidden = syncState === "online" || Object.keys(store.players).length < 2;
+  pn.hidden = syncState === "online";
   pn.textContent = me.name;
   const badge = $("#crateBadge");
   badge.hidden = S.crates.length === 0;
@@ -2347,9 +2350,34 @@ function renderLocalBoard(root, list) {
     h("h2", { text: "Add a player" }),
     h("p", { class: "note", text: "Everyone gets their own workouts, crates and gym. Switch players from this list." }),
     h("div", { class: "row" }, input, h("button", { class: "btn primary", type: "submit" }, "Add")));
-  const ren = h("form", { class: "row", onsubmit: e => { e.preventDefault(); const v = renIn.value.trim().slice(0, 20); if (v) { me.name = v; saveLocalOnly(); renderAll(); toast("Name saved"); } } });
-  const renIn = h("input", { id: "renamePlayer", type: "text", maxlength: "20", value: me.name, "aria-label": "Your player name" });
-  ren.append(renIn, h("button", { class: "btn ghost", type: "submit" }, "Rename"));
+  // Your name: shown as plain text. Tap Rename to edit it, then Save or Cancel.
+  const ren = h("div", { class: "row namerow" });
+  const showName = () => {
+    const renBtn = h("button", { class: "btn primary", type: "button", onclick: editName }, "Rename");
+    ren.replaceChildren(h("span", { class: "nameview", id: "nameView", text: me.name }), renBtn);
+    return renBtn;
+  };
+  function editName() {
+    const renIn = h("input", { id: "renamePlayer", type: "text", maxlength: "20", value: me.name, autocomplete: "off", enterkeyhint: "done", "aria-label": "New name" });
+    const form = h("form", { class: "row", style: "flex:1;min-width:0", onsubmit: e => {
+      e.preventDefault();
+      const v = renIn.value.trim().slice(0, 20);
+      if (!v) { toast("Type a name first"); renIn.focus(); return; }
+      me.name = v; saveLocalOnly();
+      renIn.blur(); // closes the phone keyboard so you can see the change
+      renderHeader();
+      // update your leaderboard row in place instead of redrawing the tab, so the page doesn't jump
+      const row = document.querySelector(".lb.me .who b"); if (row) row.textContent = v + " (playing)";
+      const btn = showName(); btn.textContent = "Saved ✓"; btn.disabled = true;
+      setTimeout(() => { btn.textContent = "Rename"; btn.disabled = false; }, 1600);
+      toast("You're now " + v);
+    } }, renIn,
+      h("button", { class: "btn primary", type: "submit" }, "Save"),
+      h("button", { class: "btn ghost", type: "button", onclick: () => showName().focus() }, "Cancel"));
+    ren.replaceChildren(form);
+    renIn.focus(); renIn.select();
+  }
+  showName();
   root.append(form, h("div", { class: "card" }, h("span", { class: "eyebrow", text: "Your name" }), ren));
 }
 function showGym(r, name, onSwitch) {
