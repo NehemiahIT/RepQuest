@@ -2669,13 +2669,20 @@ async function restoreBackup(code) {
 
 // Secret codes typed in Settings. Only a fingerprint of each code is kept here, not the code itself.
 const codeHash = str => { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; } return h; };
-const CODES = { 2973782296: { what: "every color theme", use: () => { S.themes = THEMES.map(t => t.id); } } };
+// once: each player can only use that code one time
+const CODES = {
+  2973782296: { what: "every color theme", use: () => { S.themes = THEMES.map(t => t.id); } },
+  4231158410: { what: "a Powerlifter crate", once: true, use: () => { S.crates.push(TOP); } },
+};
 function redeemCode(raw) {
   const code = (raw || "").trim();
   if (!code) { toast("Type a code first"); return false; }
-  const hit = CODES[codeHash(code)];
+  const key = codeHash(code), hit = CODES[key];
   if (!hit) { toast("That code doesn't work"); return false; }
-  hit.use(); save(); renderAll();
+  if (hit.once && (S.codesUsed || []).includes(key)) { toast("You already used this code"); return false; }
+  hit.use();
+  if (hit.once) S.codesUsed = [...(S.codesUsed || []), key];
+  save(); renderAll();
   toast(`Code accepted! You unlocked ${hit.what}.`);
   return true;
 }
