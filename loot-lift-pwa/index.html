@@ -376,6 +376,29 @@ section[role="tabpanel"] { display: flex; flex-direction: column; gap: 16px; }
     repeating-linear-gradient(0deg, transparent 0 6px, #00000040 6px 7px) 0 8px / 100% 22px no-repeat,
     repeating-linear-gradient(90deg, #4a5b73 0 34px, #22293a 34px 36px);
 }
+.wall.sk-marble { background:
+    linear-gradient(115deg, transparent 0 30%, #d9a53a 30.2% 30.6%, transparent 30.8%),
+    linear-gradient(160deg, transparent 0 58%, #e7b53c99 58.2% 58.6%, transparent 58.8%),
+    linear-gradient(75deg, transparent 0 74%, #c9b48a88 74.1% 74.4%, transparent 74.6%),
+    radial-gradient(circle at 30% 20%, #ffffff, #eceef2 55%, #d9dde4); }
+.flr.sk-temple { background:
+    linear-gradient(90deg, #c9d2de 0 2%, transparent 2% 98%, #c9d2de 98%),
+    repeating-linear-gradient(90deg, transparent 0 38px, #9c6b12 38px 40px),
+    repeating-linear-gradient(0deg, transparent 0 38px, #9c6b12 38px 40px),
+    linear-gradient(135deg, #fff1b0, #f2c94c 40%, #c9962a 75%, #f7dc85); }
+.flr.sk-cloudarena { background:
+    radial-gradient(ellipse 18% 20% at 15% 70%, #fff 60%, transparent 62%),
+    radial-gradient(ellipse 22% 24% at 48% 82%, #fff 60%, transparent 62%),
+    radial-gradient(ellipse 16% 18% at 82% 66%, #fff 60%, transparent 62%),
+    radial-gradient(ellipse 20% 16% at 70% 30%, #ffeedd 60%, transparent 62%),
+    linear-gradient(180deg, #ff9a62 0%, #ffcf86 45%, #ffe9c4 100%); }
+/* neon signs hang on a dark plaque so they stay readable on light walls (marble, clouds) */
+.wall .slot.sign, .wall .slot.filled.sign { background: #0b0d12e0; }
+.itemart { display: inline-grid; place-items: center; line-height: 1; }
+.itemart svg { width: 1.2em; height: 1.2em; overflow: visible; filter: drop-shadow(0 3px 3px #0008) drop-shadow(0 0 6px #f2c94c55); }
+.itemart .flame { transform-origin: 60px 40px; animation: flick .9s ease-in-out infinite; }
+@keyframes flick { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06, .94) translateY(1px); } }
+@media (prefers-reduced-motion: reduce) { .itemart .flame { animation: none; } }
 .flr.sk-track { background: repeating-linear-gradient(0deg, #b5452f 0 26px, #f2e9e4 26px 28px); }
 .flr.sk-turf {
   background:
@@ -774,9 +797,36 @@ const ITEMS = [
   { id: "star",     name: "Hall of Strength Star", e: "🌟", r: 5, slot: "wall", d: "Only for the strongest of all." },
   { id: "goat",     name: "GOAT Sign",         txt: "GOAT", r: 5, slot: "wall", d: "Greatest of all time. That's you." },
   { id: "aura",     name: "OLYMPIAN AURA Sign", txt: "OLYMPIAN AURA", r: 6, slot: "wall", d: "Only for those who have collected everything. It never stops glowing." },
+  { id: "o-barbell", name: "Golden Olympic Barbell", art: "barbell", r: 6, slot: "floor", d: "A solid gold bar loaded with silver plates." },
+  { id: "o-podium",  name: "Laurel Wreath Podium",   art: "podium",  r: 6, slot: "floor", d: "First place, every time." },
+  { id: "o-torch",   name: "Eternal Flame Torch",    art: "torch",   r: 6, slot: "floor", d: "The flame never goes out." },
+  { id: "o-atlas",   name: "Marble Statue of Atlas", art: "atlas",   r: 6, slot: "floor", d: "Holding up the world, one rep at a time." },
+  { id: "o-chariot", name: "Chariot Rower",          art: "chariot", r: 6, slot: "floor", d: "Row like you're racing to Olympus." },
+  { id: "o-medal",   name: "Gold Medal Wall",        art: "medal",   r: 6, slot: "wall",  d: "The biggest gold medal ever awarded." },
+  { id: "o-laurel",  name: "Laurel Crown",           art: "laurel",  r: 6, slot: "wall",  d: "Worn by champions of the ancient games." },
+  { id: "o-gods",    name: "GODS ONLY Sign",         txt: "GODS ONLY", r: 6, slot: "wall", d: "Mortals, keep scrolling." },
+  { id: "o-mural",   name: "Mount Olympus Mural",    art: "mural",   r: 6, slot: "wall",  d: "Home of the gods, above the clouds." },
+  { id: "o-marble",  name: "Marble Hall Walls",      sw: "marble",   r: 6, slot: "wallSkin",  d: "White marble with veins of gold." },
+  { id: "o-temple",  name: "Golden Temple Floor",    sw: "temple",   r: 6, slot: "floorSkin", d: "Polished gold tiles with a silver border." },
+  { id: "o-clouds",  name: "Cloud Arena Floor",      sw: "cloudarena", r: 6, slot: "floorSkin", d: "Lifting on clouds at sunset." },
 ];
+// Drawn art for items that aren't emoji (the Olympian set). Each is a 120x120 SVG.
+const ITEM_ART_DEFS = '<defs><linearGradient id="oaG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4b8"/><stop offset=".45" stop-color="#f2c94c"/><stop offset="1" stop-color="#a8730f"/></linearGradient><linearGradient id="oaGV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff4b8"/><stop offset=".5" stop-color="#e7b53c"/><stop offset="1" stop-color="#9c6b12"/></linearGradient><linearGradient id="oaS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#c9d2de"/><stop offset="1" stop-color="#7d8898"/></linearGradient><linearGradient id="oaM" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d6dbe3"/></linearGradient><radialGradient id="oaF" cx="50%" cy="70%" r="60%"><stop offset="0" stop-color="#fffbe0"/><stop offset=".4" stop-color="#ffd25a"/><stop offset="1" stop-color="#ff8a1f"/></radialGradient><linearGradient id="oaSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9a62"/><stop offset=".6" stop-color="#ffd08a"/><stop offset="1" stop-color="#fff0d2"/></linearGradient></defs>';
+const ITEM_ART = {
+  barbell: '<rect x="8" y="56" width="104" height="8" rx="4" fill="url(#oaG)"/><rect x="18" y="34" width="12" height="52" rx="4" fill="url(#oaS)"/><rect x="31" y="40" width="8" height="40" rx="3" fill="url(#oaS)"/><rect x="90" y="34" width="12" height="52" rx="4" fill="url(#oaS)"/><rect x="81" y="40" width="8" height="40" rx="3" fill="url(#oaS)"/><rect x="40" y="54" width="4" height="12" rx="1" fill="#9c6b12"/><rect x="76" y="54" width="4" height="12" rx="1" fill="#9c6b12"/><path d="M48 58h24" stroke="#fffbe0" stroke-width="1.5" opacity=".8"/>',
+  podium: '<rect x="40" y="58" width="40" height="44" rx="2" fill="url(#oaGV)"/><rect x="8" y="72" width="32" height="30" rx="2" fill="url(#oaS)"/><rect x="80" y="80" width="32" height="22" rx="2" fill="#c08a57"/><text x="60" y="88" text-anchor="middle" font-family="Saira Stencil One, Impact, sans-serif" font-size="20" fill="#6b4708">1</text><text x="24" y="94" text-anchor="middle" font-family="Saira Stencil One, Impact, sans-serif" font-size="14" fill="#4f5866">2</text><text x="96" y="97" text-anchor="middle" font-family="Saira Stencil One, Impact, sans-serif" font-size="12" fill="#6e4521">3</text><g fill="none" stroke="url(#oaG)" stroke-width="4" stroke-linecap="round"><path d="M48 50c-6-8-5-20 4-26"/><path d="M72 50c6-8 5-20-4-26"/></g><g fill="#f2c94c"><ellipse cx="46" cy="40" rx="3.5" ry="6" transform="rotate(-30 46 40)"/><ellipse cx="74" cy="40" rx="3.5" ry="6" transform="rotate(30 74 40)"/><ellipse cx="48" cy="30" rx="3.5" ry="6" transform="rotate(-10 48 30)"/><ellipse cx="72" cy="30" rx="3.5" ry="6" transform="rotate(10 72 30)"/></g>',
+  torch: '<g class="flame"><path d="M60 8c10 12 18 20 14 32-2 6-8 10-14 10s-12-4-14-10c-3-9 3-14 6-20 2 6 4 8 8 9-2-8-2-14 0-21z" fill="url(#oaF)"/><path d="M60 26c5 6 7 10 5 15-1 3-3 5-5 5s-4-2-5-5c-1-4 2-8 5-15z" fill="#fffbe0"/></g><path d="M44 50h32l-6 12H50z" fill="url(#oaG)"/><path d="M50 62h20l-6 50h-8z" fill="url(#oaS)"/><rect x="52" y="74" width="16" height="4" rx="1" fill="#f2c94c"/><rect x="53" y="92" width="14" height="4" rx="1" fill="#f2c94c"/>',
+  atlas: '<rect x="28" y="100" width="64" height="14" rx="2" fill="url(#oaM)"/><rect x="34" y="94" width="52" height="8" rx="2" fill="#c9d2de"/><circle cx="60" cy="24" r="19" fill="url(#oaG)"/><path d="M41 24h38M60 5v38M45 13c8 5 22 5 30 0M45 35c8-5 22-5 30 0" stroke="#9c6b12" stroke-width="1.4" fill="none" opacity=".7"/><g fill="url(#oaM)" stroke="#aeb6c2" stroke-width=".8"><path d="M50 60L40 40l6-3 10 18z"/><path d="M70 60l10-20-6-3-10 18z"/><circle cx="60" cy="52" r="7"/><path d="M48 60h24l-3 20H51z"/><path d="M51 80h9l-4 14h-12z"/><path d="M60 80h9l6 14H60z"/></g>',
+  chariot: '<rect x="14" y="78" width="86" height="7" rx="3" fill="url(#oaS)"/><path d="M70 50h30l-6 20H70z" fill="url(#oaG)"/><path d="M70 50c0-10 6-16 14-18" stroke="url(#oaG)" stroke-width="4" fill="none"/><rect x="38" y="66" width="16" height="8" rx="3" fill="#2b2f38"/><circle cx="30" cy="82" r="18" fill="none" stroke="url(#oaG)" stroke-width="5"/><g stroke="url(#oaS)" stroke-width="2.5"><path d="M30 64v36M12 82h36M17 69l26 26M43 69L17 95"/></g><circle cx="30" cy="82" r="5" fill="url(#oaG)"/><path d="M58 60h20" stroke="url(#oaS)" stroke-width="3" stroke-linecap="round"/>',
+  medal: '<path d="M38 6h16l10 40H48z" fill="#1d3fa6"/><path d="M66 6h16L72 46H56z" fill="#e0393e"/><path d="M54 6h12l-2 40h-8z" fill="#ffffff"/><circle cx="60" cy="74" r="32" fill="url(#oaG)"/><circle cx="60" cy="74" r="24" fill="none" stroke="#a8730f" stroke-width="2" opacity=".7"/><path d="M60 58l4.5 9.5 10.5 1.5-7.5 7 2 10.5-9.5-5-9.5 5 2-10.5-7.5-7 10.5-1.5z" fill="#fff4b8" stroke="#9c6b12" stroke-width="1"/>',
+  laurel: '<g fill="none" stroke="url(#oaG)" stroke-width="5" stroke-linecap="round"><path d="M56 100C26 92 14 62 26 34"/><path d="M64 100c30-8 42-38 30-66"/></g><g fill="url(#oaG)"><ellipse cx="26" cy="44" rx="5" ry="10" transform="rotate(-25 26 44)"/><ellipse cx="24" cy="62" rx="5" ry="10" transform="rotate(-50 24 62)"/><ellipse cx="32" cy="80" rx="5" ry="10" transform="rotate(-70 32 80)"/><ellipse cx="46" cy="94" rx="5" ry="10" transform="rotate(-85 46 94)"/><ellipse cx="94" cy="44" rx="5" ry="10" transform="rotate(25 94 44)"/><ellipse cx="96" cy="62" rx="5" ry="10" transform="rotate(50 96 62)"/><ellipse cx="88" cy="80" rx="5" ry="10" transform="rotate(70 88 80)"/><ellipse cx="74" cy="94" rx="5" ry="10" transform="rotate(85 74 94)"/></g><path d="M52 102l8-6 8 6" fill="none" stroke="url(#oaS)" stroke-width="4" stroke-linecap="round"/>',
+  mural: '<rect x="8" y="16" width="104" height="88" rx="3" fill="url(#oaG)"/><rect x="14" y="22" width="92" height="76" fill="url(#oaSky)"/><path d="M14 98l26-40 12 14 18-36 36 62z" fill="#7d8898"/><path d="M60 36l-7 14 7-3 5 5 5-6z" fill="#ffffff"/><circle cx="88" cy="36" r="7" fill="#fff4b8"/><g fill="#ffffff"><ellipse cx="34" cy="78" rx="16" ry="5"/><ellipse cx="80" cy="86" rx="20" ry="6"/><ellipse cx="58" cy="70" rx="12" ry="4"/></g><path d="M54 30h12v4H54z" fill="url(#oaM)"/><path d="M55 26h10l-5-4z" fill="url(#oaM)"/>',
+};
+function artEl(it, cls) { const s = h("span", { class: (cls || "em") + " itemart", "aria-hidden": "true" }); s.innerHTML = `<svg viewBox="0 0 120 120">${ITEM_ART_DEFS}${ITEM_ART[it.art]}</svg>`; return s; }
+// the picture for an item: drawn art or its emoji
+const emo = (it, cls, extra) => it.art ? artEl(it, cls) : h("span", { class: cls, text: it.e || (it.txt ? "✨" : "🎨"), ...(extra || {}) });
 const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
-const SKIN_CSS = { brick: "#7a3a2c", rubber: "#222429", neon: "linear-gradient(135deg,#3d1460,#ff3cf0)", court: "#b9824a", galaxy: "linear-gradient(135deg,#0a0b1e,#5b2ca0)", gold: "linear-gradient(135deg,#8a6417,#ffe08a)", concrete: "#3b404b", plain: "#23262d", lava: "linear-gradient(135deg,#1c0b06,#ff5a1a,#2a0f08)", clouds: "linear-gradient(135deg,#bfe3ff,#ffffff)", arena: "radial-gradient(circle at 50% 0,#fff8d6,#1b2340 70%)", platform: "linear-gradient(90deg,#111 0 20%,#c99358 20% 80%,#111 80%)", lockers: "repeating-linear-gradient(90deg,#4a5b73 0 10px,#2a3445 10px 12px)", track: "repeating-linear-gradient(0deg,#b5452f 0 8px,#f2e9e4 8px 9px)", turf: "repeating-linear-gradient(90deg,#2f8f3a 0 10px,#2a8034 10px 20px)" };
+const SKIN_CSS = { marble: "linear-gradient(115deg,transparent 0 30%,#d9a53a 30.4% 31%,transparent 31.4%),linear-gradient(160deg,transparent 0 58%,#e7b53c99 58.3% 58.9%,transparent 59.2%),radial-gradient(circle at 30% 30%,#ffffff,#eceef2 55%,#d9dde4)", temple: "linear-gradient(90deg,#c9d2de 0 6%,transparent 6% 94%,#c9d2de 94%),linear-gradient(0deg,#c9d2de 0 7%,transparent 7% 93%,#c9d2de 93%),repeating-linear-gradient(90deg,transparent 0 14px,#9c6b12 14px 15px),repeating-linear-gradient(0deg,transparent 0 14px,#9c6b12 14px 15px),linear-gradient(135deg,#fff1b0,#f2c94c 40%,#c9962a 75%,#f7dc85)", cloudarena: "radial-gradient(ellipse 30% 22% at 25% 70%,#fff 60%,transparent 62%),radial-gradient(ellipse 36% 26% at 65% 76%,#fff 60%,transparent 62%),linear-gradient(180deg,#ff9a62,#ffcf86 45%,#ffe9c4)", brick: "#7a3a2c", rubber: "#222429", neon: "linear-gradient(135deg,#3d1460,#ff3cf0)", court: "#b9824a", galaxy: "linear-gradient(135deg,#0a0b1e,#5b2ca0)", gold: "linear-gradient(135deg,#8a6417,#ffe08a)", concrete: "#3b404b", plain: "#23262d", lava: "linear-gradient(135deg,#1c0b06,#ff5a1a,#2a0f08)", clouds: "linear-gradient(135deg,#bfe3ff,#ffffff)", arena: "radial-gradient(circle at 50% 0,#fff8d6,#1b2340 70%)", platform: "linear-gradient(90deg,#111 0 20%,#c99358 20% 80%,#111 80%)", lockers: "repeating-linear-gradient(90deg,#4a5b73 0 10px,#2a3445 10px 12px)", track: "repeating-linear-gradient(0deg,#b5452f 0 8px,#f2e9e4 8px 9px)", turf: "repeating-linear-gradient(90deg,#2f8f3a 0 10px,#2a8034 10px 20px)" };
 
 // kind: reps | secs. spr = seconds per rep. min = lowest tier it shows up in. per = 2 for "each leg/side".
 // cam = how the camera checks it (home-screen app only):
@@ -2223,7 +2273,7 @@ function showHaul(total, rows, pickVal) {
   const best = rows[0].item, BR = RAR[best.r];
   const icon = (it, big) => it.txt ? h("span", { class: (big ? "big " : "em ") + neonClass(it), style: big ? "font-size:28px;padding:14px 0" : "font-size:11px", text: it.txt })
     : it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` + (big ? ";width:110px;height:72px;border-radius:12px;display:block" : "") })
-    : h("span", { class: big ? "big" : "em", text: it.e });
+    : emo(it, big ? "big" : "em");
   const newCount = rows.filter(r => r.isNew).length;
   const what = pickVal === "all" ? "crate" : RAR[+pickVal].label + " crate";
   const close = () => { $("#crateOv").hidden = true; renderAll(); };
@@ -2298,14 +2348,17 @@ function renderCrates() {
     root.append(h("div", { class: "card" }, h("h2", { text: "Recent loot" }),
       h("ul", { class: "loglist" }, S.log.slice(0, 8).map(l => {
         const it = ITEM[l.item]; if (!it) return null;
-        return h("li", { style: `--rc:${RAR[it.r].color}` }, h("span", { class: "em", text: it.e || (it.txt ? "✨" : "🎨") }), h("span", { style: "flex:1", text: it.name }), h("span", { class: "rtag " + (rarClass(it.r) || ""), text: RAR[it.r].label }));
+        return h("li", { style: `--rc:${RAR[it.r].color}` }, emo(it, "em"), h("span", { style: "flex:1", text: it.name }), h("span", { class: "rtag " + (rarClass(it.r) || ""), text: RAR[it.r].label }));
       }))));
   }
 }
 
 function rollItem(c) {
   const r = rollFrom(CRATE_DROPS[c]);
-  return pick(ITEMS.filter(i => i.r === r));
+  const pool = ITEMS.filter(i => i.r === r);
+  // Olympian crates hand out the Olympian items you don't own yet first; duplicates only once you have them all
+  if (r === OLY) { const have = ownedIds(), fresh = pool.filter(i => !have.has(i.id)); if (fresh.length) return pick(fresh); }
+  return pick(pool);
 }
 function openCrate(idx) {
   if (idx < 0 || idx >= S.crates.length) return;
@@ -2342,7 +2395,7 @@ function showReveal(item) {
       h("div", { class: "rays" }),
       item.txt ? h("div", { class: "big " + neonClass(item), text: item.txt }) :
       item.sw ? h("div", { class: "big" }, h("div", { class: "swatch", style: `width:120px;height:80px;border-radius:12px;background:${SKIN_CSS[item.sw]}` })) :
-      h("div", { class: "big", text: item.e }),
+      item.art ? artEl(item, "big") : h("div", { class: "big", text: item.e }),
       h("div", { class: "rtag " + (rarClass(item.r) || ""), text: R.label + (item.slot === "wall" ? " · wall decor" : item.slot === "floor" ? " · gym gear" : " · room style") }),
       h("div", { class: "rname", text: item.name }),
       h("p", { class: "rdesc", text: item.d })),
@@ -2376,21 +2429,23 @@ function confetti(r) {
 function slotView(id, extraClass, onClick, isTarget) {
   const it = id ? ITEM[id] : null;
   const btn = h(onClick ? "button" : "div", {
-    class: "slot " + extraClass + (it ? " filled" : "") + (it && it.r === TOP ? " pwr" : "") + (it && it.r === OLY ? " oly" : "") + (isTarget ? " target" : ""),
+    class: "slot " + extraClass + (it ? " filled" : "") + (it && it.txt ? " sign" : "") + (it && it.r === TOP ? " pwr" : "") + (it && it.r === OLY ? " oly" : "") + (isTarget ? " target" : ""),
     style: it ? `--rc:${RAR[it.r].color}` : null,
     title: it ? it.name : null,
     "aria-label": onClick ? (it ? it.name + " (tap to move to storage)" : isTarget ? "Empty spot, tap to place" : "Empty spot") : null,
     onclick: onClick
   });
-  if (it) btn.append(it.txt ? h("span", { class: neonClass(it), text: it.txt }) : h("span", { class: "sprite", text: it.e }));
+  if (it) btn.append(it.txt ? h("span", { class: neonClass(it), text: it.txt }) : emo(it, "sprite"));
   return btn;
 }
 function roomView(room, interactive) {
   const placingSlot = interactive && placing ? ITEM[placing].slot : null;
   const el = h("div", { class: "room" + (placingSlot ? " placing" : "") });
-  const wall = h("div", { class: "wall sk-" + room.wallSkin });
+  // the class comes from the style's swatch name (Neon Walls is item "neonwall" with the "neon" style)
+  const skinOf = id => (ITEM[id] && ITEM[id].sw) || id;
+  const wall = h("div", { class: "wall sk-" + skinOf(room.wallSkin) });
   room.wall.forEach((id, i) => wall.append(slotView(id, "", interactive ? () => tapSlot("wall", i) : null, placingSlot === "wall")));
-  const flr = h("div", { class: "flr sk-" + room.floorSkin });
+  const flr = h("div", { class: "flr sk-" + skinOf(room.floorSkin) });
   room.floor.forEach((id, i) => flr.append(slotView(id, "r" + Math.floor(i / 6), interactive ? () => tapSlot("floor", i) : null, placingSlot === "floor")));
   el.append(h("span", { class: "room-label", text: "Score " + ratingOf(room) }), wall, flr);
   return el;
@@ -2439,7 +2494,7 @@ function renderGym() {
   root.append(h("div", { class: "row" }, h("h2", { text: "My Gym" }), h("span", { class: "spacer" }), h("span", { class: "eyebrow", text: "Tap gear to move it" })));
   if (placing) {
     const it = ITEM[placing];
-    root.append(h("div", { class: "banner" }, h("span", { class: "em", text: it.e || "✨" }), h("span", { text: `Tap a glowing ${it.slot} spot` }), h("button", { onclick: () => { placing = null; renderGym(); } }, "Cancel")));
+    root.append(h("div", { class: "banner" }, emo(it, "em"), h("span", { text: `Tap a glowing ${it.slot} spot` }), h("button", { onclick: () => { placing = null; renderGym(); } }, "Cancel")));
   }
   root.append(roomView(S.room, true));
 
@@ -2466,7 +2521,7 @@ function renderGym() {
       const grid = h("div", { class: "invgrid" });
       items.forEach(it => grid.append(h("button", { class: "item", style: `--rc:${RAR[it.r].color}`, "aria-pressed": String(placing === it.id), onclick: () => useItem(it.id) },
         S.inv[it.id] > 1 ? h("span", { class: "ct", text: "×" + S.inv[it.id] }) : null,
-        it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` }) : it.txt ? h("span", { class: neonClass(it), style: "padding:9px 0", text: it.txt }) : h("span", { class: "em", text: it.e || "✨" }),
+        it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` }) : it.txt ? h("span", { class: neonClass(it), style: "padding:9px 0", text: it.txt }) : emo(it, "em"),
         h("span", { class: "nm", text: it.name }),
         h("span", { class: "rtag", text: RAR[it.r].label }))));
       card.append(h("div", { class: "invgroup" }, h("div", { class: "eyebrow", text: label }), grid));
@@ -2496,7 +2551,7 @@ function renderGym() {
       got ? h("span", { class: "ct got", "aria-label": "Found", text: "✓" }) : null,
       it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}`, "aria-hidden": got ? null : "true" })
         : it.txt ? h("span", { class: neonClass(it), style: "padding:9px 0", "aria-hidden": got ? null : "true", text: it.txt })
-        : h("span", { class: "em", "aria-hidden": got ? null : "true", text: it.e }),
+        : emo(it, "em", { "aria-hidden": got ? null : "true" }),
       h("span", { class: "nm", "aria-label": got ? null : "Not found yet", text: got ? it.name : "???" }),
       h("span", { class: "kind", text: it.slot === "wall" ? "Wall decor" : it.slot === "floor" ? "Gym gear" : it.slot === "wallSkin" ? "Wall style" : "Floor style" }))); });
     all.append(h("div", { class: "invgroup" },
@@ -2956,7 +3011,7 @@ function buyCrate(c) {
 function itemIcon(it) {
   return it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]}` })
     : it.txt ? h("span", { class: neonClass(it), style: "padding:9px 0", text: it.txt })
-    : h("span", { class: "em", text: it.e || "✨" });
+    : emo(it, "em");
 }
 const slotName = it => it.slot === "wall" ? "Wall decor" : it.slot === "floor" ? "Gym gear" : it.slot === "wallSkin" ? "Wall style" : "Floor style";
 function renderShop() {
@@ -3022,7 +3077,7 @@ function renderShop() {
     sellCard.append(h("div", { style: "display:flex;flex-direction:column;gap:6px" }, dups.map(it => {
       const n = sellable(it.id), each = sellPrice(it.r);
       return h("div", { class: "sellrow", style: `--rc:${RAR[it.r].color}` },
-        it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]};width:30px;height:22px;border-radius:5px` }) : it.txt ? h("span", { class: neonClass(it), style: "font-size:8px", text: it.txt }) : h("span", { class: "em", text: it.e || "✨" }),
+        it.sw ? h("span", { class: "swatch", style: `background:${SKIN_CSS[it.sw]};width:30px;height:22px;border-radius:5px` }) : it.txt ? h("span", { class: neonClass(it), style: "font-size:8px", text: it.txt }) : emo(it, "em"),
         h("span", { class: "nm" }, it.name, h("small", {}, `${n} extra · `, coinAmt(each, 14), " each")),
         h("span", { class: "btns" },
           h("button", { class: "btn", onclick: () => sellItem(it.id, 1) }, "Sell 1"),
