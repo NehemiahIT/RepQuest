@@ -1870,8 +1870,8 @@ function checkOlympian() {
   setTimeout(() => { toast("You collected every item! The Olympian crate is yours."); renderHeader(); }, 1300);
   return true;
 }
-// Daily streak: finish at least one workout every day. Every 50 days in a row earns an Olympian crate.
-const STREAK_GOAL = 50;
+// Daily streak: finish at least one workout every day. Every 30 days in a row earns an Olympian crate.
+const STREAK_GOAL = 30;
 const dayKey = d => d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
 const todayStr = () => dayKey(new Date());
 const yesterdayStr = () => { const d = new Date(); d.setDate(d.getDate() - 1); return dayKey(d); };
