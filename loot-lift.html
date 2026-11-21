@@ -2614,9 +2614,9 @@ async function makeBackup() {
 async function readBackup(text) {
   const clean = (text || "").replace(/[\s​-‍⁠﻿]+/g, "");
   const m = clean.match(/REPQUEST([12]):(?:(\d+):)?([A-Za-z0-9+/_-]+=*)/);
-  if (!m) return { error: clean ? "That isn't a Rep Quest backup code. It should start with REPQUEST." : "Paste your backup code in the box first" };
+  if (!m) return { error: clean ? "That isn't a Rep Quest backup code. It should start with REPQUEST." : "Open a backup file first" };
   let b64 = m[3].replace(/-/g, "+").replace(/_/g, "/");
-  if (m[2] && b64.length < +m[2]) return { error: `This code is cut off: it has ${b64.length.toLocaleString()} of ${(+m[2]).toLocaleString()} characters. Copy it again, or use a backup file.` };
+  if (m[2] && b64.length < +m[2]) return { error: `This code is cut off: it has ${b64.length.toLocaleString()} of ${(+m[2]).toLocaleString()} characters. Save a new backup file and try again.` };
   if (m[2]) b64 = b64.slice(0, +m[2]);
   try {
     let bytes = b64decode(b64.padEnd(Math.ceil(b64.length / 4) * 4, "="));
@@ -2624,26 +2624,9 @@ async function readBackup(text) {
     const data = JSON.parse(new TextDecoder().decode(bytes));
     if (data && data.players && typeof data.players === "object" && Object.keys(data.players).length) return { data };
   } catch {}
-  return { error: "This code is damaged or cut off. Copy it again, or use a backup file." };
+  return { error: "This backup is damaged. Save a new backup file and try again." };
 }
-let restoreArmed = false, restoreDraft = "", restoreTimer = 0; // the pasted code survives the redraw between the two Restore taps
-function showBackupText(code) {
-  const box = document.getElementById("backupOut");
-  if (!box) return;
-  box.hidden = false; box.value = code;
-  const n = document.getElementById("backupLen"); if (n) { n.hidden = false; n.textContent = `${code.length.toLocaleString()} characters. If copying failed, select all of it and copy.`; }
-}
-async function copyBackup() {
-  // Safari only allows copying during the tap, so hand it the code as a promise it can wait for
-  const codeP = makeBackup();
-  try {
-    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
-      await navigator.clipboard.write([new ClipboardItem({ "text/plain": codeP.then(c => new Blob([c], { type: "text/plain" })) })]);
-    } else await navigator.clipboard.writeText(await codeP);
-    toast("Backup code copied. Paste it in Notes to keep it safe.");
-  } catch { toast("Couldn't copy automatically. Select the code below and copy it."); }
-  showBackupText(await codeP);
-}
+let restoreArmed = false, restoreDraft = "", restoreFile = "", restoreTimer = 0; // the opened backup file waits here until you tap Restore
 async function saveBackupFile() {
   const code = await makeBackup();
   const d = new Date(), name = `rep-quest-backup-${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}.txt`;
@@ -2657,10 +2640,12 @@ async function saveBackupFile() {
 async function openBackupFile(input) {
   const f = input.files && input.files[0]; input.value = "";
   if (!f) return;
-  restoreDraft = await f.text(); restoreArmed = false;
+  const text = await f.text(), r = await readBackup(text);
+  restoreArmed = false;
+  if (r.error) { restoreDraft = ""; restoreFile = ""; renderSettings(); toast("That file isn't a Rep Quest backup, or it's damaged"); return; }
+  restoreDraft = text; restoreFile = f.name;
   renderSettings();
-  const r = await readBackup(restoreDraft);
-  toast(r.error ? r.error : "Backup file loaded. Tap Restore to use it.");
+  toast("Backup file opened. Tap Restore to use it.");
 }
 async function restoreBackup(code) {
   restoreDraft = code || "";
@@ -2673,7 +2658,7 @@ async function restoreBackup(code) {
     restoreTimer = setTimeout(() => { restoreArmed = false; if (tab === "settings") renderSettings(); }, 8000);
     return;
   }
-  clearTimeout(restoreTimer); restoreArmed = false; restoreDraft = "";
+  clearTimeout(restoreTimer); restoreArmed = false; restoreDraft = ""; restoreFile = "";
   const data = r.data;
   if (!data.settings) data.settings = { dumbbells: false };
   if (!data.players[data.active]) data.active = Object.keys(data.players)[0];
@@ -2829,23 +2814,19 @@ function renderSettings() {
         h("li", { text: "In the browser, tap Share, then Add to Home Screen. The new icon uses your theme's colors." }),
         h("li", { text: "Open the new icon, go to Settings and restore the same backup file again." }),
         h("li", { text: "Once your progress shows up in the new icon, delete the old icon from your home screen." }))) : null));
-  const restoreIn = h("textarea", { id: "restoreIn", rows: "3", placeholder: "…or paste a backup code here", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", "aria-label": "Backup code to restore", class: "codebox",
-    oninput: e => { restoreDraft = e.target.value; if (restoreArmed) { restoreArmed = false; clearTimeout(restoreTimer); renderSettings(); document.getElementById("restoreIn").focus(); } } });
-  restoreIn.value = restoreDraft;
   root.append(h("div", { class: "card" },
     h("span", { class: "eyebrow", text: "Backup & restore" }),
-    h("p", { class: "note", text: "Save everything on this phone (all players, items, coins and streaks). Use it before deleting the app, or to move to a new phone. A backup file is the safest way." }),
-    h("div", { class: "row" },
-      h("button", { class: "btn primary", type: "button", style: "flex:1", onclick: saveBackupFile }, "Save backup file"),
-      h("button", { class: "btn ghost", type: "button", style: "flex:1", onclick: copyBackup }, "Copy code")),
-    h("textarea", { id: "backupOut", rows: "3", readonly: true, hidden: true, class: "codebox", "aria-label": "Your backup code", onfocus: e => e.target.select() }),
-    h("small", { id: "backupLen", class: "note", hidden: true }),
+    h("p", { class: "note", text: "Save everything on this phone (all players, items, coins and streaks) as a file, and keep it in the Files app. Use it before deleting the app, or to move to a new phone." }),
+    h("button", { class: "btn primary wide", type: "button", onclick: saveBackupFile }, "Save backup file"),
     h("span", { class: "eyebrow", style: "margin-top:6px", text: "Restore" }),
     h("label", { class: "btn ghost", style: "display:flex;align-items:center;justify-content:center;cursor:pointer" }, "Open backup file",
       h("input", { type: "file", accept: ".txt,text/plain", hidden: true, onchange: e => openBackupFile(e.target) })),
-    restoreIn,
-    h("button", { class: "btn " + (restoreArmed ? "go" : "ghost"), type: "button", style: restoreArmed ? "--tc:var(--p25)" : null, onclick: () => restoreBackup(restoreIn.value) },
-      restoreArmed ? "Tap again to replace everything" : "Restore")));
+    restoreDraft ? h("div", { class: "infotip", style: "display:flex;flex-direction:column;gap:10px" },
+      h("span", {}, h("b", { text: "Ready to restore: " }), restoreFile || "backup file", ". This replaces everything on this phone."),
+      h("div", { class: "row", style: "flex-wrap:nowrap" },
+        h("button", { class: "btn " + (restoreArmed ? "go" : "primary"), type: "button", style: "flex:1;" + (restoreArmed ? "--tc:var(--p25)" : ""), onclick: () => restoreBackup(restoreDraft) },
+          restoreArmed ? "Tap again to replace everything" : "Restore"),
+        h("button", { class: "btn ghost", type: "button", onclick: () => { restoreDraft = ""; restoreFile = ""; restoreArmed = false; clearTimeout(restoreTimer); renderSettings(); } }, "Cancel"))) : null));
   const codeIn = h("input", { id: "secretCode", type: "text", autocomplete: "off", autocapitalize: "off", autocorrect: "off", spellcheck: "false", enterkeyhint: "done", placeholder: "Enter code", "aria-label": "Secret code" });
   root.append(h("form", { class: "card", onsubmit: e => { e.preventDefault(); if (redeemCode(codeIn.value)) codeIn.value = ""; codeIn.blur(); } },
     h("span", { class: "eyebrow", text: "Secret code" }),
